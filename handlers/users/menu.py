@@ -35,7 +35,8 @@ async def callback_inline_schedule(call: CallbackQuery):
                                 text='F.A.Q ↘', reply_markup=inline_keyboard_faq())
 
 
-@dp.callback_query_handler(text='schedule_call')
+#  Получение айди расписания из бд и отправка пользователю
+@dp.callback_query_handler(text_contains="['schedule_call'")
 async def callback_inline(call: CallbackQuery):
     logging.info(f'call = {call.data}')
     valueFromCallBack = ast.literal_eval(call.data)[1]

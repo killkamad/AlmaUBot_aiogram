@@ -11,7 +11,7 @@ def inline_keyboard_admin():
 
 def inline_keyboard_massive_send_all():
     markup = InlineKeyboardMarkup()
-    callback_button1 = InlineKeyboardButton(text="➕ Добавить фото", callback_data="add_photo_mass")
+    callback_button1 = InlineKeyboardButton(text="➕ Добавить фото или документ", callback_data="add_photo_mass")
     callback_button2 = InlineKeyboardButton(text="✔ Отправить", callback_data="send_send_to_all")
     callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")
     markup.row(callback_button1)

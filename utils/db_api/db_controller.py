@@ -5,6 +5,46 @@ from loader import db
 import logging
 
 
+async def create_table_users():
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists users(
+                id  serial unique primary key,
+                username VARCHAR (32) NOT NULL,
+                firstname VARCHAR (256),
+                lastname VARCHAR (256),
+                idT INT NOT NULL,
+                role VARCHAR (20))
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            logging.info('Table created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
+async def create_table_schedule():
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists schedule(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                id_sched VARCHAR (500),
+                name_sched VARCHAR (200))
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            logging.info('Table created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 async def select_users():
     pool: Connection = db
     try:
@@ -44,7 +84,6 @@ async def find_schedule_id(name):
         sql_select = "SELECT id_sched FROM schedule WHERE name_sched = $1;"
         record: Record = await pool.fetchrow(sql_select, name)
         record = list(record)[0]
-        # result = cursor.fetchall()[0][0]
         return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -53,10 +92,10 @@ async def find_schedule_id(name):
 async def insert_data():
     pool: Connection = db
     try:
-        async with pool.acquire() as connection:
-            async with connection.transaction():
-                sql_select = "Insert into users(username, firstname, lastname, idt) values ('cock111', 'big', 'bok', 1421423423);"
-                record: Record = await pool.fetchval(sql_select)
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_select = "Insert into users(username, firstname, lastname, idt) values ('cock111', 'big', 'bok', 1421423423);"
+            record: Record = await pool.fetchval(sql_select)
         return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -87,14 +126,14 @@ async def check_role(id, role):
 async def add_data(username_n, first_name, last_name, id):
     pool: Connection = db
     try:
-        async with pool.acquire() as connection:
-            async with connection.transaction():
-                # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idT') values (%s, %s, %s, %s)", data)
-                # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idt') values (%s, %s, %s, %s);", data) #Это для SQlite3
-                sql_ex = "Insert into users (username, firstname, lastname, idt) values ($1,$2,$3,$4)"
-                record: Record = await pool.fetchrow(sql_ex, username_n, first_name, last_name, id)
-                logging.info(f"ADD user({username_n}) to DB")
-                return record
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idT') values (%s, %s, %s, %s)", data)
+            # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idt') values (%s, %s, %s, %s);", data) #Это для SQlite3
+            sql_ex = "Insert into users (username, firstname, lastname, idt) values ($1,$2,$3,$4)"
+            record: Record = await pool.fetchrow(sql_ex, username_n, first_name, last_name, id)
+            logging.info(f"ADD user({username_n}) to DB")
+            return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
@@ -102,12 +141,12 @@ async def add_data(username_n, first_name, last_name, id):
 async def add_schedule_data(id_Telegram, id_sched, name_sched):
     pool: Connection = db
     try:
-        async with pool.acquire() as connection:
-            async with connection.transaction():
-                sql_ex = "Insert into schedule(id_Telegram, id_sched, name_sched) values ($1,$2,$3)"
-                record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_sched), str(name_sched))
-                logging.info(f"ADD schedule ({name_sched})")
-                return record
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = "Insert into schedule(id_Telegram, id_sched, name_sched) values ($1,$2,$3)"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_sched), str(name_sched))
+            logging.info(f"ADD schedule ({name_sched})")
+            return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
@@ -115,14 +154,20 @@ async def add_schedule_data(id_Telegram, id_sched, name_sched):
 async def clear_schedule_table(table_name):
     pool: Connection = db
     try:
-        async with pool.acquire() as connection:
-            async with connection.transaction():
-                sql_ex = "DELETE FROM schedule;"
-                record: Record = await pool.fetchrow(sql_ex)
-                logging.info(f"All data deleted from ({table_name} table")
-                return record
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = "DELETE FROM schedule;"
+            record: Record = await pool.fetchrow(sql_ex)
+            logging.info(f"All data deleted from ({table_name} table")
+            return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
+
+
+# Создание нужный таблиц в БД
+async def set_up_tables():
+    await create_table_users()
+    await create_table_schedule()
 
 
 async def main():

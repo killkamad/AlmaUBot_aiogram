@@ -23,11 +23,11 @@ dp = Dispatcher(bot, storage=storage)
 
 ############  Локальный сервер  ############
 async def create_pool():
-    return await asyncpg.create_pool(database='killka_m',
-                                     user='postgres',
-                                     password='batman2000',
-                                     host='localhost',
-                                     port=5432)
+    return await asyncpg.connect(database='killka_m',
+                                 user='postgres',
+                                 password='batman2000',
+                                 host='localhost',
+                                 port=5432)
 
 
 db = dp.loop.run_until_complete(create_pool())

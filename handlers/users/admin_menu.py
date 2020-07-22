@@ -1,10 +1,12 @@
 import logging
+
+from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from loader import dp, bot
 from keyboards.inline.admin_buttons import inline_keyboard_admin, inline_keyboard_massive_send_all, \
     inline_keyboard_cancel_or_send, inline_keyboard_cancel, cancel_or_send_schedule
-
+import asyncio
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -56,10 +58,15 @@ async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=ContentType.ANY, state=AdminSendAll.message_text)
 async def message_send_text(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
-        await state.update_data(message_text_all=message.text)
-        message_txt = 'Ваше сообщение:\n' + message.text + '\n (*ВЫ УВЕРЕНЫ?*)'
-        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_massive_send_all())
-        await state.reset_state(with_data=False)
+        if len(message.text) <= 990:
+            await state.update_data(message_text_all=message.text)
+            message_txt = 'Ваше сообщение:\n' + message.text + '\n (*ВЫ УВЕРЕНЫ?*)'
+            await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_massive_send_all())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id,
+                                   f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Бот может обработать максимум 1000 символов. Сократите количество и попробуйте снова',
+                                   parse_mode='HTML')
     else:
         print(message.content_type)
         await bot.send_message(message.chat.id,
@@ -68,6 +75,7 @@ async def message_send_text(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text='send_send_to_all')
 async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
+    request = 0
     data = await state.get_data()
     if len(data) == 2:
         await bot_delete_messages(call.message, 5)
@@ -76,9 +84,21 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
         users = await db.select_users()
         for i in users:
             try:
-                await bot.send_photo(i, data['photo_send_all'], caption=data['message_text_all'])
+                try:
+                    await bot.send_photo(i, data['photo_id'], caption=data['message_text_all'])
+                    # await bot.send_document(i, data['document_id'])
+                    # await bot.send_message(i, data['message_text_all'])
+                except Exception as e:
+                    await bot.send_document(i, data['document_id'], caption=data['message_text_all'])
+                    logging.info(e)
+                request += 1
+                await asyncio.sleep(0.5)
+                if request % 30 == 0:
+                    await asyncio.sleep(2)
+                    request = 0
             except Exception as e:
-                print('Наверно блокнул бота', e)
+                logging.info(f'Наверно бот заблокирован {e}')
+
         await state.reset_state()
     else:
         await bot_delete_messages(call.message, 2)
@@ -88,15 +108,27 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
         for i in users:
             try:
                 await bot.send_message(i, data['message_text_all'])
+                request += 1
+                await asyncio.sleep(0.5)
+                if request % 30 == 0:
+                    await asyncio.sleep(2)
+                    request = 0
             except Exception as e:
-                print('Наверно блокнул бота', e)
+                logging.info(f'Наверно бот заблокирован {e}')
         await state.reset_state()
 
 
+# Получение медиа файлы от пользователя для массовой рассылки
 @dp.message_handler(content_types=ContentType.ANY, state=AdminSendAll.message_photo)
 async def message_send_photo(message: types.Message, state: FSMContext):
     if message.content_type == 'photo':
-        await state.update_data(photo_send_all=message.photo[-1].file_id)
+        await state.update_data(photo_id=message.photo[-1].file_id)
+        data = await state.get_data()
+        message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n (*ВЫ УВЕРЕНЫ?*)'
+        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_cancel_or_send())
+        await state.reset_state(with_data=False)
+    elif message.content_type == 'document':
+        await state.update_data(document_id=message.document.file_id)
         data = await state.get_data()
         message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n (*ВЫ УВЕРЕНЫ?*)'
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_cancel_or_send())
@@ -149,11 +181,15 @@ async def message_schedule_send_file(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text='send_schedule', state=None)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    await bot_delete_messages(call.message, 4)
-    await db.add_schedule_data(data['user_id'], data['file_id'], data["button_name"])
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> отправлено', parse_mode='HTML')
+    try:
+        data = await state.get_data()
+        await bot_delete_messages(call.message, 4)
+        await db.add_schedule_data(data['user_id'], data['file_id'], data["button_name"])
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> отправлено', parse_mode='HTML')
+    except Exception as e:
+        await call.message.answer(f'Ошибка расписание не отправлено')
+        print(e)
 
 
 @dp.callback_query_handler(text_contains='cancel_schedule')

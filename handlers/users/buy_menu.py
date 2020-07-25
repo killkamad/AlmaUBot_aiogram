@@ -1,6 +1,6 @@
 from loader import dp
 from aiogram.types import Message, ContentType, ReplyKeyboardRemove
-from keyboards.default import menu
+from keyboards.default import menu_def_buttons
 from aiogram.dispatcher.filters import Command, Text
 
 

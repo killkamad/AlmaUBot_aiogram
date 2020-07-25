@@ -9,7 +9,7 @@ from utils.misc import rate_limit
 @dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
     text = [
-        'Главное меню:\n'
+        'Возможности бота:\n'
         '- Расписание - здесь можно посмотреть расписание\n'
         '- FAQ - часто задаваемые вопросы и ответы на них'
     ]

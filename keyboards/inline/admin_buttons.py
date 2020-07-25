@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 def inline_keyboard_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="📣 Рассылка", callback_data='send_all')
-    callback_button1 = InlineKeyboardButton(text="📤 Отправить расписание", callback_data='send_schedule_bot')
+    callback_button1 = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
     markup.add(callback_button, callback_button1)
     return markup
 

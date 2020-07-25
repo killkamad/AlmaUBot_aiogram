@@ -1,1 +1,1 @@
-from .menu import menu
+from .menu_def_buttons import always_stay_keyboard

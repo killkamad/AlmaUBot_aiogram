@@ -12,22 +12,22 @@ dp = Dispatcher(bot, storage=storage)
 
 
 ############  Удаленный сервер  ############
-# async def create_pool():
-#     # asyncpg.connect вместо asyncpg.create_pool, потому что не работает
-#     return await asyncpg.connect(database=DB_NAME,
-#                                  user=DB_USER,
-#                                  password=DB_PASS,
-#                                  host=DB_HOST,
-#                                  port=DB_PORT)
+async def create_pool():
+    # asyncpg.connect вместо asyncpg.create_pool, потому что не работает
+    return await asyncpg.connect(database=DB_NAME,
+                                 user=DB_USER,
+                                 password=DB_PASS,
+                                 host=DB_HOST,
+                                 port=DB_PORT)
 
 
 ############  Локальный сервер  ############
-async def create_pool():
-    return await asyncpg.connect(database='killka_m',
-                                 user='postgres',
-                                 password='batman2000',
-                                 host='localhost',
-                                 port=5432)
+# async def create_pool():
+#     return await asyncpg.connect(database='killka_m',
+#                                  user='postgres',
+#                                  password='batman2000',
+#                                  host='localhost',
+#                                  port=5432)
 
 
 db = dp.loop.run_until_complete(create_pool())

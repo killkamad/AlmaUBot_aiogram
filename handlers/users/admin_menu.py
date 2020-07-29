@@ -114,7 +114,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
                     await asyncio.sleep(2)
                     request = 0
             except Exception as e:
-                logging.info(f'Наверно бот заблокирован {e}')
+                logging.info(f'Наверно бот заблокирован - {e}')
         await state.reset_state()
 
 

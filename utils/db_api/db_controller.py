@@ -151,6 +151,34 @@ async def add_schedule_data(id_Telegram, id_sched, name_sched):
         logging.info(error)
 
 
+async def update_schedule_data(id_Telegram, id_sched, name_sched):
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = "Update schedule set id_Telegram = $1, id_sched = $2 Where name_sched = $3"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_sched), str(name_sched))
+            logging.info(f"UPDATED schedule ({name_sched})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Удлаение кнопки расписания
+async def delete_schedule_button(name_sched):
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = "Delete from schedule where name_sched = $1"
+            record: Record = await pool.fetchrow(sql_ex, str(name_sched))
+            logging.info(f"DELETED schedule ({name_sched})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Полная очистка таблицы с расписанием
 async def clear_schedule_table(table_name):
     pool: Connection = db
     try:

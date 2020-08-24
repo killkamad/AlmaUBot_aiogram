@@ -13,7 +13,7 @@ async def create_table_users():
             sql_ex = """
                 CREATE TABLE if not exists users(
                 id  serial unique primary key,
-                username VARCHAR (32) NOT NULL,
+                username VARCHAR (32),
                 firstname VARCHAR (256),
                 lastname VARCHAR (256),
                 idT INT NOT NULL,

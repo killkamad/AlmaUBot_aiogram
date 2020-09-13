@@ -3,7 +3,7 @@ from utils import db_api as db
 
 
 async def inline_keyboard_schedule():
-    markup = InlineKeyboardMarkup(row_width=3)
+    markup = InlineKeyboardMarkup(row_width=2)
     schedule = await db.aws_select_data_schedule()
     call_list = []
     schedule_name = []

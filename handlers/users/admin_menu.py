@@ -26,9 +26,7 @@ async def admin_menu(message):
         if await db.check_role(message.chat.id, 'admin') == 'admin':
             logging.info(f'Пользователь {message.chat.username} вошел в админ меню')
             users = await db.count_users()
-            await bot.send_message(message.chat.id, f'Меню Админа:\n- Количество пользователей = {users}\n'
-                                                    f'- Рассылка - Разослать сообщение всем пользователям\n'
-                                                    f'- Отправить расписание - отправить расписание боту',
+            await bot.send_message(message.chat.id, f'Меню Админа:\nКоличество пользователей = {users}\n',
                                    reply_markup=inline_keyboard_admin())
         else:
             await bot.send_message(message.chat.id, 'Недостаточный уровень доступа')
@@ -125,12 +123,14 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
 async def message_send_photo(message: types.Message, state: FSMContext):
     if message.content_type == 'photo':
         await state.update_data(photo_id=message.photo[-1].file_id)
+        logging.info(message.photo[-1].file_id)
         data = await state.get_data()
         message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n (*ВЫ УВЕРЕНЫ?*)'
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     elif message.content_type == 'document':
         await state.update_data(document_id=message.document.file_id)
+        logging.info(message.document.file_id)
         data = await state.get_data()
         message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n (*ВЫ УВЕРЕНЫ?*)'
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_cancel_or_send())

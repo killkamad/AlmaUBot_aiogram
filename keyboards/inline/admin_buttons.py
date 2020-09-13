@@ -4,13 +4,13 @@ import logging
 
 
 def inline_keyboard_admin():
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text="📣 Рассылка", callback_data='send_all')
     callback_button1 = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
     callback_button2 = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
     callback_button3 = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
-    markup.row(callback_button, callback_button1)
-    markup.row(callback_button2, callback_button3)
+    markup.add(callback_button, callback_button1, callback_button2, callback_button3)
+    # markup.row(callback_button2, callback_button3)
     return markup
 
 

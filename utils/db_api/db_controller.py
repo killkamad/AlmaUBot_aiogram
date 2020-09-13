@@ -204,9 +204,9 @@ async def main():
     # print(count_user)
     # for i in count_user:
     #     print(i)
-    print(await clear_schedule_table('schedule'))
+    # print(await clear_schedule_table('schedule'))
     # print(await check_id('43111'))
-    # print(await find_schedule_id('1 курс'))
+    print(await find_schedule_id('после колледжа на 3 года'))
     # print(await check_role(468899120, 'admin'))
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
 

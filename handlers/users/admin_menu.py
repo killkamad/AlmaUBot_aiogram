@@ -276,6 +276,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         print(e)
 
 
+# Успешное обновление расписания
 @dp.callback_query_handler(text='update_schedule_button', state=None)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     try:
@@ -285,6 +286,13 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> успешно обновлено', parse_mode='HTML')
         await admin_menu(call.message)
+        users = await db.select_users()
+        for i in users:
+            try:
+                await bot.send_message(i, f'Внимание, расписание для <b>{data["button_name"]}</b> было обновлено', parse_mode='HTML')
+            except Exception as e:
+                logging.info(f'Наверно бот заблокирован {e}')
+
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не обновлено, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')

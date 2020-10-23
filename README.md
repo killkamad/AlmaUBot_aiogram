@@ -1,4 +1,5 @@
 # AlmaUBot
+https://www.youtube.com/watch?v=wj1Vwq3IrL4&list=PLwVBSkoL97Q3phZRyInbM4lShvS1cBl-U&index=1 - гайд
 База данных - https://customer.elephantsql.com\
 Хостинг бота - https://heroku.com
 

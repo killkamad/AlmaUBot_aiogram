@@ -9,7 +9,7 @@ def inline_keyboard_faq():
     callback_button3 = InlineKeyboardButton(text="Как проходить промежуточная и итоговя аттестация?",
                                             callback_data="atestat")
     callback_button4 = InlineKeyboardButton(text="Как подключится к wi-fi в университете?", callback_data='u_wifi')
-    callback_button5 = InlineKeyboardButton(text="Назад", callback_data="go_back")
+    callback_button5 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
     markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4,
                callback_button5)
     return markup

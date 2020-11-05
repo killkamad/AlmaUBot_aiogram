@@ -75,7 +75,7 @@ async def inline_keyboard_update_schedule():
         call_list.append(callback_data)
     markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
                  zip(schedule_name, call_list)])
-    markup.add(InlineKeyboardButton(text="🔙 Назад", callback_data="cancel_update_step"))
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_update_step"))
     return markup
 
 
@@ -91,5 +91,5 @@ async def inline_keyboard_delete_schedule():
         call_list.append(callback_data)
     markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
                  zip(schedule_name, call_list)])
-    markup.add(InlineKeyboardButton(text="🔙 Назад", callback_data="cancel_delete_step"))
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))
     return markup

@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from keyboards.inline.callback_datas import buy_callback
+from keyboards.inline.example_callback_datas import buy_callback
 choice = InlineKeyboardMarkup(
     inline_keyboard=[
         [

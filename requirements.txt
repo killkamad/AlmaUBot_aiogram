@@ -1,5 +1,5 @@
-asyncpg
-aiogram
-aiohttp
-aiofiles
-python-dotenv
+asyncpg==0.20.1
+aiogram==2.9.2
+aiohttp==3.6.2
+aiofiles==0.6.0
+python-dotenv==0.14.0

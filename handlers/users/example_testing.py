@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from loader import dp
-from states.test import Test
+from states.example_test import Test
 
 
 @dp.message_handler(Command('test'), state=None)

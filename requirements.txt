@@ -1,5 +1,5 @@
-aiofiles
 asyncpg
 aiogram
 aiohttp
+aiofiles
 python-dotenv

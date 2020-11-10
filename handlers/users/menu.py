@@ -1,19 +1,29 @@
 import ast
 import logging
 
-from aiogram.types import CallbackQuery
-
+from aiogram.types import CallbackQuery, ContentType
+from aiogram import types
+from states.library_state import EmailReg
 from keyboards.default import always_stay_keyboard
 from keyboards.inline import inline_keyboard_library, inline_keyboard_library_faq
 from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
 from keyboards.inline.faq_buttons import inline_keyboard_faq
+from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, inline_keyboard_back_to_library
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
 from utils.misc import rate_limit
 from utils.json_loader import json_data
+
+# imports aiosmtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import aiosmtplib
+
+from aiogram.dispatcher import FSMContext
+
 
 
 @rate_limit(5, 'menu')
@@ -141,3 +151,74 @@ async def callback_inline_library(call: CallbackQuery):
     elif call.data == "go_back_library":
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text='Библиотека ↘', reply_markup=inline_keyboard_library())
+
+
+@dp.callback_query_handler(text=['library_registration'])
+async def callback_library_registration(call: CallbackQuery):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Регистрация на лицензионные базы данных\n'
+                                     'Такие как:\n'
+                                     '- IPR Books iprbookshop.ru\n'
+                                     '- Scopus scopus.com\n'
+                                     '- Web of Science webofknowledge.com\n',
+                                reply_markup=inline_keyboard_library_registration())
+
+
+@dp.callback_query_handler(text='library_registration_button',  state=None)
+async def callback_library_registration(call: CallbackQuery):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Регистрация проводится путем отправки данных в библиотеку ALMAU.\n'
+                                     '- IPR Books iprbookshop.ru\n'
+                                     '- Scopus scopus.com\n'
+                                     '- Web of Science webofknowledge.com\n'
+                                     'Если не можете здесь отправить данные то зарегестрируйтесь через сайт lib.almau.edu.kz/page/9 \n')
+    await call.message.answer('Напишите ФИО\n'
+                              'Номер телефона\n'
+                              'Вашу электронную почту\n'
+                              'Обозначтье базу данных на которую хотитие зарегистрироваться\n')
+    await EmailReg.names.set()
+
+
+@dp.message_handler(content_types=ContentType.ANY, state=EmailReg.names)
+async def SendToEmail(message: types.Message, state: FSMContext):
+    if message.content_type == 'text':
+        if len(message.text) <= 990:
+            await state.update_data(SendEmailData=message.text)
+            message_txt = 'Ваши данные:\n' + message.text 
+            await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id,
+                                   f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Бот может обработать максимум 1000 символов. Сократите количество и попробуйте снова',
+                                   parse_mode='HTML')
+    else:
+        print(message.content_type)
+        await bot.send_message(message.chat.id,
+                               'Ошибка - ваше сообщение должно содержать только текст')
+
+
+@dp.callback_query_handler(text='SendDataCancel')
+async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='ОТМЕНЕНЕНО', reply_markup=inline_keyboard_back_to_library())
+    await state.reset_state()
+
+
+@dp.callback_query_handler(text='SendEmailToLibrary')
+async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    Emailmessage = MIMEMultipart("alternative")
+    Emailmessage["From"] = "daniyar.urazbayev99@gmail.com"
+    Emailmessage["To"] = "bronislavishe@gmail.com"
+    Emailmessage["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
+
+    sending_message = MIMEText( 
+       f"<html><body><h1>Здраствуйте,  тут пришли регистрационные данные <br/> {data['SendEmailData']} </h1></body></html>", "html", "utf-8"
+    )
+
+    Emailmessage.attach(sending_message)
+    await aiosmtplib.send(Emailmessage, hostname="smtp.gmail.com", port=587, start_tls=True, recipients=["bronislavishe@gmail.com"],
+    username="daniyar.urazbayev99@gmail.com",
+    password="admin456852")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Данные отправлены, Ждите ответ на вашу почту', reply_markup=inline_keyboard_back_to_library())

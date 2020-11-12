@@ -20,7 +20,7 @@ async def create_table_users():
                 role VARCHAR (20))
                 """
             record: Record = await pool.fetchval(sql_ex)
-            logging.info('Table created')
+            print('Table users created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
@@ -39,7 +39,29 @@ async def create_table_schedule():
                 name_sched VARCHAR (200))
                 """
             record: Record = await pool.fetchval(sql_ex)
-            logging.info('Table created')
+            print('Table schedule created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
+async def create_table_lib_reg_requests():
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists lib_reg_requests(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                tg_message_id INT,
+                full_name VARCHAR (200),
+                phone VARCHAR (200),
+                email VARCHAR (200),
+                data_base VARCHAR (200))
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            print('Table lib_reg_requests created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
@@ -151,6 +173,19 @@ async def add_schedule_data(id_Telegram, id_sched, name_sched):
         logging.info(error)
 
 
+async def add_lib_reg_request_data(id_Telegram, tg_message_id, full_name, phone, email, data_base):
+    pool: Connection = db
+    try:
+        # async with pool.acquire() as connection:
+        async with pool.transaction():
+            sql_ex = "Insert into lib_reg_requests(id_Telegram, tg_message_id, full_name, phone, email, data_base) values ($1,$2,$3,$4,$5,$6)"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), int(tg_message_id), str(full_name), str(phone), str(email), str(data_base))
+            logging.info(f"ADD reg_request_data")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def update_schedule_data(id_Telegram, id_sched, name_sched):
     pool: Connection = db
     try:
@@ -196,6 +231,7 @@ async def clear_schedule_table(table_name):
 async def set_up_tables():
     await create_table_users()
     await create_table_schedule()
+    await create_table_lib_reg_requests()
 
 
 async def main():
@@ -206,9 +242,10 @@ async def main():
     #     print(i)
     # print(await clear_schedule_table('schedule'))
     # print(await check_id('43111'))
-    print(await find_schedule_id('после колледжа на 3 года'))
+    # print(await find_schedule_id('после колледжа на 3 года'))
     # print(await check_role(468899120, 'admin'))
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
+    await create_table_lib_reg_requests()
 
 
 if __name__ == '__main__':

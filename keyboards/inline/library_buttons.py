@@ -3,31 +3,20 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 def inline_keyboard_library():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="🔍 Поиск книги", callback_data='library_search')
-    callback_button1 = InlineKeyboardButton(text="⁉ Частые вопросы", callback_data='library_faq')
-    callback_button2 = InlineKeyboardButton(text="📕 Вебсайт", callback_data='library_site')
-    callback_button4 = InlineKeyboardButton(text="💡 Электронные ресурсы", callback_data='library_el_res')
-    callback_button5 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
-    markup.add(callback_button, callback_button1, callback_button2, callback_button4, callback_button5)
-    return markup
-
-
-def inline_keyboard_library_faq():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="☎ Контакты", callback_data='lib_contacts')
-    callback_button1 = InlineKeyboardButton(text="🕐 Время работы", callback_data='lib_work_time')
-    callback_button2 = InlineKeyboardButton(text="💡 Электронные ресурсы", callback_data='lib_el_res')
-    callback_button3 = InlineKeyboardButton(text="❓ Пример удаленной регистрации", callback_data='lib_reg_ex')
-    callback_button4 = InlineKeyboardButton(text="💻 Онлайн курсы", callback_data='lib_online_courses')
-    callback_button5 = InlineKeyboardButton(text="💳 Потерял ID-карту", callback_data='lib_lost_card')
-    callback_button6 = InlineKeyboardButton(text="📛 Правила", callback_data='lib_laws')
-    callback_button7 = InlineKeyboardButton(text="📰 Права читателя", callback_data='lib_rights')
-    callback_button8 = InlineKeyboardButton(text="❌ Что не разрешается", callback_data='lib_not_allow')
-    callback_button9 = InlineKeyboardButton(text="⛔ Ответственность за нарушения", callback_data='lib_responsible')
-    callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back_library")
-    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4,
-               callback_button5, callback_button6, callback_button7, callback_button8, callback_button9,
-               callback_back)
+    callback_button1 = InlineKeyboardButton(text="📕 Вебсайт", callback_data='library_site')
+    callback_button2 = InlineKeyboardButton(text="💡 Электронные ресурсы", callback_data='library_el_res')
+    callback_button3 = InlineKeyboardButton(text="☎ Контакты", callback_data='lib_contacts')
+    callback_button4 = InlineKeyboardButton(text="🕐 Время работы", callback_data='lib_work_time')
+    callback_button7 = InlineKeyboardButton(text="💻 Онлайн курсы", callback_data='lib_online_courses')
+    callback_button8 = InlineKeyboardButton(text="💳 Потерял ID-карту", callback_data='lib_lost_card')
+    callback_button9 = InlineKeyboardButton(text="📛 Правила", callback_data='lib_laws')
+    callback_button10 = InlineKeyboardButton(text="📰 Права читателя", callback_data='lib_rights')
+    callback_button11 = InlineKeyboardButton(text="❌ Что не разрешается", callback_data='lib_not_allow')
+    callback_button12 = InlineKeyboardButton(text="⛔ Ответственность за нарушения", callback_data='lib_responsible')
+    callback_button13 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
+    markup.add(callback_button1, callback_button2, callback_button3, callback_button4,
+               callback_button7, callback_button8, callback_button9, callback_button10,
+               callback_button11, callback_button12, callback_button13)
     return markup
 
 
@@ -57,12 +46,15 @@ def inline_keyboard_back_to_library():
 def inline_keyboard_library_el_res():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button1 = InlineKeyboardButton(text="Лицензионные Базы Данных", callback_data='library_registration')
-    callback_button2 = InlineKeyboardButton(text="Базы данных свободного доступа(Казахстанские)", callback_data='library_free_kaz')
-    callback_button3 = InlineKeyboardButton(text="Базы данных свободного доступа(Зарубежные)", callback_data='library_free_zarub')
+    callback_button2 = InlineKeyboardButton(text="Базы данных свободного доступа(Казахстанские)",
+                                            callback_data='library_free_kaz')
+    callback_button3 = InlineKeyboardButton(text="Базы данных свободного доступа(Зарубежные)",
+                                            callback_data='library_free_zarub')
     callback_button4 = InlineKeyboardButton(text="Онлайн библиотеки", callback_data='library_online_librares')
-    callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back_library")
-    markup.add(callback_button1, callback_button2, callback_button3, callback_button4, callback_back)
+    # callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back_library")
+    markup.add(callback_button1, callback_button2, callback_button3, callback_button4)
     return markup
+
 
 def inline_keyboard_library_base_kaz():
     markup = InlineKeyboardMarkup(row_width=1)
@@ -76,6 +68,7 @@ def inline_keyboard_library_base_kaz():
     markup.add(url_button1, url_button2, url_button3, url_button4, url_button5, url_button6, callback_back)
     return markup
     # Фонд Науки РК science-fund.kz
+
 
 def inline_keyboard_library_base_zarub():
     markup = InlineKeyboardMarkup(row_width=2)
@@ -94,15 +87,17 @@ def inline_keyboard_library_base_zarub():
     url_button13 = InlineKeyboardButton(text='Oxford Journals', url='https://academic.oup.com')
     url_button14 = InlineKeyboardButton(text='The World Bank', url='https://wdi.worldbank.org')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="library_el_res")
-    markup.add(url_button1, url_button2, url_button3, url_button4,url_button5,
+    markup.add(url_button1, url_button2, url_button3, url_button4, url_button5,
                url_button6, url_button7, url_button8, url_button9, url_button10,
-               url_button11, url_button12, url_button13, url_button14,  callback_back)
+               url_button11, url_button12, url_button13, url_button14, callback_back)
     return markup
+
 
 def inline_keyboard_library_online_bib():
     markup = InlineKeyboardMarkup(row_width=1)
     url_button1 = InlineKeyboardButton(text='Единая Электронная Библиотека', url='https://elibrary.kz')
-    url_button2 = InlineKeyboardButton(text='Казахстанская Национальная Электронная Библиотека', url='https://kazneb.kz')
+    url_button2 = InlineKeyboardButton(text='Казахстанская Национальная Электронная Библиотека',
+                                       url='https://kazneb.kz')
     url_button3 = InlineKeyboardButton(text='Мировая Цифровая Библиотека', url='https://wdl.org')
     url_button4 = InlineKeyboardButton(text='Научная Электронная Библиотека', url='https://elibrary.ru')
     url_button5 = InlineKeyboardButton(text='Онлайн Библиотека MyBrary', url='https://mybrary.ru')
@@ -110,6 +105,6 @@ def inline_keyboard_library_online_bib():
     url_button7 = InlineKeyboardButton(text='Электронно-Библиотечная Система Лань', url='https://e.lanbook.com')
     url_button8 = InlineKeyboardButton(text='ЮРАЙТ Легендарные Книги', url='https://biblio-online.ru')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="library_el_res")
-    markup.add(url_button1, url_button2, url_button3, url_button4, url_button5, url_button6, url_button7, url_button8, callback_back)
+    markup.add(url_button1, url_button2, url_button3, url_button4, url_button5, url_button6, url_button7, url_button8,
+               callback_back)
     return markup
-

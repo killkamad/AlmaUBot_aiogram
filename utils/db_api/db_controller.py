@@ -54,7 +54,6 @@ async def create_table_lib_reg_requests():
                 CREATE TABLE if not exists lib_reg_requests(
                 id  serial unique primary key,
                 id_Telegram INT NOT NULL,
-                tg_message_id INT,
                 full_name VARCHAR (200),
                 phone VARCHAR (200),
                 email VARCHAR (200),
@@ -178,8 +177,8 @@ async def add_lib_reg_request_data(id_Telegram, tg_message_id, full_name, phone,
     try:
         # async with pool.acquire() as connection:
         async with pool.transaction():
-            sql_ex = "Insert into lib_reg_requests(id_Telegram, tg_message_id, full_name, phone, email, data_base) values ($1,$2,$3,$4,$5,$6)"
-            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), int(tg_message_id), str(full_name), str(phone), str(email), str(data_base))
+            sql_ex = "Insert into lib_reg_requests(id_Telegram, full_name, phone, email, data_base) values ($1,$2,$3,$4,$5)"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email), str(data_base))
             logging.info(f"ADD reg_request_data")
             return record
     except(Exception, ErrorInAssignmentError) as error:

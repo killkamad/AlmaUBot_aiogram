@@ -18,3 +18,10 @@ def keyboard_library():
                callback_button7, callback_button8, callback_button9, callback_button10,
                callback_button11, callback_button12, callback_button13)
     return markup
+
+
+def keyboard_library_choice_db():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("IPR Books", "Scopus")
+    markup.add("Web of Science")
+    return markup

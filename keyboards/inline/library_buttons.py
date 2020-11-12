@@ -22,7 +22,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 def inline_keyboard_library_registration():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Зарегестрироваться", callback_data='library_registration_button')
+    callback_button = InlineKeyboardButton(text="Зарегистрироваться", callback_data='library_registration_button')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_library_el_res")
     markup.add(callback_button, callback_back)
     return markup
@@ -66,7 +66,7 @@ def inline_keyboard_library_base_kaz():
     url_button5 = InlineKeyboardButton(text='Официальный Сайт Президента РК', url='https://akorda.kz')
     url_button6 = InlineKeyboardButton(text='Фонд Науки РК', url='science-fund.kz')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_library_el_res")
-    markup.add(url_button1, url_button2, url_button3, url_button4, url_button5, url_button6, callback_back)
+    markup.add(url_button1, url_button2, url_button3, url_button4, url_button5, url_button6)
     markup.row(callback_back)
     return markup
     # Фонд Науки РК science-fund.kz
@@ -77,8 +77,8 @@ def inline_keyboard_library_base_zarub():
     markup = InlineKeyboardMarkup(row_width=2)
     url_button1 = InlineKeyboardButton(text='Australian Business Deans Council', url='https://abdc.edu.au')
     url_button2 = InlineKeyboardButton(text='bookboon', url='https://bookboon.com')
-    url_button4 = InlineKeyboardButton(text='Cambridge University Press', url='https://doaj.org')
-    url_button5 = InlineKeyboardButton(text='Directory of Open Access Journals', url='https://cambridge.org')
+    url_button4 = InlineKeyboardButton(text='Cambridge University Press', url='https://www.cambridge.org')
+    url_button5 = InlineKeyboardButton(text='Directory of Open Access Journals', url='https://doaj.org')
     url_button6 = InlineKeyboardButton(text='EBSCO', url='https://go.ebsco.com')
     url_button7 = InlineKeyboardButton(text='eldis', url='https://eldis.org')
     url_button8 = InlineKeyboardButton(text='Emerald Publishing', url='https://emeraldgrouppublishing.com')

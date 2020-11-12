@@ -23,5 +23,6 @@ def keyboard_library():
 def keyboard_library_choice_db():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("IPR Books", "Scopus")
-    markup.add("Web of Science")
+    markup.add("Web of Science", "ЮРАЙТ")
+    markup.add("Polpred", "РМЭБ")
     return markup

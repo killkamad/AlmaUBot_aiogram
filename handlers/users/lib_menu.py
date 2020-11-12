@@ -126,7 +126,10 @@ async def callback_library_registration(call: CallbackQuery):
                                      'Такие как:\n'
                                      '- IPR Books iprbookshop.ru\n'
                                      '- Scopus scopus.com\n'
-                                     '- Web of Science webofknowledge.com\n',
+                                     '- Web of Science webofknowledge.com\n'
+                                     '- Образовательная Платформа ЮРАЙТ urait.ru\n'
+                                     '- Электронно-Библиотечная Система Polpred polpred.com\n'
+                                     '- Республиканская Межвузовская Электронная Библиотека rmebrk.kz',
                                 reply_markup=inline_keyboard_library_registration())
 
 

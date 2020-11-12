@@ -10,7 +10,7 @@ from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
 from keyboards.inline.faq_buttons import inline_keyboard_faq
-from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, inline_keyboard_back_to_library
+from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, inline_keyboard_back_to_library, inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -202,6 +202,33 @@ async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='ОТМЕНЕНЕНО', reply_markup=inline_keyboard_back_to_library())
     await state.reset_state()
+
+
+
+@dp.callback_query_handler(text='library_el_res')
+async def callback_el_res(call: CallbackQuery):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Электронные ресурсы\n',
+                                reply_markup=inline_keyboard_library_el_res())
+
+@dp.callback_query_handler(text=['library_free_kaz', 'library_free_zarub', 'library_online_librares'])
+async def callback_el_res_choise(call: CallbackQuery):
+    # logging.info(f'call = {call.data}')
+    if call.data == "library_free_kaz":
+        text = "Базы данных свободного доступа(Казахстанские)"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=text,
+                                reply_markup=inline_keyboard_library_base_kaz())
+    elif call.data == "library_free_zarub":
+        text = "Базы данных свободного доступа(Зарубежные)"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=text,
+                                reply_markup=inline_keyboard_library_base_zarub())
+    elif call.data == "library_online_librares":
+        text = "Онлайн Библиотеки"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=text,
+                                reply_markup=inline_keyboard_library_online_bib())
 
 
 @dp.callback_query_handler(text='SendEmailToLibrary')

@@ -85,37 +85,51 @@ async def callback_library_registration(call: CallbackQuery):
                                 reply_markup=inline_keyboard_library_registration())
 
 
-@dp.callback_query_handler(text='library_registration_button', state=None)
+@dp.callback_query_handler(text='library_registration_button',  state=None)
 async def callback_library_registration(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Регистрация проводится путем отправки данных в библиотеку ALMAU.\n'
-                                     '- IPR Books iprbookshop.ru\n'
-                                     '- Scopus scopus.com\n'
-                                     '- Web of Science webofknowledge.com\n'
                                      'Если не можете здесь отправить данные то зарегестрируйтесь через сайт lib.almau.edu.kz/page/9 \n')
-    await call.message.answer('Напишите ФИО\n'
-                              'Номер телефона\n'
-                              'Вашу электронную почту\n'
-                              'Обозначтье базу данных на которую хотитие зарегистрироваться\n')
-    await EmailReg.names.set()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add("IPR Books", "Scopus")
+    markup.add("Web of Science")
+    await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться/n', reply_markup=markup)
+    await EmailReg.bookbase.set()
+
+@dp.message_handler(state=EmailReg.bookbase)
+async def process_name(message: types.Message, state: FSMContext):
+    markup = types.ReplyKeyboardRemove()
+    async with state.proxy() as data:
+        data['bookbase'] = message.text
+    await EmailReg.next()
+    await message.reply("Напишите ваше ФИО",reply_markup=markup)
+
+@dp.message_handler(state=EmailReg.names)
+async def process_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['names'] = message.text
+    await EmailReg.next()
+    await message.reply("Напишите ваш Email")
+
+@dp.message_handler(state=EmailReg.email)
+async def process_name(message: types.Message, state: FSMContext):
+    # markup_request = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    # markup_request.add(types.KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
+    async with state.proxy() as data:
+        data['email'] = message.text
+    await EmailReg.next()
+    await message.reply("Отправьте свой номер телефона")
+    # , reply_markup=markup_request
 
 
-@dp.message_handler(content_types=ContentType.ANY, state=EmailReg.names)
+@dp.message_handler(content_types=ContentType.ANY, state=EmailReg.phone)
 async def SendToEmail(message: types.Message, state: FSMContext):
-    if message.content_type == 'text':
-        if len(message.text) <= 990:
-            await state.update_data(SendEmailData=message.text)
-            message_txt = 'Ваши данные:\n' + message.text
-            await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
-            await state.reset_state(with_data=False)
-        else:
-            await bot.send_message(message.chat.id,
-                                   f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Бот может обработать максимум 1000 символов. Сократите количество и попробуйте снова',
-                                   parse_mode='HTML')
-    else:
-        print(message.content_type)
-        await bot.send_message(message.chat.id,
-                               'Ошибка - ваше сообщение должно содержать только текст')
+    async with state.proxy() as data:
+        data['phone'] = message.text
+    
+    message_txt = 'Ваши данные:\n ФИО: ' + data['names'] + '\n Ваш email ' + data['email'] + '\n Ваш телефон: ' + str(data['phone']) + '\n Желаемая база регистрации: ' + data['bookbase']
+    await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
+    await state.reset_state(with_data=False)
 
 
 @dp.callback_query_handler(text='SendDataCancel')
@@ -160,19 +174,19 @@ async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMCont
     Emailmessage["To"] = "bronislavishe@gmail.com"
     Emailmessage["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
 
-    sending_message = MIMEText(
-        f"<html><body><h1>Здраствуйте,  тут пришли регистрационные данные <br/> {data['SendEmailData']} </h1></body></html>",
-        "html", "utf-8"
+    sending_message = MIMEText( 
+       f"<html><body><h1>Здраствуйте,  тут пришли регистрационные данные <br/> ФИО {data['names']} <br/> Email {data['email']} <br/> Тел. {data['phone']}  <br/> База Данных {data['bookbase']} </h1></body></html>", "html", "utf-8"
     )
 
     Emailmessage.attach(sending_message)
-    await aiosmtplib.send(Emailmessage, hostname="smtp.gmail.com", port=587, start_tls=True,
-                          recipients=["bronislavishe@gmail.com"],
-                          username="daniyar.urazbayev99@gmail.com",
-                          password="admin456852")
+    await aiosmtplib.send(Emailmessage, hostname="smtp.gmail.com", port=587, start_tls=True, recipients=["bronislavishe@gmail.com"],
+    username="daniyar.urazbayev99@gmail.com",
+    password="admin456852")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Данные отправлены, Ждите ответ на вашу почту',
-                                reply_markup=inline_keyboard_back_to_library())
+                                text='Данные отправлены, Ждите ответ на вашу почту', reply_markup=inline_keyboard_back_to_library())
+
+
+
 
 
 @rate_limit(1)

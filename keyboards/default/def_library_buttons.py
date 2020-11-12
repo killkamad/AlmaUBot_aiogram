@@ -8,7 +8,7 @@ def keyboard_library():
     callback_button3 = KeyboardButton(text="☎ Контакты")
     callback_button4 = KeyboardButton(text="🕐 Время работы")
     callback_button7 = KeyboardButton(text="💻 Онлайн курсы")
-    callback_button8 = KeyboardButton(text="💳 Потерял ID-карту")
+    callback_button8 = KeyboardButton(text="💳 Потерял(a) ID-карту")
     callback_button9 = KeyboardButton(text="📛 Правила")
     callback_button10 = KeyboardButton(text="📰 Права читателя")
     callback_button11 = KeyboardButton(text="❌ Что не разрешается")

@@ -75,7 +75,7 @@ from aiogram.dispatcher import FSMContext
 @rate_limit(1)
 @dp.message_handler(
     lambda message: message.text in ['📕 Вебсайт', '💡 Электронные ресурсы', '☎ Контакты', '🕐 Время работы',
-                                     '💻 Онлайн курсы', '💳 Потерял ID-карту', '📛 Правила', '📰 Права читателя',
+                                     '💻 Онлайн курсы', '💳 Потерял(a) ID-карту', '📛 Правила', '📰 Права читателя',
                                      '❌ Что не разрешается', '⛔ Ответственность за нарушения', '⬅ В главное меню'])
 async def library_text_buttons_handler(message: types.Message):
     # Кнопки БИБЛИОТЕКИ
@@ -95,7 +95,7 @@ async def library_text_buttons_handler(message: types.Message):
     elif message.text == '💻 Онлайн курсы':
         text = (await json_data())['lib_answers']['lib_online_courses']
         await bot.send_message(message.chat.id, text=text)
-    elif message.text == '💳 Потерял ID-карту':
+    elif message.text == '💳 Потерял(a) ID-карту':
         text = (await json_data())['lib_answers']['lib_lost_card']
         await bot.send_message(message.chat.id, text=text)
     elif message.text == '📛 Правила':
@@ -232,25 +232,38 @@ async def callback_el_res_choice(call: CallbackQuery):
 @dp.callback_query_handler(text='SendEmailToLibrary')
 async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    await db.add_lib_reg_request_data(call.message.chat.id, call.message.message_id, data['names'], data['phone'], data['email'],
+    await db.add_lib_reg_request_data(call.message.chat.id, call.message.message_id, data['names'], data['phone'],
+                                      data['email'],
                                       data['bookbase'])
-    Emailmessage = MIMEMultipart("alternative")
-    Emailmessage["From"] = "daniyar.urazbayev99@gmail.com"
-    # Emailmessage["To"] = "bronislavishe@gmail.com"
-    Emailmessage["To"] = "killka_m@mail.ru"
-    Emailmessage["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
+    email_message = MIMEMultipart("alternative")
+    email_message["From"] = "almaubot@gmail.com"
+    email_message["To"] = "killka_m@mail.ru"
+    email_message["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
 
     sending_message = MIMEText(
-        f"<html><body><h1>Здраствуйте, тут пришли регистрационные данные <br/> ФИО - {data['names']} <br/> Email - {data['email']} <br/> Телефон - {data['phone']}  <br/> База Данных - {data['bookbase']} </h1></body></html>",
+        f"<html>"
+        f"<body>"
+        f"<h1>"
+        f"Пришли регистрационные данные: <br/>"
+        f"ФИО - {data['names']} <br/> "
+        f"Email - {data['email']} <br/> "
+        f"Телефон - {data['phone']}  <br/> "
+        f"База Данных - {data['bookbase']}"
+        f"</h1>"
+        f"</body>"
+        f"</html>",
         "html", "utf-8"
     )
 
-    Emailmessage.attach(sending_message)
-    await aiosmtplib.send(Emailmessage, hostname="smtp.gmail.com", port=587, start_tls=True,
-                          recipients=["killka_m@mail.ru"],
-                          username="daniyar.urazbayev99@gmail.com",
-                          password="admin456852")
+    email_message.attach(sending_message)
+    await aiosmtplib.send(email_message,
+                          hostname="smtp.gmail.com",
+                          port=587,
+                          start_tls=True,
+                          # recipients=["killka_m@mail.ru"],
+                          username="almaubot@gmail.com",
+                          password="almaubot12345")
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await bot.send_message(chat_id=call.message.chat.id,
-                           text='Запрос на ругистрацию успешно отправлен, Ожидайте ответа на указанную почту',
+                           text='Запрос на регистрацию успешно отправлен, ожидайте ответа на указанную почту',
                            reply_markup=keyboard_library())

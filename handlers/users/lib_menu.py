@@ -74,15 +74,15 @@ from aiogram.dispatcher import FSMContext
 
 @rate_limit(1)
 @dp.message_handler(
-    lambda message: message.text in ['📕 Вебсайт', '💡 Электронные ресурсы', '☎ Контакты', '🕐 Время работы',
-                                     '💻 Онлайн курсы', '💳 Потерял(a) ID-карту', '📛 Правила', '📰 Права читателя',
-                                     '❌ Что не разрешается', '⛔ Ответственность за нарушения', '⬅ В главное меню'])
+    lambda message: message.text in ['🌐 Вебсайт', '⚡ Электронные ресурсы', '☎ Контакты', '🕐 Время работы',
+                                     '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила', '📰 Права читателя',
+                                     '🚫 Что не разрешается', '⛔ Ответственность за нарушения', '⬅ В главное меню'])
 async def library_text_buttons_handler(message: types.Message):
     # Кнопки БИБЛИОТЕКИ
-    if message.text == '📕 Вебсайт':
+    if message.text == '🌐 Вебсайт':
         text = (await json_data())['lib_answers']['library_site']
-        await bot.send_message(message.chat.id, text=text, parse_mode='HTML')
-    elif message.text == '💡 Электронные ресурсы':
+        await bot.send_message(message.chat.id, text=text, parse_mode='HTML', disable_web_page_preview=True)
+    elif message.text == '⚡ Электронные ресурсы':
         await bot.send_message(chat_id=message.chat.id,
                                text='Электронные ресурсы\n',
                                reply_markup=inline_keyboard_library_el_res())
@@ -92,19 +92,19 @@ async def library_text_buttons_handler(message: types.Message):
     elif message.text == '🕐 Время работы':
         text = (await json_data())['lib_answers']['lib_work_time']
         await bot.send_message(message.chat.id, text=text)
-    elif message.text == '💻 Онлайн курсы':
+    elif message.text == '🎓 Онлайн курсы':
         text = (await json_data())['lib_answers']['lib_online_courses']
-        await bot.send_message(message.chat.id, text=text)
+        await bot.send_message(message.chat.id, text=text, disable_web_page_preview=True)
     elif message.text == '💳 Потерял(a) ID-карту':
         text = (await json_data())['lib_answers']['lib_lost_card']
         await bot.send_message(message.chat.id, text=text)
-    elif message.text == '📛 Правила':
+    elif message.text == '⚠ Правила':
         text = (await json_data())['lib_answers']['lib_laws']
         await bot.send_message(message.chat.id, text=text)
     elif message.text == '📰 Права читателя':
         text = (await json_data())['lib_answers']['lib_rights']
         await bot.send_message(message.chat.id, text=text)
-    elif message.text == '❌ Что не разрешается':
+    elif message.text == '🚫 Что не разрешается':
         text = (await json_data())['lib_answers']['lib_not_allow']
         await bot.send_message(message.chat.id, text=text)
     elif message.text == '⛔ Ответственность за нарушения':

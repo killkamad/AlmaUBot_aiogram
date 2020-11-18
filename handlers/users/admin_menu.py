@@ -24,31 +24,34 @@ from utils.misc import rate_limit
 async def admin_menu(message):
     try:
         if await db.check_role(message.chat.id, 'admin') == 'admin':
-            logging.info(f'Пользователь {message.chat.username} вошел в админ меню')
+            logging.info(f'User({message.chat.id}) вошел в админ меню')
             users = await db.count_users()
             await bot.send_message(message.chat.id, f'Меню Админа:\nКоличество пользователей = {users}\n',
                                    reply_markup=inline_keyboard_admin())
         else:
             await bot.send_message(message.chat.id, 'Недостаточный уровень доступа')
-            logging.info(f'Пользователь {message.chat.username} попытался войти в админ меню')
+            logging.info(f'User({message.chat.id}) попытался войти в админ меню')
     except Exception as e:
         logging.info(f'Ошибка - {e}')
 
 
 @dp.callback_query_handler(text='send_all', state=None)
 async def callback_inline_send_all(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку 📣 Рассылка')
     await call.message.answer('Напишите текст сообщения для массовой рассылки:')
     await SendAll.message_text.set()
 
 
 @dp.callback_query_handler(text='add_photo_mass')
 async def callback_inline_add_photo_mass(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку ➕ Добавить фото или документ')
     await bot.send_message(call.message.chat.id, 'Прикрепите фото к сообщению')
     await SendAll.message_photo.set()
 
 
 @dp.callback_query_handler(text='cancel')
 async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку ❌ Отмена')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='ОТМЕНЕНЕНО')
     await bot_delete_messages(call.message, 3)
@@ -75,6 +78,7 @@ async def message_send_text(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text='send_send_to_all')
 async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку "✔ Отправить" всем пользователям')
     request = 0
     data = await state.get_data()
     if len(data) == 2:
@@ -144,6 +148,7 @@ async def message_send_photo(message: types.Message, state: FSMContext):
 #### Отправка расписания ####
 @dp.callback_query_handler(text='send_schedule_bot', state=None)
 async def callback_inline_send_schedule_bot(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await call.message.answer('Напишите название для кнопки, например (3 Курс):', reply_markup=inline_keyboard_cancel())
     await SendScheduleToBot.button_name.set()
 
@@ -151,6 +156,7 @@ async def callback_inline_send_schedule_bot(call: CallbackQuery):
 #### Обновление расписания ####
 @dp.callback_query_handler(text='update_schedule_bot', state=None)
 async def callback_inline_update_schedule_bot(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_update_schedule())
@@ -160,6 +166,7 @@ async def callback_inline_update_schedule_bot(call: CallbackQuery):
 #### ОТМЕНА Обновление расписания
 @dp.callback_query_handler(text='cancel_update_step', state=UpdateSchedule.button_name)
 async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     users = await db.count_users()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Меню Админа:\n- Количество пользователей = {users}\n'
@@ -171,7 +178,7 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 
 @dp.callback_query_handler(text_contains="['upd_sch'", state=UpdateSchedule.button_name)
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext):
-    logging.info(f'call_back = {call.data}')
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     schedule_button_name = ast.literal_eval(call.data)[1]
     await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -201,6 +208,7 @@ async def change_schedule_id(message: types.Message, state: FSMContext):
 #### Удаление расписания ####
 @dp.callback_query_handler(text='delete_schedule_bot', state=None)
 async def callback_inline_send_schedule_bot(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для удаление:',
                                 reply_markup=await inline_keyboard_delete_schedule())
@@ -210,6 +218,7 @@ async def callback_inline_send_schedule_bot(call: CallbackQuery):
 #### ОТМЕНА Удаления расписания
 @dp.callback_query_handler(text='cancel_delete_step', state=DeleteSchedule.button_name)
 async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     users = await db.count_users()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Меню Админа:\n- Количество пользователей = {users}\n'
@@ -221,7 +230,7 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 
 @dp.callback_query_handler(text_contains="['del_sch'", state=DeleteSchedule.button_name)
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext):
-    logging.info(f'call_back = {call.data}')
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     schedule_button_name = ast.literal_eval(call.data)[1]
     await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -232,11 +241,13 @@ async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext
 
 @dp.callback_query_handler(text='cancel_step', state=['*'])
 async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='<b>Отправка расписания отменена</b>', parse_mode='HTML')
     await state.reset_state()
 
 
+# Проверка сообщения на текст, если текст, то сохраняет это сообщение и айди в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendScheduleToBot.button_name)
 async def message_send_button_name(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
@@ -250,6 +261,7 @@ async def message_send_button_name(message: types.Message, state: FSMContext):
                                'Ошибка - название может содержать только текст\nПовторите название для кнопки, например (3 Курс):')
 
 
+# Проверка если отправлен файл, то сохраняет айди файла в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendScheduleToBot.send_file)
 async def message_schedule_send_file(message: types.Message, state: FSMContext):
     if message.content_type == 'document':
@@ -263,6 +275,7 @@ async def message_schedule_send_file(message: types.Message, state: FSMContext):
         await message.answer('Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием')
 
 
+# Отправление расписания в базу данных
 @dp.callback_query_handler(text='send_schedule', state=None)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     try:
@@ -271,12 +284,13 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         await db.add_schedule_data(data['user_id'], data['file_id'], data["button_name"])
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> отправлено', parse_mode='HTML')
+        logging.info(f'User({call.message.chat.id}) отправил расписание для {data["button_name"]}')
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не отправлено, (Ошибка - {e})')
         print(e)
 
 
-# Успешное обновление расписания
+# Успешное обновление расписания в базе данных
 @dp.callback_query_handler(text='update_schedule_button', state=None)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     try:
@@ -285,10 +299,12 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         await db.update_schedule_data(data['user_id'], data['file_id'], data["button_name"])
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> успешно обновлено', parse_mode='HTML')
+        logging.info(f'User({call.message.chat.id}) обновил расписание для {data["button_name"]}')
         users = await db.select_users()
         for i in users:
             try:
-                await bot.send_message(i, f'Внимание, расписание для <b>{data["button_name"]}</b> было обновлено', parse_mode='HTML')
+                await bot.send_message(i, f'Внимание, расписание для <b>{data["button_name"]}</b> было обновлено',
+                                       parse_mode='HTML')
             except Exception as e:
                 logging.info(f'Наверно бот заблокирован {e}')
         await admin_menu(call.message)
@@ -298,6 +314,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         logging.info(f'Ошибка - {e}')
 
 
+# Удаление расписания из базы данных
 @dp.callback_query_handler(text='delete_schedule_button', state=DeleteSchedule.confirm_delete)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     try:
@@ -312,6 +329,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         # await call.message.answer(f'Расписание для <b>{data["button_name"]}</b> успешно удалено из базы данных',
         #                           parse_mode='HTML')
         await state.reset_state()
+        logging.info(f'User({call.message.chat.id}) удалил расписание для {data["button_name"]}')
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не удалено, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')
@@ -319,6 +337,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text_contains='cancel_schedule')
 async def callback_inline_cancel_schedule(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) отменил отправку расписания call.data - {call.data}')
     await bot_delete_messages(call.message, 4)
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await call.message.answer('<b>Отправка расписания отменена</b>', parse_mode='HTML')
@@ -327,6 +346,7 @@ async def callback_inline_cancel_schedule(call: CallbackQuery, state: FSMContext
 
 @dp.callback_query_handler(text_contains='cancel_update_schedule')
 async def callback_inline_cancel_update_schedule(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) отменил обновления расписания call.data - {call.data}')
     await bot_delete_messages(call.message, 2)
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await call.message.answer('<b>Обновление|Изменение отменено</b>', parse_mode='HTML')
@@ -336,6 +356,7 @@ async def callback_inline_cancel_update_schedule(call: CallbackQuery, state: FSM
 
 @dp.callback_query_handler(text_contains='cancel_delete_schedule', state=DeleteSchedule.confirm_delete)
 async def callback_inline_cancel_delete_schedule(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) отменил удаление расписания call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='<b>Удаление отмененено</b>', parse_mode='HTML')
     # await call.message.answer('<b>Удаление отмененено</b>', parse_mode='HTML')

@@ -26,3 +26,10 @@ def keyboard_library_choice_db():
     markup.add("Web of Science", "ЮРАЙТ")
     markup.add("Polpred", "РМЭБ")
     return markup
+
+
+def keyboard_library_send_phone():
+    markup = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    button_phone = KeyboardButton(text="☎ Отправить номер телефона", request_contact=True)
+    markup.add(button_phone)
+    return markup

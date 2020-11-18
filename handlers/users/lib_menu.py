@@ -3,7 +3,8 @@ import logging
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
-from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_library_choice_db
+from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_library_choice_db, \
+    keyboard_library_send_phone
 from keyboards.inline import inline_keyboard_menu
 from states.library_state import EmailReg
 from loader import dp, bot
@@ -14,6 +15,7 @@ from keyboards.inline.library_buttons import inline_keyboard_library_registratio
 from utils import db_api as db
 from utils.misc import rate_limit
 from utils.json_loader import json_data
+from aiogram.types import ReplyKeyboardRemove
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -78,6 +80,7 @@ from aiogram.dispatcher import FSMContext
                                      '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила', '📰 Права читателя',
                                      '🚫 Что не разрешается', '⛔ Ответственность за нарушения', '⬅ В главное меню'])
 async def library_text_buttons_handler(message: types.Message):
+    logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки БИБЛИОТЕКИ
     if message.text == '🌐 Вебсайт':
         text = (await json_data())['lib_answers']['library_site']
@@ -145,13 +148,14 @@ async def callback_library_registration(call: CallbackQuery):
 
 
 # Сохранение выбранной базы данных и запрос ФИО
-@dp.message_handler(state=EmailReg.bookbase)
+@dp.message_handler(
+    lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'], state=EmailReg.bookbase)
 async def process_name(message: types.Message, state: FSMContext):
     markup = types.ReplyKeyboardRemove()
     async with state.proxy() as data:
-        data['bookbase'] = message.text
-    await EmailReg.next()
+        data['book_database'] = message.text
     await message.reply("Напишите ваше ФИО", reply_markup=markup)
+    await EmailReg.names.set()
 
 
 # Сохранение ФИО и запрос Email
@@ -159,40 +163,65 @@ async def process_name(message: types.Message, state: FSMContext):
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['names'] = message.text
-    await EmailReg.next()
     await message.reply("Напишите ваш Email")
+    await EmailReg.email.set()
 
 
 # Сохранение Email и запрос номера телефона
 @dp.message_handler(state=EmailReg.email)
 async def process_name(message: types.Message, state: FSMContext):
-    # markup_request = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    # markup_request.add(types.KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
     async with state.proxy() as data:
         data['email'] = message.text
-    await EmailReg.next()
-    await message.reply("Отправьте свой номер телефона")
-    # , reply_markup=markup_request
+    await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
+    await EmailReg.phone.set()
+
+    # async with state.proxy() as data:
+    #     try:
+    #         if data['email'] is not None:
+    #             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
+    #             await EmailReg.phone.set()
+    #         else:
+    #             data['email'] = message.text
+    #             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
+    #             await EmailReg.phone.set()
+    #     except Exception as err:
+    #         logging.info(err)
+    #         data['email'] = message.text
+    #         await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
+    #         await EmailReg.phone.set()
 
 
 # Сохранение Номера телефона и показ всех записанных данных, с вариантами 'отправить' или 'отменить'
-@dp.message_handler(content_types=ContentType.ANY, state=EmailReg.phone)
+@dp.message_handler(content_types=ContentType.CONTACT, state=EmailReg.phone)
 async def SendToEmail(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['phone'] = message.text
-
-    message_txt = f"Ваши данные:\n" \
-                  f"ФИО: {data['names']}\n" \
-                  f"Ваш email: {data['email']}\n" \
-                  f"Ваш телефон: {data['phone']}\n" \
-                  f"Желаемая база регистрации: {data['bookbase']}"
-    await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
-    await state.reset_state(with_data=False)
+    if message.chat.id == message.contact.user_id:
+        logging.info(f"User({message.chat.id}) ввел правильный номер")
+        await message.reply("Номер телефона получен", reply_markup=ReplyKeyboardRemove())
+        phone = message.contact.phone_number
+        if phone.startswith("+"):
+            phone = phone
+        else:
+            phone = f"+{phone}"
+        async with state.proxy() as data:
+            data['phone'] = phone
+        message_txt = f"Ваши данные:\n" \
+                      f"ФИО: {data['names']}\n" \
+                      f"Ваш email: {data['email']}\n" \
+                      f"Ваш телефон: {data['phone']}\n" \
+                      f"Желаемая база регистрации: {data['book_database']}"
+        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
+        await state.reset_state(with_data=False)
+    else:
+        logging.info(f"User({message.chat.id}) ввел не правильный номер")
+        await message.answer("Вы отправили не свой номер", reply_markup=ReplyKeyboardRemove())
+        await message.answer("Повторите отправку номера с помощью кнопки ниже",
+                             reply_markup=keyboard_library_send_phone())
 
 
 # Если пользователь нажал кнопку Отмена происходит отмена и возвращение в меню библиотеки
 @dp.callback_query_handler(text='SendDataCancel')
 async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) отменил регистрацию в БД библиотеки - {call.data}')
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Регистрация Отменена\n'
@@ -231,10 +260,11 @@ async def callback_el_res_choice(call: CallbackQuery):
 
 @dp.callback_query_handler(text='SendEmailToLibrary')
 async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
+    logging.info(f"User({call.message.chat.id}) отправил запрос на регистрацию")
     data = await state.get_data()
     await db.add_lib_reg_request_data(call.message.chat.id, call.message.message_id, data['names'], data['phone'],
                                       data['email'],
-                                      data['bookbase'])
+                                      data['book_database'])
     email_message = MIMEMultipart("alternative")
     email_message["From"] = "almaubot@gmail.com"
     email_message["To"] = "killka_m@mail.ru"
@@ -248,7 +278,7 @@ async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMCont
         f"ФИО - {data['names']} <br/> "
         f"Email - {data['email']} <br/> "
         f"Телефон - {data['phone']}  <br/> "
-        f"База Данных - {data['bookbase']}"
+        f"База Данных - {data['book_database']}"
         f"</h1>"
         f"</body>"
         f"</html>",

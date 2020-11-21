@@ -13,7 +13,6 @@ from datetime import datetime
 
 @dp.message_handler(commands=["start"])
 async def bot_start(message: types.Message):
-    logging.info(f'Данный {datetime.utcnow()}')
     check_id = await db.check_id(message.chat.id)
     if message.chat.id == check_id:
         logging.info('Данный пользователь уже находится в базе данных')

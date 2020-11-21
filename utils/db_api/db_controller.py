@@ -3,11 +3,12 @@ from asyncpg import ErrorInAssignmentError, Connection, Record
 from loader import db
 import logging
 
+
 async def create_table_users():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = """
                 CREATE TABLE if not exists users(
                 idT INT NOT NULL primary key,
@@ -27,7 +28,7 @@ async def create_table_schedule():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = """
                 CREATE TABLE if not exists schedule(
                 id  serial unique primary key,
@@ -46,15 +47,16 @@ async def create_table_lib_reg_requests():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = """
-                CREATE TABLE if not exists lib_reg_requests(
+                CREATE TABLE if not exists library_reg_requests(
                 id  serial unique primary key,
                 id_Telegram INT NOT NULL,
                 full_name VARCHAR (200),
                 phone VARCHAR (200),
                 email VARCHAR (200),
-                data_base VARCHAR (200))
+                data_base VARCHAR (200),
+                date_time TIMESTAMP)
                 """
             record: Record = await pool.fetchval(sql_ex)
             print('Table lib_reg_requests created')
@@ -107,12 +109,13 @@ async def find_schedule_id(name):
         logging.info(error)
 
 
+# Для тестов
 async def insert_data():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
-            sql_select = "Insert into users(username, firstname, lastname, idt, date_time) values ('dedus1337', 'Иван', 'Иванов', 5555, now());"
+            # async with pool.transaction():
+            sql_select = "Insert into users(username, firstname, lastname, idt, date_time) values ('dedus1337', 'Иван', 'Иванов', 555455, to_timestamp(now(), 'dd-mm-yyyy hh24:mi:ss'));"
             await connection.execute(sql_select)
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -142,7 +145,7 @@ async def add_data(username_n, first_name, last_name, id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idT') values (%s, %s, %s, %s)", data)
             # cursor.execute("Insert into users('username', 'firstname', 'lastname', 'idt') values (%s, %s, %s, %s);", data) #Это для SQlite3
             sql_ex = "Insert into users (username, firstname, lastname, idt, date_time) values ($1,$2,$3,$4,now())"
@@ -157,7 +160,7 @@ async def add_schedule_data(id_Telegram, id_sched, name_sched):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = "Insert into schedule(id_Telegram, id_sched, name_sched) values ($1,$2,$3)"
             record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_sched), str(name_sched))
             logging.info(f"ADD schedule ({name_sched})")
@@ -166,15 +169,15 @@ async def add_schedule_data(id_Telegram, id_sched, name_sched):
         logging.info(error)
 
 
-async def add_lib_reg_request_data(id_Telegram, tg_message_id, full_name, phone, email, data_base):
+async def add_lib_reg_request_data(id_Telegram, full_name, phone, email, data_base):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
-            sql_ex = "Insert into lib_reg_requests(id_Telegram, full_name, phone, email, data_base) values ($1,$2,$3,$4,$5)"
+            # async with pool.transaction():
+            sql_ex = "Insert into library_reg_requests(id_Telegram, full_name, phone, email, data_base, date_time) values ($1,$2,$3,$4,$5, now())"
             record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email),
                                                  str(data_base))
-            logging.info(f"ADD reg_request_data")
+            logging.info(f"ADD registration request for registration in library")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -184,7 +187,7 @@ async def update_schedule_data(id_Telegram, id_sched, name_sched):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = "Update schedule set id_Telegram = $1, id_sched = $2 Where name_sched = $3"
             record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_sched), str(name_sched))
             logging.info(f"UPDATED schedule ({name_sched})")
@@ -198,7 +201,7 @@ async def delete_schedule_button(name_sched):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = "Delete from schedule where name_sched = $1"
             record: Record = await pool.fetchrow(sql_ex, str(name_sched))
             logging.info(f"DELETED schedule ({name_sched})")
@@ -212,7 +215,7 @@ async def clear_schedule_table(table_name):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-        # async with pool.transaction():
+            # async with pool.transaction():
             sql_ex = "DELETE FROM schedule;"
             record: Record = await pool.fetchrow(sql_ex)
             logging.info(f"All data deleted from ({table_name} table")

@@ -22,6 +22,14 @@ from email.mime.text import MIMEText
 import aiosmtplib
 
 from aiogram.dispatcher import FSMContext
+# Библиотека регулярных выражений
+import re
+
+# Патерн регулярного выражения для проверки почты
+valid_email_patern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
+# Создается функция для проверки валидности почты
+def is_valid_email(s):
+    return valid_email_patern.match(s) is not None
 
 
 # Меню библиотеки
@@ -168,12 +176,19 @@ async def process_name(message: types.Message, state: FSMContext):
 
 
 # Сохранение Email и запрос номера телефона
-@dp.message_handler(state=EmailReg.email)
+@dp.message_handler(content_types=ContentType.TEXT, state=EmailReg.email)
 async def process_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['email'] = message.text
-    await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
-    await EmailReg.phone.set()
+    if "@" in message.text:
+        email = message.text.strip()
+        if is_valid_email(email):
+            async with state.proxy() as data:
+                data['email'] = message.text
+            await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
+            await EmailReg.phone.set()
+        else:
+            await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+    else:
+        await message.reply("Неверный формат электронной почты, напишите правильно почту!")
 
     # async with state.proxy() as data:
     #     try:

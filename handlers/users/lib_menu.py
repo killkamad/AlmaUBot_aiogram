@@ -262,9 +262,7 @@ async def callback_el_res_choice(call: CallbackQuery):
 async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил запрос на регистрацию")
     data = await state.get_data()
-    await db.add_lib_reg_request_data(call.message.chat.id, call.message.message_id, data['names'], data['phone'],
-                                      data['email'],
-                                      data['book_database'])
+    await db.add_lib_reg_request_data(call.message.chat.id, data['names'], data['phone'], data['email'], data['book_database'])
     email_message = MIMEMultipart("alternative")
     email_message["From"] = "almaubot@gmail.com"
     email_message["To"] = "killka_m@mail.ru"

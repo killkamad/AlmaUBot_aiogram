@@ -7,7 +7,19 @@ load_dotenv()
 BOT_TOKEN = str(os.getenv("BOT_TOKEN"))
 admins = [
     468899120,
+    302422833,
+    472211929
 ]
+
+library_admins = [
+    668049153,
+    846857659
+]
+
+# Для Теста
+# library_admins = [
+#     468899120,
+# ]
 
 DB_NAME = str(os.getenv("DB_NAME"))
 DB_USER = str(os.getenv("DB_USER"))

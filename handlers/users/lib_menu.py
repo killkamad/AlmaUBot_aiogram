@@ -1,5 +1,6 @@
 import logging
 
+from data.config import library_admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
@@ -27,59 +28,11 @@ import re
 
 # Патерн регулярного выражения для проверки почты
 valid_email_patern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
+
+
 # Создается функция для проверки валидности почты
 def is_valid_email(s):
     return valid_email_patern.match(s) is not None
-
-
-# Меню библиотеки
-# @dp.callback_query_handler(text=['library_site'])
-# async def callback_inline_library(call: CallbackQuery):
-#     # logging.info(f'call = {call.data}')
-#     if call.data == "library_site":
-#         text = (await json_data())['lib_answers']['library_site']
-#         await bot.send_message(call.message.chat.id, text=text, parse_mode='HTML')
-
-
-# Меню библиотеки - Часто задаваемых вопросов
-# @dp.callback_query_handler(
-#     text=['go_back_library', 'lib_contacts', 'lib_work_time', 'lib_el_res', 'lib_reg_ex', 'lib_online_courses',
-#           'lib_lost_card', 'lib_laws', 'lib_rights', 'lib_not_allow', 'lib_responsible'])
-# async def callback_inline_library(call: CallbackQuery):
-#     # logging.info(f'call = {call.data}')
-#     if call.data == "lib_contacts":
-#         text = (await json_data())['lib_answers']['lib_contacts']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_work_time":
-#         text = (await json_data())['lib_answers']['lib_work_time']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_el_res":
-#         text = (await json_data())['lib_answers']['lib_el_res']
-#         await bot.send_message(call.message.chat.id, text=text, parse_mode='HTML')
-#     elif call.data == "lib_reg_ex":
-#         text = (await json_data())['lib_answers']['lib_reg_ex']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_online_courses":
-#         text = (await json_data())['lib_answers']['lib_online_courses']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_lost_card":
-#         text = (await json_data())['lib_answers']['lib_lost_card']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_laws":
-#         text = (await json_data())['lib_answers']['lib_laws']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_rights":
-#         text = (await json_data())['lib_answers']['lib_rights']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_not_allow":
-#         text = (await json_data())['lib_answers']['lib_not_allow']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "lib_responsible":
-#         text = (await json_data())['lib_answers']['lib_responsible']
-#         await bot.send_message(call.message.chat.id, text=text)
-#     elif call.data == "go_back_library":
-#         await bot.send_message(chat_id=call.message.chat.id,
-#                                text='Библиотека ↘', reply_markup=keyboard_library())
 
 
 @rate_limit(1)
@@ -157,7 +110,8 @@ async def callback_library_registration(call: CallbackQuery):
 
 # Сохранение выбранной базы данных и запрос ФИО
 @dp.message_handler(
-    lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'], state=EmailReg.bookbase)
+    lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
+    state=EmailReg.bookbase)
 async def process_name(message: types.Message, state: FSMContext):
     markup = types.ReplyKeyboardRemove()
     async with state.proxy() as data:
@@ -189,21 +143,6 @@ async def process_name(message: types.Message, state: FSMContext):
             await message.reply("Неверный формат электронной почты, напишите правильно почту!")
     else:
         await message.reply("Неверный формат электронной почты, напишите правильно почту!")
-
-    # async with state.proxy() as data:
-    #     try:
-    #         if data['email'] is not None:
-    #             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
-    #             await EmailReg.phone.set()
-    #         else:
-    #             data['email'] = message.text
-    #             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
-    #             await EmailReg.phone.set()
-    #     except Exception as err:
-    #         logging.info(err)
-    #         data['email'] = message.text
-    #         await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
-    #         await EmailReg.phone.set()
 
 
 # Сохранение Номера телефона и показ всех записанных данных, с вариантами 'отправить' или 'отменить'
@@ -277,10 +216,12 @@ async def callback_el_res_choice(call: CallbackQuery):
 async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил запрос на регистрацию")
     data = await state.get_data()
-    await db.add_lib_reg_request_data(call.message.chat.id, data['names'], data['phone'], data['email'], data['book_database'])
+    await db.add_lib_reg_request_data(call.message.chat.id, data['names'], data['phone'], data['email'],
+                                      data['book_database'])
     email_message = MIMEMultipart("alternative")
     email_message["From"] = "almaubot@gmail.com"
-    email_message["To"] = "killka_m@mail.ru"
+    # email_message["To"] = "killka_m@mail.ru"
+    email_message["To"] = "lib@almau.edu.kz"
     email_message["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
 
     sending_message = MIMEText(
@@ -310,3 +251,12 @@ async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMCont
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Запрос на регистрацию успешно отправлен, ожидайте ответа на указанную почту',
                            reply_markup=keyboard_library())
+    for admin in library_admins:
+        try:
+            await bot.send_message(admin, f"Пришла заявка на регистрацию:\n"
+                                          f"ФИО - {data['names']}\n"
+                                          f"Email - {data['email']}\n"
+                                          f"Телефон - {data['phone']}\n"
+                                          f"База Данных - {data['book_database']}")
+        except Exception as err:
+            logging.exception(err)

@@ -65,6 +65,28 @@ async def create_table_lib_reg_requests():
         print(error)
 
 
+async def create_table_almau_shop_products():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists almau_shop_products(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                product_name VARCHAR (200),
+                price INT,
+                currency VARCHAR (100),
+                img VARCHAR (300),
+                url VARCHAR (300))
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            print('Table almau_shop_products created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(f'error in create_table_almau_shop_products - {error}')
+
+
 async def select_users():
     pool: Connection = db
     try:
@@ -92,6 +114,17 @@ async def aws_select_data_schedule():
     pool: Connection = db
     try:
         sql_select = "SELECT * FROM schedule ORDER BY id;"
+        record: Record = await pool.fetch(sql_select)
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Almau Shop получение данных
+async def almaushop_select_data():
+    pool: Connection = db
+    try:
+        sql_select = "SELECT * FROM almau_shop_products"
         record: Record = await pool.fetch(sql_select)
         return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -175,7 +208,23 @@ async def add_lib_reg_request_data(id_Telegram, full_name, phone, email, data_ba
         async with pool.acquire() as connection:
             # async with pool.transaction():
             sql_ex = "Insert into library_reg_requests(id_Telegram, full_name, phone, email, data_base, date_time) values ($1,$2,$3,$4,$5, now())"
-            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email), str(data_base))
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email),
+                                                       str(data_base))
+            logging.info(f"ADD registration request for registration in library")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def add_almau_shop_data(id_Telegram, product_name, price, currency, img, url):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Insert into almau_shop_products(id_telegram, product_name, price, currency, img, url) values ($1,$2,$3,$4,$5,$6)"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(product_name), int(price),
+                                                       str(currency),
+                                                       str(img), str(url))
             logging.info(f"ADD registration request for registration in library")
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -216,8 +265,22 @@ async def clear_schedule_table(table_name):
         async with pool.acquire() as connection:
             # async with pool.transaction():
             sql_ex = "DELETE FROM schedule;"
-            record: Record = await pool.fetchrow(sql_ex)
+            record: Record = await connection.fetchrow(sql_ex)
             logging.info(f"All data deleted from ({table_name} table")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Полная очистка таблицы almau_shop_products
+async def clear_almaushop_table():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "DELETE FROM almau_shop_products;"
+            record: Record = await connection.fetchrow(sql_ex)
+            logging.info(f"All data deleted from almau_shop_products table")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -231,7 +294,7 @@ async def set_up_tables():
 
 
 async def main():
-    print(await insert_data())
+    # print(await add_almau_shop_data(525325, "dadadada", 4000, 'тг', 'https://static.tildacdn.com/tild3865-6336-4639-a332-653936323434/for_AlmaU_0709__.png', 'https://almaushop.kz/#!/tproduct/221510661-1605267838115'))
     # count_user = await select_users()
     # print(count_user)
     # for i in count_user:
@@ -243,6 +306,8 @@ async def main():
     # print(await select_users())
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
+    print(await almaushop_select_data())
+    print(await clear_almaushop_table())
 
 
 if __name__ == '__main__':

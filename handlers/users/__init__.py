@@ -6,5 +6,6 @@ from .menu import dp
 from .lib_menu import dp
 from .admin_menu import dp
 from .menu_text_handler import dp
+from .almaushop_menu import dp
 
 __all__ = ["dp"]

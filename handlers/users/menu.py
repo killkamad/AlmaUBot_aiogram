@@ -3,7 +3,7 @@ import logging
 
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
-from keyboards.default import always_stay_keyboard, keyboard_library
+from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop
 from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
@@ -53,17 +53,24 @@ async def callback_inline_schedule(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='/faq')
-async def callback_inline_schedule(call: CallbackQuery):
+async def callback_inline_faq(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в F.A.Q")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='F.A.Q ↘', reply_markup=inline_keyboard_faq())
 
 
 @dp.callback_query_handler(text='/library')
-async def callback_inline_schedule(call: CallbackQuery):
+async def callback_inline_library(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Библиотеку")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Библиотека ↘', reply_markup=keyboard_library())
+
+
+@dp.callback_query_handler(text='/almaushop')
+async def callback_inline_almaushop(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в AlmaU Shop")
+    await bot.send_message(chat_id=call.message.chat.id,
+                           text='AlmaU Shop ↘', reply_markup=keyboard_almaushop())
 
 
 #  Получение айди расписания из бд и отправка пользователю

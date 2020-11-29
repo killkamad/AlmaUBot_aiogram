@@ -11,6 +11,7 @@ from keyboards.inline.admin_buttons import inline_keyboard_admin, inline_keyboar
 import asyncio
 # Импортирование функций из БД контроллера
 from utils import db_api as db
+from utils.almaushop_parser import AlmauShop
 
 from utils.delete_messages import bot_delete_messages
 from aiogram.dispatcher import FSMContext
@@ -362,3 +363,19 @@ async def callback_inline_cancel_delete_schedule(call: CallbackQuery, state: FSM
     # await call.message.answer('<b>Удаление отмененено</b>', parse_mode='HTML')
     await admin_menu(call.message)
     await state.reset_state()
+
+
+# Парсинг сайта almaushop.kz и загрузка данных в таблицу в БД
+@dp.callback_query_handler(text_contains='update_almaushop_data')
+async def callback_inline_update_almaushop_data(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) запустил обновление данных таблицы almaushop call.data - {call.data}')
+    shop = AlmauShop()
+    shop.parse_page(text=shop.load_page())
+    try:
+        await db.clear_almaushop_table()
+        for i in shop.result:
+            await db.add_almau_shop_data(call.message.chat.id, i.product_name, i.price, i.currency, i.img, i.url)
+        await bot.send_message(call.message.chat.id, 'Данные в таблице almau shop обновлены')
+    except Exception as err:
+        logging.exception(err)
+        await bot.send_message(call.message.chat.id, 'Произошла ошибка')

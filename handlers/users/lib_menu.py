@@ -27,19 +27,19 @@ from aiogram.dispatcher import FSMContext
 import re
 
 # Патерн регулярного выражения для проверки почты
-valid_email_patern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
+valid_email_pattern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
 
 
 # Создается функция для проверки валидности почты
 def is_valid_email(s):
-    return valid_email_patern.match(s) is not None
+    return valid_email_pattern.match(s) is not None
 
 
 @rate_limit(1)
 @dp.message_handler(
     lambda message: message.text in ['🌐 Вебсайт', '⚡ Электронные ресурсы', '☎ Контакты', '🕐 Время работы',
                                      '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила', '📰 Права читателя',
-                                     '🚫 Что не разрешается', '⛔ Ответственность за нарушения', '⬅ В главное меню'])
+                                     '🚫 Что не разрешается', '⛔ Ответственность за нарушения'])
 async def library_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки БИБЛИОТЕКИ
@@ -74,13 +74,6 @@ async def library_text_buttons_handler(message: types.Message):
     elif message.text == '⛔ Ответственность за нарушения':
         text = (await json_data())['lib_answers']['lib_responsible']
         await bot.send_message(message.chat.id, text=text)
-    elif message.text == '⬅ В главное меню':
-        await message.answer('Возвращение в главное меню', reply_markup=always_stay_keyboard())
-        await message.answer('Главное меню:\n'
-                             '- Расписание - здесь можно посмотреть расписание\n'
-                             '- FAQ - часто задаваемые вопросы и ответы на них\n'
-                             '- Библиотека - поиск книг',
-                             reply_markup=inline_keyboard_menu())
 
 
 @dp.callback_query_handler(text=['library_registration'])

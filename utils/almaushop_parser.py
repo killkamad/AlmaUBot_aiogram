@@ -79,7 +79,7 @@ class AlmauShop:
             url=url
         ))
 
-        logger.info(f'{name_block.text}, {price_block.text}, {currency_block}, {img}, {url}')
+        # logger.info(f'{name_block.text}, {price_block.text}, {currency_block}, {img}, {url}')
 
     def run(self):
         text = self.load_page()

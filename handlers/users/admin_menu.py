@@ -54,7 +54,7 @@ async def callback_inline_add_photo_mass(call: CallbackQuery):
 async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку ❌ Отмена')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='ОТМЕНЕНЕНО')
+                                text='ОТМЕНЕНО')
     await bot_delete_messages(call.message, 3)
     await state.reset_state()
 

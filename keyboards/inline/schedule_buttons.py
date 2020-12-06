@@ -20,5 +20,5 @@ async def inline_keyboard_schedule():
                  zip(schedule_name, call_list)])
     # for i in schedule:
     #     print(i)
-    markup.add(InlineKeyboardButton(text="🔙 Назад", callback_data="go_back"))
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="go_back"))
     return markup

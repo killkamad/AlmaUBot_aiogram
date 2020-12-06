@@ -90,13 +90,25 @@ async def callback_library_registration(call: CallbackQuery):
                                 reply_markup=inline_keyboard_library_registration())
 
 
+# Отмена регистрации на лицензионные БД
+@dp.message_handler(text='/cancel', state=[EmailReg.bookbase, EmailReg.names, EmailReg.email, EmailReg.phone])
+async def callback_cancel_lib_reg(message: types.Message, state: FSMContext):
+    logging.info(f'User({message.chat.id}) отменил регистрацию на лицензионные БД')
+    await bot.send_message(chat_id=message.chat.id, text='Регистрация на лицензионные базы данных была отменена',
+                           reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(chat_id=message.chat.id,
+                           text='Возвращение в меню библиотеки', reply_markup=keyboard_library())
+    await state.reset_state()
+
+
 # Отравка клавиатуры для выбора базы данных для регистрации
 @dp.callback_query_handler(text='library_registration_button', state=None)
 async def callback_library_registration(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Регистрация проводится путем отправки данных в библиотеку ALMAU.\n'
                                      'Если не можете здесь отправить данные то зарегестрируйтесь через сайт lib.almau.edu.kz/page/9 \n')
-    await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться',
+    await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться\n'
+                              'Для отмены введите команду /cancel',
                               reply_markup=keyboard_library_choice_db())
     await EmailReg.bookbase.set()
 
@@ -106,10 +118,9 @@ async def callback_library_registration(call: CallbackQuery):
     lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
     state=EmailReg.bookbase)
 async def process_name(message: types.Message, state: FSMContext):
-    markup = types.ReplyKeyboardRemove()
     async with state.proxy() as data:
         data['book_database'] = message.text
-    await message.reply("Напишите ваше ФИО", reply_markup=markup)
+    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
     await EmailReg.names.set()
 
 
@@ -169,7 +180,9 @@ async def SendToEmail(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text='SendDataCancel')
 async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил регистрацию в БД библиотеки - {call.data}')
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+    # Добовляет alert вверху экрана
+    await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Запрос на регистрацию отменен")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Регистрация Отменена\n'
                                 'Возвращение в меню библиотеки', reply_markup=keyboard_library())
@@ -240,7 +253,8 @@ async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMCont
                           # recipients=["killka_m@mail.ru"],
                           username="almaubot@gmail.com",
                           password="almaubot12345")
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+    await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Запрос успешно отправлен")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Запрос на регистрацию успешно отправлен, ожидайте ответа на указанную почту',
                            reply_markup=keyboard_library())

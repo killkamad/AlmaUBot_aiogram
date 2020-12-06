@@ -30,7 +30,7 @@ def inline_keyboard_library_registration():
 
 def inline_keyboard_send_reg_data():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Отправить Данные", callback_data='SendEmailToLibrary')
+    callback_button = InlineKeyboardButton(text="✅ Отправить Данные", callback_data='SendEmailToLibrary')
     callback_back = InlineKeyboardButton(text="❌ Отмена", callback_data="SendDataCancel")
     markup.add(callback_button, callback_back)
     return markup
@@ -45,12 +45,12 @@ def inline_keyboard_back_to_library():
 
 def inline_keyboard_library_el_res():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button1 = InlineKeyboardButton(text="Лицензионные Базы Данных", callback_data='library_registration')
-    callback_button2 = InlineKeyboardButton(text="Базы данных свободного доступа(Казахстанские)",
+    callback_button1 = InlineKeyboardButton(text="📕 Лицензионные Базы Данных", callback_data='library_registration')
+    callback_button2 = InlineKeyboardButton(text="📗 Базы данных свободного доступа(Казахстанские)",
                                             callback_data='library_free_kaz')
-    callback_button3 = InlineKeyboardButton(text="Базы данных свободного доступа(Зарубежные)",
+    callback_button3 = InlineKeyboardButton(text="📗 Базы данных свободного доступа(Зарубежные)",
                                             callback_data='library_free_zarub')
-    callback_button4 = InlineKeyboardButton(text="Онлайн библиотеки", callback_data='library_online_librares')
+    callback_button4 = InlineKeyboardButton(text="📗 Онлайн библиотеки", callback_data='library_online_librares')
     # callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back_library")
     markup.add(callback_button1, callback_button2, callback_button3, callback_button4)
     return markup

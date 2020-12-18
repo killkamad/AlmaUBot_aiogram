@@ -86,6 +86,45 @@ async def create_table_almau_shop_products():
     except(Exception, ErrorInAssignmentError) as error:
         print(f'error in create_table_almau_shop_products - {error}')
 
+#Создание таблицы академ кадендарь
+async def create_table_academic_calendar():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                CREATE TABLE if not exists academic_calendar(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                id_calendar VARCHAR (500))
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            print('Table academic_calendar created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+#Поиск последнего академ календаря в базе
+async def find_id_academic_calendar():
+    pool: Connection = db
+    try:
+        sql_select = "SELECT id_calendar FROM academic_calendar ORDER BY id DESC LIMIT 1;"
+        record: Record = await pool.fetchval(sql_select)
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+#Добавление данных академ календаря
+async def add_academic_calendar_data(id_Telegram, id_calendar):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Insert into academic_calendar(id_Telegram, id_calendar) values ($1,$2)"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_calendar))
+            logging.info(f"ADD academic calendar")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
 
 async def select_users():
     pool: Connection = db
@@ -307,7 +346,7 @@ async def main():
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
     print(await almaushop_select_data())
-    print(await clear_almaushop_table())
+    # print(await clear_almaushop_table())
 
 
 if __name__ == '__main__':

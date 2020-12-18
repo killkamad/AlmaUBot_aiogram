@@ -20,3 +20,6 @@ class UpdateSchedule(StatesGroup):
 class DeleteSchedule(StatesGroup):
     button_name = State()
     confirm_delete = State()
+
+class SendAcademCalendar(StatesGroup):
+    send_file = State()

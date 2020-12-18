@@ -9,8 +9,9 @@ def inline_keyboard_admin():
     callback_button1 = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
     callback_button2 = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
     callback_button3 = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
-    callback_button4 = InlineKeyboardButton(text="👔 Обновить данные AlmaU Shop", callback_data='update_almaushop_data')
-    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4)
+    callback_button4 = InlineKeyboardButton(text=" Обновить Академический Календарь", callback_data='send_academic_calendar')
+    callback_button5 = InlineKeyboardButton(text="👔 Обновить данные AlmaU Shop", callback_data='update_almaushop_data')
+    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4, callback_button5)
     # markup.row(callback_button2, callback_button3)
     return markup
 
@@ -93,4 +94,17 @@ async def inline_keyboard_delete_schedule():
     markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
                  zip(schedule_name, call_list)])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))
+    return markup
+
+def cancel_academic_calendar():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_academic_calendar")
+    markup.add(cancel_button)
+    return markup
+
+def cancel_or_send_academic_calendar():
+    markup = InlineKeyboardMarkup()
+    callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_academic_calendar_to_base")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_academic_calendar")
+    markup.add(callback_button, callback_button2)
     return markup

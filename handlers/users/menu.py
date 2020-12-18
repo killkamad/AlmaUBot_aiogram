@@ -91,6 +91,10 @@ async def callback_inline(call: CallbackQuery):
                                      '- FAQ - часто задаваемые вопросы и ответы на них',
                                 reply_markup=inline_keyboard_menu())
 
+@dp.callback_query_handler(text = '/academ_calendar')
+async def callback_academ_calendar(call: CallbackQuery):
+    file_id = await db.find_id_academic_calendar()
+    await bot.send_document(call.message.chat.id, file_id)
 
 # Меню F.A.Q
 @dp.callback_query_handler(text=['moodle', 'retake', 'reactor_info', 'atestat', 'u_wifi'])

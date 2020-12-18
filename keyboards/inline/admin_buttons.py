@@ -9,7 +9,7 @@ def inline_keyboard_admin():
     callback_button1 = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
     callback_button2 = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
     callback_button3 = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
-    callback_button4 = InlineKeyboardButton(text=" Обновить Академический Календарь", callback_data='send_academic_calendar')
+    callback_button4 = InlineKeyboardButton(text="🗒 Обновить Академический Календарь", callback_data='send_academic_calendar')
     callback_button5 = InlineKeyboardButton(text="👔 Обновить данные AlmaU Shop", callback_data='update_almaushop_data')
     markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4, callback_button5)
     # markup.row(callback_button2, callback_button3)

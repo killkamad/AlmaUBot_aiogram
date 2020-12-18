@@ -86,7 +86,8 @@ async def create_table_almau_shop_products():
     except(Exception, ErrorInAssignmentError) as error:
         print(f'error in create_table_almau_shop_products - {error}')
 
-#Создание таблицы академ кадендарь
+
+# Создание таблицы академ кадендарь
 async def create_table_academic_calendar():
     pool: Connection = db
     try:
@@ -95,7 +96,8 @@ async def create_table_academic_calendar():
                 CREATE TABLE if not exists academic_calendar(
                 id  serial unique primary key,
                 id_Telegram INT NOT NULL,
-                id_calendar VARCHAR (500))
+                id_calendar VARCHAR (500),
+                date_time TIMESTAMP)
                 """
             record: Record = await pool.fetchval(sql_ex)
             print('Table academic_calendar created')
@@ -103,7 +105,8 @@ async def create_table_academic_calendar():
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
 
-#Поиск последнего академ календаря в базе
+
+# Поиск последнего академ календаря в базе
 async def find_id_academic_calendar():
     pool: Connection = db
     try:
@@ -113,18 +116,20 @@ async def find_id_academic_calendar():
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
-#Добавление данных академ календаря
+
+# Добавление данных академ календаря
 async def add_academic_calendar_data(id_Telegram, id_calendar):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
             # async with pool.transaction():
-            sql_ex = "Insert into academic_calendar(id_Telegram, id_calendar) values ($1,$2)"
-            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(id_calendar))
+            sql_ex = "Insert into academic_calendar(id_Telegram, id_calendar, date_time) values ($1,$2, now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(id_calendar))
             logging.info(f"ADD academic calendar")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
+
 
 async def select_users():
     pool: Connection = db
@@ -345,7 +350,7 @@ async def main():
     # print(await select_users())
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
-    print(await almaushop_select_data())
+    await create_table_academic_calendar()
     # print(await clear_almaushop_table())
 
 

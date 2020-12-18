@@ -381,18 +381,20 @@ async def callback_inline_update_almaushop_data(call: CallbackQuery):
         logging.exception(err)
         await bot.send_message(call.message.chat.id, 'Произошла ошибка')
 
-#Запрос академ календаря
+
+# Запрос академ календаря
 @dp.callback_query_handler(text='send_academic_calendar', state=None)
 async def callback_send_academic_calendar(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await call.message.answer('Отправьте файл академического календаря', reply_markup=cancel_academic_calendar())
     await SendAcademCalendar.send_file.set()
-    
-#Проверка академ календаря на то что он файл
+
+
+# Проверка академ календаря на то что он файл
 @dp.message_handler(content_types=ContentType.ANY, state=SendAcademCalendar.send_file)
 async def message_academic_calendar_send_file(message: types.Message, state: FSMContext):
     if message.content_type == 'document':
-        await state.update_data(file_id=message.document.file_id, user_id = message.chat.id)
+        await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
         data = await state.get_data()
         await bot.send_document(message.chat.id, data["file_id"], caption="Отправить этот документ?",
                                 reply_markup=cancel_or_send_academic_calendar())
@@ -400,21 +402,24 @@ async def message_academic_calendar_send_file(message: types.Message, state: FSM
     else:
         await message.answer('Ошибка - вы отправили не документ\nПовторите Отправление файла')
 
-#Отправка академ календаря в базу данных
+
+# Отправка академ календаря в базу данных
 @dp.callback_query_handler(text='send_academic_calendar_to_base', state=None)
 async def callback_inline_send_academic_calendar(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await bot_delete_messages(call.message, 2)
+        # await bot_delete_messages(call.message, 2)
         await db.add_academic_calendar_data(data['user_id'], data['file_id'])
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+        # await bot.delete_message(call.message.chat.id, call.message.message_id)
         await call.message.answer('<b>Академический календарь</b> отправлен', parse_mode='HTML')
         logging.info(f'User({call.message.chat.id}) отправил академ календарь')
     except Exception as e:
         await call.message.answer(f'Ошибка Академический календарь не отправлен, (Ошибка - {e})')
         print(e)
 
-#Отмена первого шага отправки календаря
+
+# Отмена первого шага отправки календаря
 @dp.callback_query_handler(text='cancel_step_academic_calendar', state=['*'])
 async def callback_inline_cancel_step_academic_calendar(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
@@ -422,7 +427,8 @@ async def callback_inline_cancel_step_academic_calendar(call: CallbackQuery, sta
                                 text='<b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
     await state.reset_state()
 
-#Отмена отправки календаря
+
+# Отмена отправки календаря
 @dp.callback_query_handler(text_contains='cancel_academic_calendar')
 async def callback_inline_cancel_acdemic_calendar(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил отправку Академического календаря call.data - {call.data}')

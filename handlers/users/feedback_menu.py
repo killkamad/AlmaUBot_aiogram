@@ -1,6 +1,6 @@
 import logging
 
-from data.config import library_admins
+from data.config import admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
@@ -150,13 +150,13 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Письмо успешно отправлено',
                            reply_markup=always_stay_keyboard())
-    # for admin in library_admins:
-    #     try:
-    #         await bot.send_message(admin, f"Пришло письмо в адрес ректора:\n"
-    #                                       f"ФИО - {data['names']}\n"
-    #                                       f"Email - {data['email']}\n"
-    #                                       f"Телефон - {data['phone']}\n"
-    #                                       f"Содержание письма:\n"
-    #                                       f"{data['content']}")
-    #     except Exception as err:
-    #         logging.exception(err)
+    for admin in admins:
+        try:
+            await bot.send_message(admin, f"Пришло письмо в адрес ректора:\n"
+                                          f"ФИО - {data['names']}\n"
+                                          f"Email - {data['email']}\n"
+                                          f"Телефон - {data['phone']}\n"
+                                          f"Содержание письма:\n"
+                                          f"{data['content']}")
+        except Exception as err:
+            logging.exception(err)

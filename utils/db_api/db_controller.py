@@ -259,6 +259,19 @@ async def add_lib_reg_request_data(id_Telegram, full_name, phone, email, data_ba
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
+async def add_feedback_msg_data(id_Telegram, full_name, phone, email, message_content):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Insert into message_to_rector(id_Telegram, full_name, phone, email, message_content, date_time) values ($1,$2,$3,$4,$5, now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email),
+                                                       str(message_content))
+            logging.info(f"ADD messages for feedback to rector")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
 
 async def add_almau_shop_data(id_Telegram, product_name, price, currency, img, url):
     pool: Connection = db
@@ -329,6 +342,27 @@ async def clear_almaushop_table():
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
+async def create_table_message_to_rector():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists message_to_rector(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                full_name VARCHAR (200),
+                phone VARCHAR (200),
+                email VARCHAR (200),
+                message_content VARCHAR (990),
+                date_time TIMESTAMP)
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            print('Table message_to_rector created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
 
 # Создание таблиц в БД
 async def set_up_tables():
@@ -350,7 +384,8 @@ async def main():
     # print(await select_users())
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
-    await create_table_academic_calendar()
+    # await create_table_academic_calendar()
+    await create_table_message_to_rector()
     # print(await clear_almaushop_table())
 
 

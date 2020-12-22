@@ -3,11 +3,12 @@ import logging
 
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
-from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop
+from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback
 from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
 from keyboards.inline.faq_buttons import inline_keyboard_faq
+from keyboards.inline.feedback_buttons import inline_keyboard_feedback
 from data.config import admins
 
 # Импортирование функций из БД контроллера
@@ -15,6 +16,9 @@ from utils import db_api as db
 
 from utils.misc import rate_limit
 from utils.json_loader import json_data
+
+from aiogram.dispatcher import FSMContext
+from states.feedback_state import FeedbackMessage
 
 
 # Настройка команд для бота
@@ -32,7 +36,7 @@ async def cmd_set_commands(message: types.Message):
             logging.exception(err)
 
 
-@rate_limit(5, 'menu')
+@rate_limit(6, 'menu')
 @dp.message_handler(commands=['menu'])
 async def menu_handler(message):
     logging.info(f"User({message.chat.id}) вошел в меню")
@@ -65,6 +69,14 @@ async def callback_inline_library(call: CallbackQuery):
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Библиотека ↘', reply_markup=keyboard_library())
 
+@dp.callback_query_handler(text='/feedback')
+async def callback_inline_feedback(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в Обратную связь с ректором")
+    await bot.send_message(chat_id=call.message.chat.id,
+                            text='Обратная связь с ректором ↘')
+    await bot.send_message(chat_id=call.message.chat.id,
+                            text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
+                                 'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.', reply_markup=keyboard_feedback())
 
 @dp.callback_query_handler(text='/almaushop')
 async def callback_inline_almaushop(call: CallbackQuery):
@@ -115,3 +127,10 @@ async def callback_inline_faq(call: CallbackQuery):
     elif call.data == "u_wifi":
         text = (await json_data())['faq_answers']['wifi1']
         await bot.send_message(call.message.chat.id, text=text)
+
+@dp.message_handler(
+    text=['message_to_rector'],
+    state=None)
+async def process_name(message: types.Message, state: FSMContext):
+    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+    await FeedbackMessage.names.set()

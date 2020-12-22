@@ -46,10 +46,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=killka_m
-WorkingDirectory=/home/killka_m/AlmaUBot_aiogram
-ExecStart=/home/killka_m/AlmaUBot_aiogram/almaubotenv/bin/python3 app.py
-Restart=on-failure
+User=botadmin
+WorkingDirectory=/home/botadmin/almaubot
+ExecStart=/home/botadmin/almaubot/myprojectenv/bin/python app.py
+Restart=Always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
@@ -59,6 +60,30 @@ WantedBy=multi-user.target
 Войти в root - sudo -i
 Как поменять название файла - mv название_файла тут_новое_название
 Чтобы поменять линки:
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+единица в конце обозначает приоритет
+
+```
+**Настройка сервера**
+```
+1) sudo -i
+2) adduser botadmin
+3) войти в etc/sudoers и выдать нужному пользователю root права
+4) sudo nano /etc/ssh/sshd_config и PasswordAuthentication сделать yes
+чтобы можно было подключаться через ip
+5) git clone проекта
+6) sudo -H pip3 install --upgrade pip
+   sudo -H pip3 install virtualenv
+7) virtualenv myprojectenv - создаем виртуальное окружение
+8) source myprojectenv/bin/activate - входим в него
+9) pip install -r requirements.txt - устанавливаем зависимости
+10) создаем bot.service - sudo nano /etc/systemd/system/bot.service
+```
+
+
+**Настройка PostgreSQL сервера**
+```
+1) Созать сервер в CloudSql
+2) Подключиться к нему через pgadmin
+3) Создать базу данных и из бекапа вытащить данные
 ```

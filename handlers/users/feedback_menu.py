@@ -150,7 +150,7 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
                           port=587,
                           start_tls=True,
                           username="almaubot@gmail.com",
-                          password="almaubot12345")
+                          password="mjykwcchpvduwcjy")
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Письмо успешно отправлено")
     await bot.send_message(chat_id=call.message.chat.id,

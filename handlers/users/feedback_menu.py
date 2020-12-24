@@ -34,12 +34,13 @@ def is_valid_email(s):
 
 
 @rate_limit(1)
-@dp.message_handler(text = ['Написать письмо ректору'], state=None)
+@dp.message_handler(text=['✏ Написать письмо ректору'], state=None)
 async def feedback_text_buttons_handler(message: types.Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
-    if message.text == 'Написать письмо ректору':
+    if message.text == '✏ Написать письмо ректору':
         await message.reply("Что вы хотели бы написать?", reply_markup=ReplyKeyboardRemove())
         await FeedbackMessage.content.set()
+
 
 @dp.message_handler(state=FeedbackMessage.content)
 async def process_name(message: types.Message, state: FSMContext):
@@ -48,12 +49,14 @@ async def process_name(message: types.Message, state: FSMContext):
     await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
     await FeedbackMessage.names.set()
 
+
 @dp.message_handler(state=FeedbackMessage.names)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['names'] = message.text
     await message.reply("Напишите ваш Email")
     await FeedbackMessage.email.set()
+
 
 @dp.message_handler(content_types=ContentType.TEXT, state=FeedbackMessage.email)
 async def process_name(message: types.Message, state: FSMContext):
@@ -68,6 +71,7 @@ async def process_name(message: types.Message, state: FSMContext):
             await message.reply("Неверный формат электронной почты, напишите правильно почту!")
     else:
         await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=FeedbackMessage.phone)
 async def SendToEmail(message: types.Message, state: FSMContext):
@@ -94,6 +98,7 @@ async def SendToEmail(message: types.Message, state: FSMContext):
         await message.answer("Повторите отправку номера с помощью кнопки ниже",
                              reply_markup=keyboard_feedback_send_phone())
 
+
 @dp.callback_query_handler(text='SendMsgCancel')
 async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил отправку письма - {call.data}')
@@ -105,12 +110,13 @@ async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext)
                                 'Возвращение в главное меню', reply_markup=always_stay_keyboard())
     await state.reset_state()
 
+
 @dp.callback_query_handler(text='SendMsgToRector')
 async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил письмо")
     data = await state.get_data()
     await db.add_feedback_msg_data(call.message.chat.id, data['names'], data['phone'], data['email'],
-                                      data['content'])
+                                   data['content'])
     email_message = MIMEMultipart("alternative")
     email_message["From"] = "almaubot@gmail.com"
     email_message["To"] = "killka_m@mail.ru"

@@ -8,11 +8,12 @@ from loader import dp, bot
 from keyboards.inline.admin_buttons import inline_keyboard_admin, inline_keyboard_massive_send_all, \
     inline_keyboard_cancel_or_send, inline_keyboard_cancel, cancel_or_send_schedule, inline_keyboard_update_schedule, \
     cancel_or_update_schedule, inline_keyboard_delete_schedule, cancel_or_delete_schedule, \
-    cancel_or_send_academic_calendar, cancel_academic_calendar
+    cancel_or_send_academic_calendar, cancel_academic_calendar, inline_keyboard_almau_shop_admin, \
+    inline_keyboard_schedule_admin
 import asyncio
 # Импортирование функций из БД контроллера
 from utils import db_api as db
-from utils.almaushop_parser import AlmauShop
+from utils.almaushop_parser import AlmauShop, AlmauShopBooks
 
 from utils.delete_messages import bot_delete_messages
 from aiogram.dispatcher import FSMContext
@@ -277,6 +278,14 @@ async def message_schedule_send_file(message: types.Message, state: FSMContext):
         await message.answer('Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием')
 
 
+# АДмин меню для Расписания
+@dp.callback_query_handler(text_contains='schedule_admin_menu')
+async def callback_inline_update_almaushop_merch(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) вошел в админ меню Расписания, call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Админ меню Расписания:', reply_markup=inline_keyboard_schedule_admin())
+
+
 # Отправление расписания в базу данных
 @dp.callback_query_handler(text='send_schedule', state=None)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
@@ -366,21 +375,53 @@ async def callback_inline_cancel_delete_schedule(call: CallbackQuery, state: FSM
     await state.reset_state()
 
 
-# Парсинг сайта almaushop.kz и загрузка данных в таблицу в БД
-@dp.callback_query_handler(text_contains='update_almaushop_data')
-async def callback_inline_update_almaushop_data(call: CallbackQuery):
-    logging.info(f'User({call.message.chat.id}) запустил обновление данных таблицы almaushop call.data - {call.data}')
+############### Админ меню для AlmaU Shop ####################
+@dp.callback_query_handler(text_contains='almaushop_admin_menu')
+async def callback_inline_update_almaushop_merch(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) вошел в админ меню AlmaU Shop, call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
+
+
+# Парсинг сайта almaushop.kz мерча и загрузка данных в таблицу в БД
+@dp.callback_query_handler(text_contains='update_almaushop_merch')
+async def callback_inline_update_almaushop_merch(call: CallbackQuery):
+    logging.info(
+        f'User({call.message.chat.id}) запустил обновление данных таблицы "almau_shop_products" call.data - {call.data}')
     shop = AlmauShop()
     shop.parse_page(text=shop.load_page())
     try:
+        await bot.send_message(call.message.chat.id,
+                               '🔄 Началось обновление данных в таблице, пожалуйста ожидайте!')
         await db.clear_almaushop_table()
         for i in shop.result:
             await db.add_almau_shop_data(call.message.chat.id, i.product_name, i.price, i.currency, i.img, i.url)
-        await bot.send_message(call.message.chat.id, 'Данные в таблице almau shop обновлены')
+        await bot.send_message(call.message.chat.id, '✅ Данные в таблице almau shop успешно обновлены')
     except Exception as err:
         logging.exception(err)
-        await bot.send_message(call.message.chat.id, 'Произошла ошибка')
+        await bot.send_message(call.message.chat.id, '❗ Произошла ошибка')
 
+
+# Парсинг сайта almaushop.kz/books книг и загрузка данных в таблицу в БД
+@dp.callback_query_handler(text_contains='update_almaushop_books')
+async def callback_inline_update_almaushop_books(call: CallbackQuery):
+    logging.info(
+        f'User({call.message.chat.id}) запустил обновление данных таблицы "almau_shop_books" call.data - {call.data}')
+    book_shop = AlmauShopBooks()
+    book_shop.parse_page(text=book_shop.load_page())
+    try:
+        await bot.send_message(call.message.chat.id, '🔄 Началось обновление данных в таблице, пожалуйста ожидайте!')
+        await db.clear_almaushop_books_table()
+        for i in book_shop.result:
+            await db.add_almau_shop_books(call.message.chat.id, i.book_name, i.author_name, i.price, i.currency, i.img,
+                                          i.url)
+        await bot.send_message(call.message.chat.id, '✅ Данные в таблице almau_shop_books успешно обновлены')
+    except Exception as err:
+        logging.exception(err)
+        await bot.send_message(call.message.chat.id, '❗ Произошла ошибка')
+
+
+############### Админ меню для AlmaU Shop конец ####################
 
 # Запрос академ календаря
 @dp.callback_query_handler(text='send_academic_calendar', state=None)
@@ -436,3 +477,19 @@ async def callback_inline_cancel_acdemic_calendar(call: CallbackQuery, state: FS
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await call.message.answer('<b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
     await state.reset_state()
+
+
+@dp.callback_query_handler(text_contains='back_to_admin_menu')
+async def callback_inline_update_almaushop_merch(call: CallbackQuery):
+    try:
+        if await db.check_role(call.message.chat.id, 'admin') == 'admin':
+            logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
+            users = await db.count_users()
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=f'Меню Админа:\nКоличество пользователей = {users}\n',
+                                        reply_markup=inline_keyboard_admin())
+        else:
+            await bot.send_message(call.message.chat.id, 'Недостаточный уровень доступа')
+            logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')
+    except Exception as e:
+        logging.info(f'Ошибка - {e}')

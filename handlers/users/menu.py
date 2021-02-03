@@ -20,6 +20,14 @@ from utils.json_loader import json_data
 from aiogram.dispatcher import FSMContext
 from states.feedback_state import FeedbackMessage
 
+_main_menu_text = 'Главное меню:\n' \
+                  '- Расписание - просмотр актуального расписания\n' \
+                  '- FAQ - часто задаваемые вопросы студентов и ответы на них\n' \
+                  '- Библиотека - поиск книг\n' \
+                  '- AlmaU Shop - просмотр мерча AlmaU и книг\n' \
+                  '- Академический календарь - получение календаря на учебный год\n' \
+                  '- Обратная связь с ректором - возможность написать свою жалобу или пожелания ректору\n'
+
 
 # Настройка команд для бота
 @dp.message_handler(commands="set_commands", state="*")
@@ -42,10 +50,7 @@ async def menu_handler(message):
     logging.info(f"User({message.chat.id}) вошел в меню")
     await bot.send_message(message.chat.id, f'Вы находитесь в главном меню.',
                            reply_markup=always_stay_keyboard())
-    await bot.send_message(message.chat.id, 'Главное меню:\n'
-                                            '- Расписание - здесь можно посмотреть расписание\n'
-                                            '- FAQ - часто задаваемые вопросы и ответы на них\n'
-                                            '- Библиотека - поиск книг',
+    await bot.send_message(message.chat.id, _main_menu_text,
                            reply_markup=inline_keyboard_menu())
 
 
@@ -69,14 +74,17 @@ async def callback_inline_library(call: CallbackQuery):
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Библиотека ↘', reply_markup=keyboard_library())
 
+
 @dp.callback_query_handler(text='/feedback')
 async def callback_inline_feedback(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Обратную связь с ректором")
     await bot.send_message(chat_id=call.message.chat.id,
-                            text='Обратная связь с ректором ↘')
+                           text='Обратная связь с ректором ↘')
     await bot.send_message(chat_id=call.message.chat.id,
-                            text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
-                                 'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.', reply_markup=keyboard_feedback())
+                           text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
+                                'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.',
+                           reply_markup=keyboard_feedback())
+
 
 @dp.callback_query_handler(text='/almaushop')
 async def callback_inline_almaushop(call: CallbackQuery):
@@ -98,15 +106,15 @@ async def callback_inline(call: CallbackQuery):
 async def callback_inline(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) нажал кнопку Назад и вернулся в Главное меню")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Главное меню:\n'
-                                     '- Расписание - здесь можно посмотреть расписание\n'
-                                     '- FAQ - часто задаваемые вопросы и ответы на них',
+                                text=_main_menu_text,
                                 reply_markup=inline_keyboard_menu())
 
-@dp.callback_query_handler(text = '/academ_calendar')
+
+@dp.callback_query_handler(text='/academ_calendar')
 async def callback_academ_calendar(call: CallbackQuery):
     file_id = await db.find_id_academic_calendar()
     await bot.send_document(call.message.chat.id, file_id)
+
 
 # Меню F.A.Q
 @dp.callback_query_handler(text=['moodle', 'retake', 'reactor_info', 'atestat', 'u_wifi'])
@@ -127,6 +135,7 @@ async def callback_inline_faq(call: CallbackQuery):
     elif call.data == "u_wifi":
         text = (await json_data())['faq_answers']['wifi1']
         await bot.send_message(call.message.chat.id, text=text)
+
 
 @dp.message_handler(
     text=['message_to_rector'],

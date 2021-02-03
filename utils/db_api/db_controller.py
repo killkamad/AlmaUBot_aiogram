@@ -4,6 +4,7 @@ from loader import db
 import logging
 
 
+# Создание таблицы пользователей
 async def create_table_users():
     pool: Connection = db
     try:
@@ -18,12 +19,13 @@ async def create_table_users():
                 role VARCHAR (20))
                 """
             record: Record = await connection.execute(sql_ex)
-            print('Table users created')
+            print('Table users successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
 
 
+# Создание таблицы для расписанием
 async def create_table_schedule():
     pool: Connection = db
     try:
@@ -36,13 +38,15 @@ async def create_table_schedule():
                 id_sched VARCHAR (500),
                 name_sched VARCHAR (200))
                 """
-            record: Record = await pool.fetchval(sql_ex)
-            print('Table schedule created')
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table schedule successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
 
 
+# Создание таблицы для регистрации на лицензионные базы данных (БИБЛИОТЕКА)
 async def create_table_lib_reg_requests():
     pool: Connection = db
     try:
@@ -58,13 +62,38 @@ async def create_table_lib_reg_requests():
                 data_base VARCHAR (200),
                 date_time TIMESTAMP)
                 """
-            record: Record = await pool.fetchval(sql_ex)
-            print('Table lib_reg_requests created')
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table lib_reg_requests successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
 
 
+# Создание таблицы для обращения к ректору
+async def create_table_message_to_rector():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists message_to_rector(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                full_name VARCHAR (200),
+                phone VARCHAR (200),
+                email VARCHAR (200),
+                message_content VARCHAR (990),
+                date_time TIMESTAMP)
+                """
+            record: Record = await pool.fetchval(sql_ex)
+            print('Table message_to_rector successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
+# Создание таблицы с мерчом для almaushop
 async def create_table_almau_shop_products():
     pool: Connection = db
     try:
@@ -80,8 +109,32 @@ async def create_table_almau_shop_products():
                 img VARCHAR (300),
                 url VARCHAR (300))
                 """
-            record: Record = await pool.fetchval(sql_ex)
-            print('Table almau_shop_products created')
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table almau_shop_products successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(f'error in create_table_almau_shop_products - {error}')
+
+
+# Создание таблицы с книгами для almaushop
+async def create_table_almau_shop_books():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists almau_shop_books(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                book_name VARCHAR (200),
+                book_author VARCHAR (200),
+                price INT,
+                currency VARCHAR (100),
+                img VARCHAR (300),
+                url VARCHAR (300))
+                """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table almau_shop_books successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(f'error in create_table_almau_shop_products - {error}')
@@ -164,11 +217,22 @@ async def aws_select_data_schedule():
         logging.info(error)
 
 
-# Almau Shop получение данных
+# Almau Shop получение данных о мерче
 async def almaushop_select_data():
     pool: Connection = db
     try:
         sql_select = "SELECT * FROM almau_shop_products"
+        record: Record = await pool.fetch(sql_select)
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Almau Shop получение данных о книгах
+async def almaushop_select_books():
+    pool: Connection = db
+    try:
+        sql_select = "SELECT * FROM almau_shop_books"
         record: Record = await pool.fetch(sql_select)
         return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -259,6 +323,7 @@ async def add_lib_reg_request_data(id_Telegram, full_name, phone, email, data_ba
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
+
 async def add_feedback_msg_data(id_Telegram, full_name, phone, email, message_content):
     pool: Connection = db
     try:
@@ -273,6 +338,7 @@ async def add_feedback_msg_data(id_Telegram, full_name, phone, email, message_co
         logging.info(error)
 
 
+# Добавления мерча в таблицу 'almau_shop_products'
 async def add_almau_shop_data(id_Telegram, product_name, price, currency, img, url):
     pool: Connection = db
     try:
@@ -282,7 +348,23 @@ async def add_almau_shop_data(id_Telegram, product_name, price, currency, img, u
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(product_name), int(price),
                                                        str(currency),
                                                        str(img), str(url))
-            logging.info(f"ADD registration request for registration in library")
+            logging.info(f"ADD data of merch from almaushop website to table")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Добавления мерча в таблицу 'almau_shop_books'
+async def add_almau_shop_books(id_Telegram, book_name, book_author, price, currency, img, url):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Insert into almau_shop_books(id_telegram, book_name, book_author, price, currency, img, url) values ($1,$2,$3,$4,$5,$6,$7)"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(book_name), str(book_author),
+                                                       int(price), str(currency),
+                                                       str(img), str(url))
+            logging.info(f"ADD data of books from almaushop website to table")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -342,33 +424,33 @@ async def clear_almaushop_table():
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
-async def create_table_message_to_rector():
+
+# Полная очистка таблицы almau_shop_books
+async def clear_almaushop_books_table():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
             # async with pool.transaction():
-            sql_ex = """
-                CREATE TABLE if not exists message_to_rector(
-                id  serial unique primary key,
-                id_Telegram INT NOT NULL,
-                full_name VARCHAR (200),
-                phone VARCHAR (200),
-                email VARCHAR (200),
-                message_content VARCHAR (990),
-                date_time TIMESTAMP)
-                """
-            record: Record = await pool.fetchval(sql_ex)
-            print('Table message_to_rector created')
+            sql_ex = "DELETE FROM almau_shop_books;"
+            record: Record = await connection.fetchrow(sql_ex)
+            logging.info(f"All data deleted from almau_shop_books table")
             return record
     except(Exception, ErrorInAssignmentError) as error:
-        print(error)
+        logging.info(error)
 
 
 # Создание таблиц в БД
 async def set_up_tables():
-    await create_table_users()
-    await create_table_schedule()
-    await create_table_lib_reg_requests()
+    try:
+        await create_table_users()
+        await create_table_schedule()
+        await create_table_lib_reg_requests()
+        await create_table_message_to_rector()
+        await create_table_academic_calendar()
+        await create_table_almau_shop_products()
+        await create_table_almau_shop_books()
+    except Exception as error:
+        print(f'Error - {error}')
 
 
 async def main():
@@ -385,8 +467,10 @@ async def main():
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
     # await create_table_academic_calendar()
-    await create_table_message_to_rector()
+    # await set_up_tables()
     # print(await clear_almaushop_table())
+    # await add_almau_shop_books(5135215, 'book_name', 'book_author', 54545, 'currency', 'img', 'url')
+    print(await clear_almaushop_books_table())
 
 
 if __name__ == '__main__':

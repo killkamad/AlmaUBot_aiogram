@@ -5,14 +5,34 @@ import logging
 
 def inline_keyboard_admin():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="📣 Рассылка", callback_data='send_all')
-    callback_button1 = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
-    callback_button2 = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
-    callback_button3 = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
-    callback_button4 = InlineKeyboardButton(text="🗒 Обновить Академический Календарь", callback_data='send_academic_calendar')
-    callback_button5 = InlineKeyboardButton(text="👔 Обновить данные AlmaU Shop", callback_data='update_almaushop_data')
-    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4, callback_button5)
-    # markup.row(callback_button2, callback_button3)
+    callback_sending = InlineKeyboardButton(text="📣 Рассылка", callback_data='send_all')
+    callback_schedule = InlineKeyboardButton(text="📅 Расписание", callback_data='schedule_admin_menu')
+    callback_almaushop = InlineKeyboardButton(text="🌀 Меню AlmaU Shop", callback_data='almaushop_admin_menu')
+    callback_calendar = InlineKeyboardButton(text="🗒 Обновить Академический Календарь",
+                                             callback_data='send_academic_calendar')
+    markup.add(callback_sending, callback_schedule, callback_almaushop, callback_calendar)
+    return markup
+
+
+# Админ меню AlmaU Shop
+def inline_keyboard_almau_shop_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_merch = InlineKeyboardButton(text="👔 Обновить мерч", callback_data='update_almaushop_merch')
+    callback_books = InlineKeyboardButton(text="📚 Обновить книги", callback_data='update_almaushop_books')
+    callback_faq = InlineKeyboardButton(text="⁉ Добавить вопрос FAQ", callback_data='add_faq_question_almaushop')
+    callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data='back_to_admin_menu')
+    markup.add(callback_merch, callback_books, callback_faq, callback_back)
+    return markup
+
+
+# Админ меню Расписания
+def inline_keyboard_schedule_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_upload = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
+    callback_update = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
+    callback_delete = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
+    callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data='back_to_admin_menu')
+    markup.add(callback_upload, callback_update, callback_delete, callback_back)
     return markup
 
 
@@ -96,11 +116,13 @@ async def inline_keyboard_delete_schedule():
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))
     return markup
 
+
 def cancel_academic_calendar():
     markup = InlineKeyboardMarkup()
     cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_academic_calendar")
     markup.add(cancel_button)
     return markup
+
 
 def cancel_or_send_academic_calendar():
     markup = InlineKeyboardMarkup()

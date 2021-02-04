@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from keyboards.inline.example_callback_datas import buy_callback
+from keyboards.inline.callback_datas import buy_callback
 choice = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -27,7 +27,8 @@ pivo_keyboard = InlineKeyboardMarkup(
 sigi_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text='Купи тут', url='https://stackoverflow.com/questions/55647358/how-do-i-solve-error-dotenv-installation-error-on-pycharm')
+            InlineKeyboardButton(text='Купи тут',
+                                 url='https://stackoverflow.com/questions/55647358/how-do-i-solve-error-dotenv-installation-error-on-pycharm')
         ]
     ]
 )

@@ -1,6 +1,6 @@
 import logging
 
-from keyboards.inline.example_callback_datas import buy_callback
+from keyboards.inline.callback_datas import buy_callback
 from loader import dp, bot
 from aiogram.types import Message, CallbackQuery
 from keyboards.inline.example_choice_buttons import choice, pivo_keyboard, sigi_keyboard

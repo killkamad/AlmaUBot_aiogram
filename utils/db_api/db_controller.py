@@ -153,7 +153,27 @@ async def create_table_academic_calendar():
                 date_time TIMESTAMP)
                 """
             record: Record = await pool.fetchval(sql_ex)
-            print('Table academic_calendar created')
+            print('Table academic_calendar successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
+# Создание таблицы FAQ для AlmaU Shop
+async def create_table_almau_shop_faq():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                CREATE TABLE if not exists almau_shop_faq(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                question VARCHAR (300),
+                answer VARCHAR (4000),
+                date_time TIMESTAMP)
+                """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table almau_shop_faq successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
@@ -239,6 +259,51 @@ async def almaushop_select_books():
         logging.info(error)
 
 
+# Almau Shop FAQ получение вопроса и ответа
+async def almaushop_faq_select_data():
+    pool: Connection = db
+    try:
+        sql_select = "SELECT id, question, answer FROM almau_shop_faq ORDER BY id;"
+        record: Record = await pool.fetch(sql_select)
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def almaushop_faq_find_answer(id):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT answer FROM almau_shop_faq WHERE id = $1;"
+        record: Record = await pool.fetchval(sql_select, int(id))
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def almaushop_faq_find_question(id):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT question FROM almau_shop_faq WHERE id = $1;"
+        record: Record = await pool.fetchval(sql_select, int(id))
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Удлаение кнопки faq Almau Shop
+async def delete_faq_almaushop_button(question):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Delete from almau_shop_faq where question = $1"
+            record: Record = await connection.fetchrow(sql_ex, str(question))
+            logging.info(f"DELETED faq - ({question})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def find_schedule_id(name):
     pool: Connection = db
     try:
@@ -250,17 +315,17 @@ async def find_schedule_id(name):
         logging.info(error)
 
 
-# Для тестов
-async def insert_data():
-    pool: Connection = db
-    try:
-        async with pool.acquire() as connection:
-            # async with pool.transaction():
-            sql_select = "Insert into users(username, firstname, lastname, idt, date_time) values ('dedus1337', 'Иван', 'Иванов', 555455, to_timestamp(now(), 'dd-mm-yyyy hh24:mi:ss'));"
-            await connection.execute(sql_select)
-    except(Exception, ErrorInAssignmentError) as error:
-        logging.info(error)
-
+############## Для тестов ####################
+# async def insert_data():
+#     pool: Connection = db
+#     try:
+#         async with pool.acquire() as connection:
+#             # async with pool.transaction():
+#             sql_select = "Insert into users(username, firstname, lastname, idt, date_time) values ('dedus1337', 'Иван', 'Иванов', 555455, to_timestamp(now(), 'dd-mm-yyyy hh24:mi:ss'));"
+#             await connection.execute(sql_select)
+#     except(Exception, ErrorInAssignmentError) as error:
+#         logging.info(error)
+###############################################
 
 async def check_id(id):
     pool: Connection = db
@@ -354,7 +419,7 @@ async def add_almau_shop_data(id_Telegram, product_name, price, currency, img, u
         logging.info(error)
 
 
-# Добавления мерча в таблицу 'almau_shop_books'
+# Добавления книг в таблицу 'almau_shop_books'
 async def add_almau_shop_books(id_Telegram, book_name, book_author, price, currency, img, url):
     pool: Connection = db
     try:
@@ -365,6 +430,18 @@ async def add_almau_shop_books(id_Telegram, book_name, book_author, price, curre
                                                        int(price), str(currency),
                                                        str(img), str(url))
             logging.info(f"ADD data of books from almaushop website to table")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def add_almau_shop_faq(id_telegram, question, answer):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Insert into almau_shop_faq(id_Telegram, question, answer, date_time) values ($1,$2,$3,now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(question), str(answer))
+            logging.info(f"ADD almaushop faq({question}) to DB")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -449,6 +526,7 @@ async def set_up_tables():
         await create_table_academic_calendar()
         await create_table_almau_shop_products()
         await create_table_almau_shop_books()
+        await create_table_almau_shop_faq()
     except Exception as error:
         print(f'Error - {error}')
 
@@ -470,7 +548,10 @@ async def main():
     # await set_up_tables()
     # print(await clear_almaushop_table())
     # await add_almau_shop_books(5135215, 'book_name', 'book_author', 54545, 'currency', 'img', 'url')
-    print(await clear_almaushop_books_table())
+    # await add_almau_shop_faq(1488, "Poel?", "Yes dada")
+    print(await almaushop_faq_find_answer(1))
+    # for i in (await almaushop_faq_select_data()):
+    #     print(i['id'], i['question'], i['answer'])
 
 
 if __name__ == '__main__':

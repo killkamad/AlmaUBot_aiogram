@@ -21,5 +21,16 @@ class DeleteSchedule(StatesGroup):
     button_name = State()
     confirm_delete = State()
 
+
 class SendAcademCalendar(StatesGroup):
     send_file = State()
+
+
+class CreateFaqAlmauShop(StatesGroup):
+    question = State()
+    answer = State()
+
+
+class DeleteFaqAlmauShop(StatesGroup):
+    question = State()
+    confirm_delete = State()

@@ -42,3 +42,18 @@ class EditFaqAlmauShop(StatesGroup):
     selected_item = State()
     question_confirm = State()
     answer_confirm = State()
+
+
+class SendContactCenter(StatesGroup):
+    name = State()
+    description = State()
+
+
+class UpdateContactCenter(StatesGroup):
+    name = State()
+    description = State()
+
+
+class DeleteContactCenter(StatesGroup):
+    name = State()
+    confirm_delete = State()

@@ -11,5 +11,7 @@ from .admin_almaushop import dp
 from .menu_text_handler import dp
 from .almaushop_menu import dp
 from .feedback_menu import dp
+from .navigation_univer import dp
+from .admin_navigation import dp
 
 __all__ = ["dp"]

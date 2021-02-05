@@ -49,8 +49,5 @@ async def bot_echo(message: types.Message):
                              parse_mode='HTML')
     elif message.text == '⬅ В главное меню':
         await message.answer('Возвращение в главное меню', reply_markup=always_stay_keyboard())
-        await message.answer('Главное меню:\n'
-                             '- Расписание - здесь можно посмотреть расписание\n'
-                             '- FAQ - часто задаваемые вопросы и ответы на них\n'
-                             '- Библиотека - поиск книг',
+        await message.answer(text=_main_menu_text,
                              reply_markup=inline_keyboard_menu())

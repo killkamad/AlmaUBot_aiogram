@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from keyboards.inline.callback_datas import almau_shop_faq_delete_callback
+from keyboards.inline.callback_datas import almau_shop_faq_delete_callback, almau_shop_faq_edit_callback
 from utils import db_api as db
 import logging
 
@@ -21,9 +21,9 @@ def inline_keyboard_almau_shop_admin():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_merch = InlineKeyboardButton(text="👔 Обновить мерч", callback_data='update_almaushop_merch')
     callback_books = InlineKeyboardButton(text="📚 Обновить книги", callback_data='update_almaushop_books')
-    callback_faq_add = InlineKeyboardButton(text="➕ Добавить вопрос FAQ", callback_data='add_faq_almaushop')
-    callback_faq_edit = InlineKeyboardButton(text="♻ Изменить вопрос FAQ", callback_data='edit_faq_almaushop')
-    callback_faq_delete = InlineKeyboardButton(text="❌ Удалить вопрос FAQ", callback_data='delete_faq_almaushop')
+    callback_faq_add = InlineKeyboardButton(text="➕ Добавить FAQ", callback_data='add_faq_almaushop')
+    callback_faq_edit = InlineKeyboardButton(text="♻ Изменить FAQ", callback_data='edit_faq_almaushop')
+    callback_faq_delete = InlineKeyboardButton(text="❌ Удалить FAQ", callback_data='delete_faq_almaushop')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data='back_to_admin_menu')
     markup.add(callback_merch, callback_books, callback_faq_add, callback_faq_edit, callback_faq_delete, callback_back)
     return markup
@@ -44,7 +44,7 @@ def inline_keyboard_massive_send_all():
     markup = InlineKeyboardMarkup()
     callback_button1 = InlineKeyboardButton(text="➕ Добавить фото или документ", callback_data="add_photo_mass")
     callback_button2 = InlineKeyboardButton(text="✅ Отправить", callback_data="send_send_to_all")
-    callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")
+    callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_massive_sending")
     markup.row(callback_button1)
     markup.row(callback_button2, callback_button3)
     return markup
@@ -53,7 +53,7 @@ def inline_keyboard_massive_send_all():
 def inline_keyboard_cancel_or_send():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_send_to_all")
-    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_massive_sending")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -155,10 +155,39 @@ async def inline_keyboard_delete_faq_almaushop():
     return markup
 
 
+async def inline_keyboard_edit_faq_almaushop():
+    markup = InlineKeyboardMarkup(row_width=1)
+    faq_questions = await db.almaushop_faq_select_data()
+    markup.add(
+        *[InlineKeyboardButton(text=item["question"],
+                               callback_data=almau_shop_faq_edit_callback.new(callback_id=item["id"]))
+          for item in faq_questions])
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_almaushop_admin"))
+    return markup
+
+
 def cancel_or_delete_faq_almau_shop():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Удалить", callback_data="delete_faq_almaushop")
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_del_faq_almaushop")
+    markup.add(callback_button, callback_button2)
+    return markup
+
+
+def inline_keyboard_edit_faq_almaushop_choice():
+    markup = InlineKeyboardMarkup()
+    callback_button = InlineKeyboardButton(text="❓ Вопрос", callback_data="edit_faq_shop_q")
+    callback_button2 = InlineKeyboardButton(text="❗ Ответ", callback_data="edit_faq_shop_a")
+    callback_button3 = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_almaushop_admin_faq")
+    markup.add(callback_button, callback_button2)
+    markup.row(callback_button3)
+    return markup
+
+
+def inline_keyboard_edit_almaushop_faq_or_cancel():
+    markup = InlineKeyboardMarkup()
+    callback_button = InlineKeyboardButton(text="✅ Изменить", callback_data="edit_faq_shop_conf")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="edit_faq_shop_dec")
     markup.add(callback_button, callback_button2)
     return markup
 

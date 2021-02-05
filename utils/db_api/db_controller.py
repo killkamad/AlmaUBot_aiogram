@@ -290,6 +290,16 @@ async def almaushop_faq_find_question(id):
         logging.info(error)
 
 
+async def almaushop_faq_find_question_and_answer(id):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT question, answer FROM almau_shop_faq WHERE id = $1;"
+        record: Record = await pool.fetchrow(sql_select, int(id))
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 # Удлаение кнопки faq Almau Shop
 async def delete_faq_almaushop_button(question):
     pool: Connection = db
@@ -447,6 +457,30 @@ async def add_almau_shop_faq(id_telegram, question, answer):
         logging.info(error)
 
 
+async def edit_almau_shop_faq_question(id_telegram, question, id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update almau_shop_faq set id_Telegram = $1, question = $2, date_time = now() Where id = $3"
+            record: Record = await connection.fetch(sql_ex, int(id_telegram), str(question), int(id))
+            logging.info(f"EDIT almaushop faq id = ({id}) to DB")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def edit_almau_shop_faq_answer(id_telegram, answer, id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update almau_shop_faq set id_Telegram = $1, answer = $2, date_time = now() Where id = $3"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(answer), int(id))
+            logging.info(f"EDIT almaushop faq id = ({id}) to DB")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def update_schedule_data(id_Telegram, id_sched, name_sched):
     pool: Connection = db
     try:
@@ -549,9 +583,11 @@ async def main():
     # print(await clear_almaushop_table())
     # await add_almau_shop_books(5135215, 'book_name', 'book_author', 54545, 'currency', 'img', 'url')
     # await add_almau_shop_faq(1488, "Poel?", "Yes dada")
-    print(await almaushop_faq_find_answer(1))
+    # print(await almaushop_faq_find_answer(14))
+    print(await almaushop_faq_find_question_and_answer(12))
     # for i in (await almaushop_faq_select_data()):
     #     print(i['id'], i['question'], i['answer'])
+    await edit_almau_shop_faq_question(468899120, 'Как можно?', 12)
 
 
 if __name__ == '__main__':

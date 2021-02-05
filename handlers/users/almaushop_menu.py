@@ -61,8 +61,8 @@ async def callback_inline_add_faq_almaushop(call: CallbackQuery, callback_data: 
     answer = await db.almaushop_faq_find_answer(id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=answer, reply_markup=inline_keyboard_faq_almaushop_back())
-    logging.info(f'User({call.message.chat.id}) нажал на кнопку {id}')
-    logging.info(f'User({call.message.chat.id}) нажал на кнопку {callback_data}')
+    # logging.info(f'User({call.message.chat.id}) нажал на кнопку {id}')
+    # logging.info(f'User({call.message.chat.id}) нажал на кнопку {callback_data}')
 
 
 @dp.callback_query_handler(text='back_to_almau_shop_faq')

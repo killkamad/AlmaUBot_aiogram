@@ -10,7 +10,7 @@ from keyboards.inline import almau_shop_faq_delete_callback, almau_shop_faq_edit
 from keyboards.inline.admin_buttons import inline_keyboard_almau_shop_admin, \
     inline_keyboard_add_almaushop_faq_or_cancel, inline_keyboard_delete_faq_almaushop, cancel_or_delete_faq_almau_shop, \
     inline_keyboard_edit_faq_almaushop, inline_keyboard_edit_faq_almaushop_choice, \
-    inline_keyboard_edit_almaushop_faq_or_cancel
+    inline_keyboard_edit_almaushop_faq_or_cancel, inline_keyboard_edit_button_content_almaushop_or_cancel
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -19,7 +19,7 @@ from utils import db_api as db
 from utils.almaushop_parser import AlmauShop, AlmauShopBooks
 
 # Импорт стейтов
-from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop
+from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop, EditButtonContentAlmauShop
 
 from utils.misc import rate_limit
 
@@ -71,6 +71,68 @@ async def callback_inline_add_faq_almaushop(call: CallbackQuery, state: FSMConte
     await CreateFaqAlmauShop.question.set()
 
 
+# Изменение контента кнопок вебсайта и контактов в меню almaushop
+@dp.callback_query_handler(text=['edit_website_b_almaushop', 'edit_contacts_b_almaushop'], state=None)
+async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    if call.data == 'edit_website_b_almaushop':
+        await call.message.answer('Напишите новый текст для кнопки "🌐  Вебсайт":\n'
+                                  'Для отмены - /cancel')
+        await state.update_data(button_name='🌐  Вебсайт')
+    elif call.data == 'edit_contacts_b_almaushop':
+        await call.message.answer('Напишите новый текст для кнопки "☎  Контакты":\n'
+                                  'Для отмены - /cancel')
+        await state.update_data(button_name='☎  Контакты')
+    await EditButtonContentAlmauShop.button_content.set()
+
+
+@dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentAlmauShop.button_content)
+async def edit_button_content_almaushop_first_step(message: types.Message, state: FSMContext):
+    if message.content_type == 'text':
+        if len(message.text) <= 4000:
+            await state.update_data(button_content=message.text)
+            await message.reply('✅ Новый текст получен.\n'
+                                'Подтвердите изменение',
+                                reply_markup=inline_keyboard_edit_button_content_almaushop_or_cancel())
+            # await state.reset_state(with_data=False)
+            await EditButtonContentAlmauShop.confirm.set()
+        else:
+            await message.reply(
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
+                parse_mode='HTML')
+    else:
+        await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
+                            'Повторите отправку сообщения')
+
+
+@dp.callback_query_handler(text='edit_button_content_shop', state=EditButtonContentAlmauShop.confirm)
+async def edit_button_content_almaushop_last_step(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    try:
+        data = await state.get_data()
+        await db.edit_almau_shop_menu_button(call.message.chat.id, data['button_content'], data['button_name'])
+        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+        await bot.send_message(call.message.chat.id,
+                               f'✅ Успешно изменен контент для кнопки - "{data["button_name"]}" для раздела AlmaU Shop')
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
+        await state.reset_state()
+    except Exception as error:
+        logging.info(f'Error - {error}')
+        await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
+
+
+@dp.callback_query_handler(text='cancel_ed_but_con_shop', state=EditButtonContentAlmauShop.confirm)
+async def edit_button_content_almaushop_last_step_cancel(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+    await bot.send_message(call.message.chat.id, f'❌ Отмена изменения контента для кнопки - "{data["button_name"]}" для раздела AlmaU Shop')
+    await bot.send_message(chat_id=call.message.chat.id,
+                           text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
+    await state.reset_state()
+
+
 @dp.message_handler(content_types=ContentType.ANY, state=CreateFaqAlmauShop.question)
 async def callback_inline_add_faq_almaushop_question_step(message: types.Message, state: FSMContext):
     # await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
@@ -87,7 +149,7 @@ async def callback_inline_add_faq_almaushop_question_step(message: types.Message
                 parse_mode='HTML')
     else:
         print(message.content_type)
-        await message.reply('Ошибка - ваще сообщение должно содержать только текст\n'
+        await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова')
 
 
@@ -106,11 +168,11 @@ async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, 
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML')
     else:
         print(message.content_type)
-        await message.reply('Ошибка - ваще сообщение должно содержать только текст\n'
+        await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова')
 
 
@@ -256,7 +318,7 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
                 parse_mode='HTML')
     else:
         print(message.content_type)
-        await message.reply('Ошибка - ваще сообщение должно содержать только текст\n'
+        await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова')
 
 
@@ -278,7 +340,7 @@ async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, st
                 parse_mode='HTML')
     else:
         print(message.content_type)
-        await message.reply('Ошибка - ваще сообщение должно содержать только текст\n'
+        await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова')
 
 
@@ -315,7 +377,7 @@ async def edit_faq_almaushop_choice_step_question_final_decline(call: CallbackQu
 @dp.callback_query_handler(text='cancel_del_faq_almaushop', state=DeleteFaqAlmauShop.confirm_delete)
 async def callback_inline_cancel_faq_almaushop(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+    await bot.edit_message_text(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.send_message(call.message.chat.id, '❌ Отмена удаления вопроса F.A.Q AlmaU Shop')
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())

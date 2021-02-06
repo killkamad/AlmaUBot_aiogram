@@ -31,17 +31,40 @@ class CreateFaqAlmauShop(StatesGroup):
     answer = State()
 
 
-class DeleteFaqAlmauShop(StatesGroup):
-    question = State()
-    confirm_delete = State()
-
-
 class EditFaqAlmauShop(StatesGroup):
     button_name = State()
     choice = State()
     selected_item = State()
     question_confirm = State()
     answer_confirm = State()
+
+
+class DeleteFaqAlmauShop(StatesGroup):
+    question = State()
+    confirm_delete = State()
+
+
+class CreateMainFaq(StatesGroup):
+    question = State()
+    answer = State()
+
+
+class DeleteMainFaq(StatesGroup):
+    question = State()
+    confirm_delete = State()
+
+
+class EditMainFaq(StatesGroup):
+    button_name = State()
+    choice = State()
+    selected_item = State()
+    question_confirm = State()
+    answer_confirm = State()
+
+
+class EditButtonContentAlmauShop(StatesGroup):
+    button_content = State()
+    confirm = State()
 
 
 class SendContactCenter(StatesGroup):

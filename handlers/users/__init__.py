@@ -6,6 +6,7 @@ from .menu import dp
 from .lib_menu import dp
 from .admin_menu import dp
 from .admin_schedule import dp
+from .admin_faq_main import dp
 from .admin_messaging import dp
 from .admin_almaushop import dp
 from .menu_text_handler import dp

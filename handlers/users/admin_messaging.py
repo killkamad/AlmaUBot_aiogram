@@ -57,7 +57,7 @@ async def message_send_text(message: types.Message, state: FSMContext):
     else:
         print(message.content_type)
         await bot.send_message(message.chat.id,
-                               'Ошибка - ваще сообщение должно содержать только текст\nНапишите текст сообщения для массовой рассылки:')
+                               'Ошибка - ваше сообщение должно содержать только текст\nНапишите текст сообщения для массовой рассылки:')
 
 
 @dp.callback_query_handler(text='send_send_to_all')

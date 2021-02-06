@@ -43,20 +43,20 @@ async def almaushop_text_buttons_handler(message: types.Message):
                 await asyncio.sleep(2)
                 request = 0
     elif message.text == '🌐  Вебсайт':
+        button_content = await db.select_almau_shop_menu_button_content(message.text)
         await bot.send_message(chat_id=message.chat.id,
-                               text='Вебсайт – https://almaushop.kz')
+                               text=button_content)
     elif message.text == '☎  Контакты':
-        text = 'Контакты: \n' \
-               '• Телефон +7 777 227 30 62\n' \
-               '• Почта t.possivnаya@almau.edu.kz'
-        await bot.send_message(message.chat.id, text=text)
+        button_content = await db.select_almau_shop_menu_button_content(message.text)
+        await bot.send_message(message.chat.id,
+                               text=button_content)
     elif message.text == '⁉  ЧаВо':
-        text = "F.A.Q ↘"
+        text = "AlmaU Shop F.A.Q ↘"
         await bot.send_message(message.chat.id, text=text, reply_markup=await inline_keyboard_faq_almaushop())
 
 
 @dp.callback_query_handler(almau_shop_faq_callback.filter())
-async def callback_inline_add_faq_almaushop(call: CallbackQuery, callback_data: dict):
+async def almaushop_faq_menu(call: CallbackQuery, callback_data: dict):
     id = callback_data.get('callback_id')
     answer = await db.almaushop_faq_find_answer(id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -66,7 +66,7 @@ async def callback_inline_add_faq_almaushop(call: CallbackQuery, callback_data: 
 
 
 @dp.callback_query_handler(text='back_to_almau_shop_faq')
-async def callback_inline_update_almaushop_merch(call: CallbackQuery):
+async def almaushop_faq_menu_back(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text="F.A.Q ↘",

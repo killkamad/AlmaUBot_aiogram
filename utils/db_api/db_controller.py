@@ -198,6 +198,46 @@ async def create_table_contact_centers():
         print(error)
 
 
+# Создание таблицы для кнопок меню AlmaU Shop
+async def create_table_almau_shop_menu_buttons():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                CREATE TABLE if not exists almau_shop_menu_buttons(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                button_name VARCHAR (300),
+                button_content VARCHAR (4000),
+                date_time TIMESTAMP)
+                """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table almau_shop_menu_buttons successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
+# Создание таблицы для FAQ в главном меню
+async def create_table_main_faq():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                    CREATE TABLE if not exists main_faq(
+                    id  serial unique primary key,
+                    id_Telegram INT NOT NULL,
+                    question VARCHAR (300),
+                    answer VARCHAR (4000),
+                    date_time TIMESTAMP)
+                    """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table main_faq successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # Поиск последнего академ календаря в базе
 async def find_id_academic_calendar():
     pool: Connection = db
@@ -289,6 +329,17 @@ async def almaushop_faq_select_data():
         logging.info(error)
 
 
+# Главное менб FAQ получение вопроса и ответа
+async def main_faq_select_data():
+    pool: Connection = db
+    try:
+        sql_select = "SELECT id, question, answer FROM main_faq ORDER BY id;"
+        record: Record = await pool.fetch(sql_select)
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def almaushop_faq_find_answer(id):
     pool: Connection = db
     try:
@@ -319,6 +370,26 @@ async def almaushop_faq_find_question_and_answer(id):
         logging.info(error)
 
 
+async def main_faq_select_question_and_answer(id):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT question, answer FROM main_faq WHERE id = $1;"
+        record: Record = await pool.fetchrow(sql_select, int(id))
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def select_almau_shop_menu_button_content(button_name):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT button_content FROM almau_shop_menu_buttons WHERE button_name = $1;"
+        record: Record = await pool.fetchval(sql_select, str(button_name))
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 # Удлаение кнопки faq Almau Shop
 async def delete_faq_almaushop_button(question):
     pool: Connection = db
@@ -328,6 +399,20 @@ async def delete_faq_almaushop_button(question):
             sql_ex = "Delete from almau_shop_faq where question = $1"
             record: Record = await connection.fetchrow(sql_ex, str(question))
             logging.info(f"DELETED faq - ({question})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Удлаение кнопки FAQ в главном меню
+async def delete_main_faq_button(question):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Delete from main_faq where question = $1"
+            record: Record = await connection.fetchrow(sql_ex, str(question))
+            logging.info(f"DELETED main_faq question - ({question})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -476,6 +561,30 @@ async def add_almau_shop_faq(id_telegram, question, answer):
         logging.info(error)
 
 
+async def add_data_main_faq(id_telegram, question, answer):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Insert into main_faq(id_Telegram, question, answer, date_time) values ($1,$2,$3,now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(question), str(answer))
+            logging.info(f"ADD main_faq({question}) to DB")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def edit_almau_shop_menu_button(id_telegram, button_content, button_name):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update almau_shop_menu_buttons set id_Telegram = $1, button_content = $2, date_time = now() Where button_name = $3"
+            record: Record = await connection.fetch(sql_ex, int(id_telegram), str(button_content), str(button_name))
+            logging.info(f"EDIT almaushop button = ({button_name})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def edit_almau_shop_faq_question(id_telegram, question, id):
     pool: Connection = db
     try:
@@ -495,6 +604,30 @@ async def edit_almau_shop_faq_answer(id_telegram, answer, id):
             sql_ex = "Update almau_shop_faq set id_Telegram = $1, answer = $2, date_time = now() Where id = $3"
             record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(answer), int(id))
             logging.info(f"EDIT almaushop faq id = ({id}) to DB")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def edit_main_faq_question(id_telegram, question, id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update main_faq set id_Telegram = $1, question = $2, date_time = now() Where id = $3"
+            record: Record = await connection.fetch(sql_ex, int(id_telegram), str(question), int(id))
+            logging.info(f"EDIT  main_faq question id = ({id}) to DB")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def edit_main_faq_answer(id_telegram, answer, id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update main_faq set id_Telegram = $1, answer = $2, date_time = now() Where id = $3"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(answer), int(id))
+            logging.info(f"EDIT  main_faq answer id = ({id}) to DB")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -568,21 +701,22 @@ async def clear_almaushop_books_table():
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
-#добавление ключевого центра
+
 async def add_contact_center_data(id_Telegram, description_contact_center, name_contact_center):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
             # async with pool.transaction():
             sql_ex = "Insert into contact_centers(id_Telegram, description_contact_center, name_contact_center) values ($1,$2,$3)"
-            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(description_contact_center), str(name_contact_center))
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(description_contact_center),
+                                                 str(name_contact_center))
             logging.info(f"ADD contact_centers ({name_contact_center})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-#Удаления ключевого центра
+# Удаления ключевого центра
 async def delete_contact_center_button(name_contact_center):
     pool: Connection = db
     try:
@@ -596,21 +730,22 @@ async def delete_contact_center_button(name_contact_center):
         logging.info(error)
 
 
-#обновление описания центра
+# обновление описания центра
 async def update_contact_center_data(id_Telegram, description_contact_center, name_contact_center):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
             # async with pool.transaction():
             sql_ex = "Update contact_centers set id_Telegram = $1, description_contact_center = $2 Where name_contact_center = $3"
-            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(description_contact_center), str(name_contact_center))
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(description_contact_center),
+                                                 str(name_contact_center))
             logging.info(f"UPDATED contact_center ({name_contact_center})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-#Описание определенного  центра
+# Описание определенного  центра
 async def contact_center_description(name):
     pool: Connection = db
     try:
@@ -622,7 +757,7 @@ async def contact_center_description(name):
         logging.info(error)
 
 
-#Все данные о контактах ключевых центров
+# Все данные о контактах ключевых центров
 async def select_data_contact_centers():
     pool: Connection = db
     try:
@@ -644,6 +779,8 @@ async def set_up_tables():
         await create_table_almau_shop_products()
         await create_table_almau_shop_books()
         await create_table_almau_shop_faq()
+        await create_table_almau_shop_menu_buttons()
+        await create_table_main_faq()
     except Exception as error:
         print(f'Error - {error}')
 
@@ -662,15 +799,15 @@ async def main():
     # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
     # await create_table_lib_reg_requests()
     # await create_table_academic_calendar()
-    # await set_up_tables()
+    await set_up_tables()
     # print(await clear_almaushop_table())
     # await add_almau_shop_books(5135215, 'book_name', 'book_author', 54545, 'currency', 'img', 'url')
     # await add_almau_shop_faq(1488, "Poel?", "Yes dada")
     # print(await almaushop_faq_find_answer(14))
-    print(await almaushop_faq_find_question_and_answer(12))
+    # print(await almaushop_faq_find_question_and_answer(12))
     # for i in (await almaushop_faq_select_data()):
     #     print(i['id'], i['question'], i['answer'])
-    await edit_almau_shop_faq_question(468899120, 'Как можно?', 12)
+    # await edit_almau_shop_faq_question(468899120, 'Как можно?', 12)
 
 
 if __name__ == '__main__':

@@ -1,13 +1,14 @@
 import ast
 import logging
 
-from aiogram.types import CallbackQuery, ContentType
+from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
 from aiogram import types
 from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback
+from keyboards.inline import main_faq_callback
 from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
-from keyboards.inline.faq_buttons import inline_keyboard_faq
+from keyboards.inline.faq_buttons import inline_keyboard_main_faq, inline_keyboard_main_faq_back
 from keyboards.inline.feedback_buttons import inline_keyboard_feedback
 from data.config import admins
 
@@ -37,7 +38,9 @@ async def cmd_set_commands(message: types.Message):
         try:
             if message.from_user.id == admin:
                 commands = [types.BotCommand(command="/menu", description="главное меню"),
-                            types.BotCommand(command="/admin", description="админ меню")]
+                            types.BotCommand(command="/admin", description="админ меню"),
+                            types.BotCommand(command="/set_commands", description="настройка команд бота")
+                            ]
                 await bot.set_my_commands(commands)
                 await message.answer("Команды настроены.")
         except Exception as err:
@@ -65,7 +68,7 @@ async def callback_inline_schedule(call: CallbackQuery):
 async def callback_inline_faq(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в F.A.Q")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='F.A.Q ↘', reply_markup=inline_keyboard_faq())
+                                text='F.A.Q ↘', reply_markup=await inline_keyboard_main_faq())
 
 
 @dp.callback_query_handler(text='/library')
@@ -116,30 +119,28 @@ async def callback_academ_calendar(call: CallbackQuery):
     await bot.send_document(call.message.chat.id, file_id)
 
 
-# Меню F.A.Q
-@dp.callback_query_handler(text=['moodle', 'retake', 'reactor_info', 'atestat', 'u_wifi'])
-async def callback_inline_faq(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) нажал на кнопку {call.data}")
-    if call.data == "moodle":
-        text = (await json_data())['faq_answers']['moodle']
-        await bot.send_message(call.message.chat.id, text=text)
-    elif call.data == "retake":
-        text = (await json_data())['faq_answers']['retake']
-        await bot.send_message(call.message.chat.id, text=text)
-    elif call.data == "reactor_info":
-        text = (await json_data())['faq_answers']['rektor']
-        await bot.send_message(call.message.chat.id, text=text)
-    elif call.data == "atestat":
-        text = (await json_data())['faq_answers']['examination']
-        await bot.send_message(call.message.chat.id, text=text)
-    elif call.data == "u_wifi":
-        text = (await json_data())['faq_answers']['wifi1']
-        await bot.send_message(call.message.chat.id, text=text)
+############################ Меню F.A.Q #########################################################
+@dp.callback_query_handler(main_faq_callback.filter())
+async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
+    id = callback_data.get('callback_id')
+    answer = (await db.main_faq_select_question_and_answer(id))['answer']
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=answer, reply_markup=inline_keyboard_main_faq_back())
 
 
-@dp.message_handler(
-    text=['message_to_rector'],
-    state=None)
-async def process_name(message: types.Message, state: FSMContext):
-    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
-    await FeedbackMessage.names.set()
+@dp.callback_query_handler(text='back_to_main_faq')
+async def callback_inline_faq_menu_back(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text="F.A.Q ↘",
+                                reply_markup=await inline_keyboard_main_faq())
+
+############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################
+
+
+# @dp.message_handler(
+#     text=['message_to_rector'],
+#     state=None)
+# async def process_name(message: types.Message, state: FSMContext):
+#     await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+#     await FeedbackMessage.names.set()

@@ -8,6 +8,7 @@ def inline_keyboard_menu():
     callback_button2 = InlineKeyboardButton(text="📚 Библиотека", callback_data="/library")
     callback_button3 = InlineKeyboardButton(text="🌀 AlmaU Shop", callback_data="/almaushop")
     callback_button4 = InlineKeyboardButton(text="🗒 Академический календарь", callback_data="/academ_calendar")
-    callback_button5 = InlineKeyboardButton(text="🗺️ Навигация по университету", callback_data="/nav_unifi")
-    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4, callback_button5)
+    callback_button5 = InlineKeyboardButton(text="📝 Обратная связь с ректором", callback_data="/feedback")
+    callback_button6 = InlineKeyboardButton(text="🗺️ Навигация по университету", callback_data="/nav_unifi")
+    markup.add(callback_button, callback_button1, callback_button2, callback_button3, callback_button4, callback_button5, callback_button6)
     return markup

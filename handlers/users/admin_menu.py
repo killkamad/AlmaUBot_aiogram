@@ -8,7 +8,7 @@ from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
 from keyboards.inline.admin_buttons import inline_keyboard_admin, cancel_or_send_academic_calendar, \
-    cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin
+    cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, inline_keyboard_faq_admin
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -49,6 +49,14 @@ async def schedule_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Расписания, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Расписания:', reply_markup=inline_keyboard_schedule_admin())
+
+
+# Переход Админ меню для FAQ главного меню
+@dp.callback_query_handler(text_contains='faq_admin_menu')
+async def almaushop_admin_menu(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) вошел в админ меню FAQ главного меню, call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
 
 
 # Переход Админ меню для Almau shop

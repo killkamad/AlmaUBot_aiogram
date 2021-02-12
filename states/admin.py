@@ -80,3 +80,9 @@ class UpdateContactCenter(StatesGroup):
 class DeleteContactCenter(StatesGroup):
     name = State()
     confirm_delete = State()
+
+
+class UpdateUserRole(StatesGroup):
+    phone = State()
+    role = State()
+    confirm = State()

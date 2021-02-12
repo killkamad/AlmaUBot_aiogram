@@ -3,7 +3,8 @@ import logging
 
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
 from aiogram import types
-from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback
+from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback, \
+    keyboard_send_phone_to_register_in_db
 from keyboards.inline import main_faq_callback
 from loader import dp, bot
 from keyboards.inline.menu_buttons import inline_keyboard_menu
@@ -16,7 +17,7 @@ from data.config import admins
 from utils import db_api as db
 
 from utils.misc import rate_limit
-from utils.json_loader import json_data
+from states.register_user_phone import RegisterUserPhone
 
 from aiogram.dispatcher import FSMContext
 from states.feedback_state import FeedbackMessage
@@ -57,6 +58,34 @@ async def menu_handler(message):
                            reply_markup=inline_keyboard_menu())
 
 
+################# Регистрация номера в таблицу Users ###########################
+@dp.message_handler(commands=['phone_reg'])
+async def register_user_phone(message):
+    logging.info(f"User({message.chat.id}) начал регистрацию номера телефона")
+    await message.answer("Отправьте свой номер телефона", reply_markup=keyboard_send_phone_to_register_in_db())
+    await RegisterUserPhone.phone.set()
+
+
+@dp.message_handler(content_types=ContentType.CONTACT, state=RegisterUserPhone.phone)
+async def register_user_phone_next(message: types.Message, state: FSMContext):
+    if message.chat.id == message.contact.user_id:
+        logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
+        await message.reply("✅ Номер телефона получен, и успешно зарегистрирован", reply_markup=always_stay_keyboard())
+        phone = message.contact.phone_number
+        if phone.startswith("+"):
+            phone = phone
+        else:
+            phone = f"+{phone}"
+        await db.register_user_phone(message.chat.id, phone)
+        await state.reset_state()
+    else:
+        logging.info(f"User({message.chat.id}) ввел не правильный номер")
+        await message.answer("Вы отправили не свой номер", reply_markup=ReplyKeyboardRemove())
+        await message.answer("Повторите отправку номера с помощью кнопки ниже",
+                             reply_markup=keyboard_send_phone_to_register_in_db())
+
+
+################# КОНЕЦ Регистрация номера в таблицу Users КОНЕЦ ###########################
 @dp.callback_query_handler(text='/schedule')
 async def callback_inline_schedule(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Расписание")

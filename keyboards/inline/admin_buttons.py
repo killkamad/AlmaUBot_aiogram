@@ -426,3 +426,10 @@ def inline_keyboard_cancel_contact_center_admin():
 #     cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_for_all")
 #     markup.add(cancel_button)
 #     return markup
+
+def cancel_or_send_tutors_management():
+    markup = InlineKeyboardMarkup()
+    callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_tutors_management")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin")
+    markup.add(callback_button, callback_button2)
+    return markup

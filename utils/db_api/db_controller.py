@@ -239,6 +239,29 @@ async def create_table_main_faq():
         print(error)
 
 
+# Создание таблицы для профессорско-преподавательского состава
+async def create_table_pps():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists tutors_and_employees(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                shcool VARCHAR (200),
+                position VARCHAR (200),
+                description VARCHAR (990),
+                date_time TIMESTAMP)
+                """
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table tutors_and_employees successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # Поиск последнего академ календаря в базе
 async def find_id_academic_calendar():
     pool: Connection = db
@@ -873,6 +896,31 @@ async def select_data_contact_centers():
         logging.info(error)
 
 
+async def add_pps_data(id_Telegram, shcool, position, description):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Insert into tutors_and_employees(id_Telegram, shcool, position, description, date_time) values ($1,$2,$3,$4,now())"
+            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(shcool),
+                                                 str(position), str(description))
+            logging.info(f"ADD info to ({shcool}) shcool")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def pps_center_description(shcool, position):
+    pool: Connection = db
+    try:
+        sql_select = "SELECT description FROM tutors_and_employees WHERE shcool = $1 and position=$2 ORDER BY id DESC LIMIT 1;"
+        record: Record = await pool.fetchrow(sql_select, str(shcool), str(position))
+        record = list(record)[0]
+        return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 # Создание таблиц в БД
 async def set_up_tables():
     try:
@@ -886,6 +934,7 @@ async def set_up_tables():
         await create_table_almau_shop_faq()
         await create_table_almau_shop_menu_buttons()
         await create_table_main_faq()
+        await create_table_pps()
     except Exception as error:
         print(f'Error - {error}')
 

@@ -86,3 +86,9 @@ class UpdateUserRole(StatesGroup):
     phone = State()
     role = State()
     confirm = State()
+
+
+class Pps_admin(StatesGroup):
+    shcool = State()
+    position = State()
+    description = State()

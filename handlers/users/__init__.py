@@ -15,5 +15,7 @@ from .feedback_menu import dp
 from .navigation_univer import dp
 from .admin_navigation import dp
 from .admin_users import dp
+from .admin_certificate import dp
+from .certificate import dp
 
 __all__ = ["dp"]

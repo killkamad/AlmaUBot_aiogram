@@ -9,7 +9,7 @@ from utils.delete_messages import bot_delete_messages
 # Импорт клавиатур
 from keyboards.inline.admin_buttons import inline_keyboard_admin, cancel_or_send_academic_calendar, \
     cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, \
-    inline_keyboard_faq_admin, inline_keyboard_users_admin
+    inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -150,3 +150,11 @@ async def callback_inline_back_to_admin_menu(call: CallbackQuery):
             logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')
     except Exception as e:
         logging.info(f'Ошибка - {e}')
+
+
+# Переход в Админ меню для Справок
+@dp.callback_query_handler(text_contains='certificate_admin_menu')
+async def certificate_admin_menu(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) вошел в админ меню Справки, call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Админ меню Справки:', reply_markup=inline_keyboard_certificate_admin())

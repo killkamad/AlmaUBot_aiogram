@@ -92,3 +92,21 @@ class Pps_admin(StatesGroup):
     shcool = State()
     position = State()
     description = State()
+
+
+class SendCertificate(StatesGroup):
+    request = State()
+    button_name = State()
+    send_file = State()
+
+
+class UpdateCertificate(StatesGroup):
+    request = State()
+    button_name = State()
+    send_file = State()
+
+
+class DeleteCertificate(StatesGroup):
+    request = State()
+    button_name = State()
+    confirm_delete = State()

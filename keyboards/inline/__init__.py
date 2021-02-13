@@ -11,8 +11,11 @@ from .admin_buttons import inline_keyboard_admin, inline_keyboard_massive_send_a
     inline_keyboard_faq_admin, inline_keyboard_add_main_faq_or_cancel, inline_keyboard_edit_main_faq, \
     inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_almaushop_faq_or_cancel, inline_keyboard_nav_university_admin_menu, \
     inline_keyboard_contact_center_admin, cancel_or_send_contact_center_admin, inline_keyboard_contacts_center_update, \
-    cancel_or_update_contact_center_admin, inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin
+    cancel_or_update_contact_center_admin, inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin, \
+    inline_keyboard_certificate_admin, cancel_or_send_certificate, cancel_or_update_certificate, cancel_or_delete_certificate, \
+    inline_keyboard_update_certificate, inline_keyboard_delete_certificate, inline_keyboard_get_request_certificate
 from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back
 from .navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \
     inline_keyboard_contacts_center_back
+from .certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate, inline_keyboard_send_req_data

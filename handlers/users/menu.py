@@ -11,6 +11,7 @@ from keyboards.inline.menu_buttons import inline_keyboard_menu
 from keyboards.inline.schedule_buttons import inline_keyboard_schedule
 from keyboards.inline.faq_buttons import inline_keyboard_main_faq, inline_keyboard_main_faq_back
 from keyboards.inline.feedback_buttons import inline_keyboard_feedback
+from keyboards.inline.certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate
 from data.config import admins
 
 # Импортирование функций из БД контроллера
@@ -125,12 +126,30 @@ async def callback_inline_almaushop(call: CallbackQuery):
                            text='AlmaU Shop ↘', reply_markup=keyboard_almaushop())
 
 
+@dp.callback_query_handler(text='/certificate')
+async def callback_inline_certificate(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в Получение справки")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Получение справки с места учебы ↘ \n' \
+                                     'Вы можете получить справку или оставить заявку на получение справки с места учебы по месту требования (военкомат и тд.)',
+                                reply_markup=await inline_keyboard_certificate())
+
+
 #  Получение айди расписания из бд и отправка пользователю
 @dp.callback_query_handler(text_contains="['schedule_call'")
 async def callback_inline(call: CallbackQuery):
     logging.info(f'call = {call.data}')
     valueFromCallBack = ast.literal_eval(call.data)[1]
     file_id = await db.find_schedule_id(valueFromCallBack)
+    await bot.send_document(call.message.chat.id, file_id)
+
+
+@dp.callback_query_handler(text_contains="['certificate_call'")
+async def callback_inline(call: CallbackQuery):
+    logging.info(f'call = {call.data}')
+    valueFromCallBack = ast.literal_eval(call.data)[1]
+    file_id = await db.find_certificate_id(valueFromCallBack)
+    print(file_id)
     await bot.send_document(call.message.chat.id, file_id)
 
 

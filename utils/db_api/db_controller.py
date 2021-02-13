@@ -902,7 +902,7 @@ async def add_pps_data(id_Telegram, shcool, position, description):
         async with pool.acquire() as connection:
             # async with pool.transaction():
             sql_ex = "Insert into tutors_and_employees(id_Telegram, shcool, position, description, date_time) values ($1,$2,$3,$4,now())"
-            record: Record = await pool.fetchrow(sql_ex, int(id_Telegram), str(shcool),
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(shcool),
                                                  str(position), str(description))
             logging.info(f"ADD info to ({shcool}) shcool")
             return record
@@ -913,10 +913,11 @@ async def add_pps_data(id_Telegram, shcool, position, description):
 async def pps_center_description(shcool, position):
     pool: Connection = db
     try:
-        sql_select = "SELECT description FROM tutors_and_employees WHERE shcool = $1 and position=$2 ORDER BY id DESC LIMIT 1;"
-        record: Record = await pool.fetchrow(sql_select, str(shcool), str(position))
-        record = list(record)[0]
-        return record
+        async with pool.acquire() as connection:
+            sql_select = "SELECT description FROM tutors_and_employees WHERE shcool = $1 and position=$2 ORDER BY id DESC LIMIT 1;"
+            record: Record = await connection.fetchrow(sql_select, str(shcool), str(position))
+            record = list(record)[0]
+            return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
@@ -952,38 +953,9 @@ async def set_up_tables():
 #         logging.info(error)
 
 async def main():
-    # print(await add_almau_shop_data(525325, "dadadada", 4000, 'тг', 'https://static.tildacdn.com/tild3865-6336-4639-a332-653936323434/for_AlmaU_0709__.png', 'https://almaushop.kz/#!/tproduct/221510661-1605267838115'))
     # count_user = await select_users()
     # print(count_user)
     # for i in count_user:
-    #     print(i)
-    # print(await clear_schedule_table('schedule'))
-    # print(await check_id('468899120'))
-    # print(await find_schedule_id('после колледжа на 3 года'))
-    # print(await check_role(468899120, 'admin'))
-    # print(await select_users())
-    # await add_data('ggg12g', 'bbbb', 'last31_name', 43111)
-    # await create_table_lib_reg_requests()
-    # await create_table_academic_calendar()
-    # await set_up_tables()
-    # print(await clear_almaushop_table())
-    # await add_almau_shop_books(5135215, 'book_name', 'book_author', 54545, 'currency', 'img', 'url')
-    # await add_almau_shop_faq(1488, "Poel?", "Yes dada")
-    # print(await almaushop_faq_find_answer(14))
-    # print(await almaushop_faq_find_question_and_answer(12))
-    # for i in (await almaushop_faq_select_data()):
-    #     print(i['id'], i['question'], i['answer'])
-    # await edit_almau_shop_faq_question(468899120, 'Как можно?', 12)
-    # for i in (await test_test()):
-    #     print(i['date_time'].day)
-    # print(i['date_time'], type(i['date_time']))
-    # await register_user_phone(468899120, '+767565345353')
-    # print(type(await check_phone_in_users('+7707101062065')))
-    # if not (await check_phone_in_users('+77071010620')):
-    #     print('Netu')
-    # else:
-    #     print('EST')
-    # for i in (await select_last_ten_users()):
     #     print(i)
     print((await find_user_by_telegram_id(468899120))['phone'])
 

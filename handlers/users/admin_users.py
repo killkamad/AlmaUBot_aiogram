@@ -154,13 +154,14 @@ async def callback_inline_edit_main_faq_choice_step(call: CallbackQuery, callbac
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     idt = callback_data.get('telegram_id')
     db_find_user = await db.find_user_by_telegram_id(idt)
+    date_time = db_find_user["date_time"].strftime("%d-%m-%Y")
     text = f'<i>Телефон</i> - {db_find_user["phone"]},\n' \
            f'<i>ID</i> - {db_find_user["idt"]},\n' \
-           f'<i>username</i> - {db_find_user["username"]},\n' \
+           f'<i>Username</i> - {db_find_user["username"]},\n' \
            f'<i>Имя</i> - {db_find_user["lastname"]},\n' \
            f'<i>Фамилия</i> - {db_find_user["firstname"]},\n' \
            f'<i>Роль</i> - {db_find_user["role"]},\n' \
-           f'<i>Дата присоединения</i> - {db_find_user["date_time"]}'
+           f'<i>Дата присоединения</i> - {date_time}'
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=text,
                                 reply_markup=back_to_last_ten_users(), parse_mode='HTML')

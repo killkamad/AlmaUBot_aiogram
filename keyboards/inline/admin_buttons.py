@@ -12,13 +12,18 @@ def inline_keyboard_admin():
     callback_schedule = InlineKeyboardButton(text="📅 Расписание", callback_data='schedule_admin_menu')
     callback_certificate = InlineKeyboardButton(text="🏢 Справки", callback_data="certificate_admin_menu")
     callback_faq = InlineKeyboardButton(text="⁉ FAQ", callback_data='faq_admin_menu')
-    callback_almaushop = InlineKeyboardButton(text="🌀 Меню AlmaU Shop", callback_data='almaushop_admin_menu')
+    callback_library = InlineKeyboardButton(text="📚 Библиотека", callback_data='library_admin_menu')
+    callback_almaushop = InlineKeyboardButton(text="🌀 AlmaU Shop", callback_data='almaushop_admin_menu')
     callback_calendar = InlineKeyboardButton(text="🗒 Обновить Академический Календарь",
                                              callback_data='send_academic_calendar')
     callback_navigation = InlineKeyboardButton(text="🗺️ Меню Навигации", callback_data='nav_university_admin_menu')
     callback_users = InlineKeyboardButton(text="👥 Пользователи", callback_data='users_admin')
-    markup.add(callback_sending, callback_schedule, callback_certificate, callback_faq, callback_almaushop, callback_calendar,
-               callback_navigation, callback_users)
+    markup.add(callback_schedule, callback_faq, callback_library, callback_almaushop)
+    markup.row(callback_calendar)
+    markup.row(callback_certificate)
+    markup.row(callback_navigation)
+    markup.row(callback_sending)
+    markup.row(callback_users)
     return markup
 
 
@@ -109,7 +114,8 @@ async def inline_keyboard_select_last_ten_users():
     markup = InlineKeyboardMarkup(row_width=1)
     users_list = await db.select_last_ten_users()
     markup.add(
-        *[InlineKeyboardButton(text=f'{i}. {user["idt"]}', callback_data=last_ten_users_callback.new(telegram_id=user["idt"]))
+        *[InlineKeyboardButton(text=f'{i}. {user["idt"]}',
+                               callback_data=last_ten_users_callback.new(telegram_id=user["idt"]))
           for i, user in enumerate(users_list, 1)])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_users_admin"))
     return markup
@@ -421,6 +427,7 @@ def inline_keyboard_cancel_contact_center_admin():
     cancel_button = InlineKeyboardButton(text="❌ Отмена ", callback_data="cancel_step_contact_center_admin")
     markup.add(cancel_button)
     return markup
+
 
 # def cancel_for_all():
 #     markup = InlineKeyboardMarkup()

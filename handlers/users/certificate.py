@@ -1,6 +1,5 @@
 import ast
 import logging
-import aiosmtplib
 import re
 
 from aiogram import types
@@ -8,11 +7,14 @@ from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
 from aiogram.dispatcher import FSMContext
 
 from loader import dp, bot
-from keyboards.inline.certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate, \
-                                                 inline_keyboard_send_req_data
-from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type
+
+# Импорт клавиатур
+from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data
+from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
+    keyboard_feedback_send_phone
 from utils import db_api as db
 
+# Импорт стейтов
 from states.request_state import CertificateRequest
 
 # Патерн регулярного выражения для проверки почты
@@ -29,7 +31,8 @@ def is_valid_email(s):
 async def callback_inline_completes(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Готовые справки")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Готовые справки:', reply_markup=await inline_keyboard_get_certificate(call.message.chat.id))
+                                text='Готовые справки:',
+                                reply_markup=await inline_keyboard_get_certificate(call.message.chat.id))
 
 
 # Запрос на получение справки
@@ -115,7 +118,8 @@ async def callback_inline_request_cancel(call: CallbackQuery, state: FSMContext)
 async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил заявку")
     data = await state.get_data()
-    await db.add_certificate_request_data(call.message.chat.id, data['names'], data['phone'], data['email'], data['type'])
+    await db.add_certificate_request_data(call.message.chat.id, data['names'], data['phone'], data['email'],
+                                          data['type'])
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка успешно отправлена")
     await bot.send_message(chat_id=call.message.chat.id,

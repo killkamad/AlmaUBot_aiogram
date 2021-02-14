@@ -6,13 +6,8 @@ from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 
 # Импорт клавиатур
-from keyboards.inline import almau_shop_faq_delete_callback, almau_shop_faq_edit_callback, main_faq_edit_callback, \
-    main_faq_delete_callback
-from keyboards.inline.admin_buttons import inline_keyboard_almau_shop_admin, \
-    inline_keyboard_add_almaushop_faq_or_cancel, inline_keyboard_delete_faq_almaushop, cancel_or_delete_faq_almau_shop, \
-    inline_keyboard_edit_faq_almaushop, inline_keyboard_edit_faq_almaushop_choice, \
-    inline_keyboard_edit_almaushop_faq_or_cancel, inline_keyboard_edit_button_content_almaushop_or_cancel, \
-    inline_keyboard_add_main_faq_or_cancel, inline_keyboard_faq_admin, inline_keyboard_edit_main_faq, \
+from keyboards.inline import main_faq_edit_callback, main_faq_delete_callback, inline_keyboard_add_main_faq_or_cancel, \
+    inline_keyboard_faq_admin, inline_keyboard_edit_main_faq, \
     inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel, inline_keyboard_delete_main_faq, \
     cancel_or_delete_main_faq
 

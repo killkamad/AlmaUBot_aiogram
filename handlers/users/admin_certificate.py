@@ -9,7 +9,7 @@ from .admin_menu import admin_menu
 from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
-from keyboards.inline.admin_buttons import inline_keyboard_admin, inline_keyboard_cancel, cancel_or_send_certificate, \
+from keyboards.inline import inline_keyboard_admin, inline_keyboard_cancel, cancel_or_send_certificate, \
     inline_keyboard_update_certificate, cancel_or_update_certificate, inline_keyboard_delete_certificate, \
     cancel_or_delete_certificate, inline_keyboard_get_request_certificate, inline_keyboard_upd_req_certificate, \
     inline_keyboard_del_req_certificate

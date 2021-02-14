@@ -1,19 +1,15 @@
 import ast
 import logging
+from loader import dp, bot
 
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
 from aiogram import types
 from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback, \
     keyboard_send_phone_to_register_in_db
-from keyboards.inline import main_faq_callback
-from loader import dp, bot
-from keyboards.inline.menu_buttons import inline_keyboard_menu
-from keyboards.inline.schedule_buttons import inline_keyboard_schedule
-from keyboards.inline.faq_buttons import inline_keyboard_main_faq, inline_keyboard_main_faq_back
-from keyboards.inline.feedback_buttons import inline_keyboard_feedback
-from keyboards.inline.certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate
-from data.config import admins
+from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_keyboard_schedule, \
+    inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback
 
+from data.config import admins
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -135,13 +131,13 @@ async def callback_inline_certificate(call: CallbackQuery):
                                 reply_markup=await inline_keyboard_certificate())
 
 
-#  Получение айди расписания из бд и отправка пользователю
-@dp.callback_query_handler(text_contains="['schedule_call'")
-async def callback_inline(call: CallbackQuery):
+#  Динамические кнопки Расписания
+@dp.callback_query_handler(schedule_callback.filter())
+async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    valueFromCallBack = ast.literal_eval(call.data)[1]
-    file_id = await db.find_schedule_id(valueFromCallBack)
-    await bot.send_document(call.message.chat.id, file_id)
+    schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
+    file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
+    await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
 
 
 @dp.callback_query_handler(text_contains="['certificate_call'")

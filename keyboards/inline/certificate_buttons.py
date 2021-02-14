@@ -1,7 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
-from loader import dp, bot
-from aiogram.types import CallbackQuery
 
 
 async def inline_keyboard_certificate():

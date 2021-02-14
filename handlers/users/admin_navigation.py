@@ -5,7 +5,7 @@ from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from loader import dp, bot
-from keyboards.inline.admin_buttons import inline_keyboard_nav_university_admin_menu, inline_keyboard_contact_center_admin, \
+from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_keyboard_contact_center_admin, \
     cancel_or_send_contact_center_admin, cancel_or_update_contact_center_admin, \
     cancel_or_delete_contact_center_admin, inline_keyboard_contacts_center_delete, inline_keyboard_contacts_center_update, \
     inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management 

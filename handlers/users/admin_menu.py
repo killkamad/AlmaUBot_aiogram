@@ -7,7 +7,7 @@ from loader import dp, bot
 from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
-from keyboards.inline.admin_buttons import inline_keyboard_admin, cancel_or_send_academic_calendar, \
+from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_calendar, \
     cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, \
     inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin
 

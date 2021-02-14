@@ -8,7 +8,7 @@ from loader import dp, bot
 from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
-from keyboards.inline.admin_buttons import inline_keyboard_massive_send_all, inline_keyboard_cancel_or_send
+from keyboards.inline import inline_keyboard_massive_send_all, inline_keyboard_cancel_or_send
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db

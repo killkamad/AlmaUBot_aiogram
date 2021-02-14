@@ -1,22 +1,20 @@
 import logging
+
+# Импорт библиотек aiogram
 from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 
-from keyboards.inline.callback_datas import last_ten_users_callback
 from loader import dp, bot
 
 # Импорт клавиатур
-from keyboards.inline import almau_shop_faq_delete_callback, almau_shop_faq_edit_callback
-from keyboards.inline.admin_buttons import inline_keyboard_users_admin_roles, inline_keyboard_users_admin, \
+from keyboards.inline import inline_keyboard_users_admin_roles, inline_keyboard_users_admin, \
     inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users
+from keyboards.inline.callback_datas import last_ten_users_callback
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
-
-# Импорт класса парсеров
-from utils.almaushop_parser import AlmauShop, AlmauShopBooks
 
 # Импорт стейтов
 from states.admin import UpdateUserRole

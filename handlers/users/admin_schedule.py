@@ -1,4 +1,3 @@
-import ast
 import logging
 from aiogram.utils import exceptions
 from aiogram import types
@@ -9,9 +8,9 @@ from .admin_menu import admin_menu
 from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
-from keyboards.inline.admin_buttons import inline_keyboard_admin, inline_keyboard_cancel, cancel_or_send_schedule, \
+from keyboards.inline import inline_keyboard_admin, inline_keyboard_cancel, cancel_or_send_schedule, \
     inline_keyboard_update_schedule, cancel_or_update_schedule, inline_keyboard_delete_schedule, \
-    cancel_or_delete_schedule
+    cancel_or_delete_schedule, schedule_update_callback, schedule_delete_callback
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -53,10 +52,11 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
     await state.reset_state()
 
 
-@dp.callback_query_handler(text_contains="['upd_sch'", state=UpdateSchedule.button_name)
-async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext):
+# Нажатие на одну из кнопок с названием расписания, для обновления
+@dp.callback_query_handler(schedule_update_callback.filter(), state=UpdateSchedule.button_name)
+async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    schedule_button_name = ast.literal_eval(call.data)[1]
+    schedule_button_name = callback_data.get('schedule_name')
     await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Отправьте файл с расписанием для кнопки <b>{schedule_button_name}</b>:',
@@ -105,10 +105,11 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
     await state.reset_state()
 
 
-@dp.callback_query_handler(text_contains="['del_sch'", state=DeleteSchedule.button_name)
-async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext):
+# Нажатие на одну из кнопок с названием расписания, для удаления
+@dp.callback_query_handler(schedule_delete_callback.filter(), state=DeleteSchedule.button_name)
+async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    schedule_button_name = ast.literal_eval(call.data)[1]
+    schedule_button_name = callback_data.get('schedule_name')
     await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Вы точно уверены, что хотите удалить кнопку расписания для <b>{schedule_button_name}</b>:',

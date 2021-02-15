@@ -23,3 +23,4 @@ schedule_update_callback = CallbackData('schedule_upd_call', 'schedule_name')
 schedule_delete_callback = CallbackData('schedule_del_call', 'schedule_name')
 
 # test_callback = CallbackData('тест', 'schedule_name')
+#### main_test

@@ -297,13 +297,28 @@ async def create_table_request_certificate():
                 full_name VARCHAR (200),
                 phone VARCHAR (200),
                 email VARCHAR (200),
-                certif_type VARCHAR (200))
+                certif_type VARCHAR (200),
+                date_time TIMESTAMP)
                 """
             record: Record = await pool.fetchval(sql_ex)
             print('Table request_certificate successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
+
+# async def create_table_test():
+#     pool: Connection = db
+#     try:
+#         async with pool.acquire() as connection:
+#             # async with pool.transaction():
+#             sql_ex = """
+#                 AlTER TABLE certificate ADD date_time TIMESTAMP
+#                 """
+#             record: Record = await pool.fetchval(sql_ex)
+#             print('Table request_certificate successfully created')
+#             return record
+#     except(Exception, ErrorInAssignmentError) as error:
+#         print(error)
 
 
 # Создание таблиц в БД
@@ -332,6 +347,7 @@ async def main():
     # for i in count_user:
     #     print(i)
     await set_up_tables()
+    # await create_table_test()
 
 
 if __name__ == '__main__':

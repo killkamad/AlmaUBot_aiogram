@@ -109,7 +109,7 @@ async def add_certificate_request_data(id_Telegram, full_name, phone, email, cer
     try:
         async with pool.acquire() as connection:
             # async with pool.transaction():
-            sql_ex = "Insert into request_certificate(id_Telegram, full_name, phone, email, certif_type) values ($1,$2,$3,$4,$5)"
+            sql_ex = "Insert into request_certificate(id_Telegram, full_name, phone, email, certif_type, date_time) values ($1,$2,$3,$4,$5, now())"
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(full_name), str(phone), str(email),
                                                        str(certif_type))
             logging.info(f"ADD request for certificate")

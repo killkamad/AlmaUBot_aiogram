@@ -21,6 +21,10 @@ last_ten_users_callback = CallbackData('L10', 'telegram_id')
 schedule_callback = CallbackData('schedule_call', 'schedule_name')
 schedule_update_callback = CallbackData('schedule_upd_call', 'schedule_name')
 schedule_delete_callback = CallbackData('schedule_del_call', 'schedule_name')
-
-# test_callback = CallbackData('тест', 'schedule_name')
+<<<<<<< main_test
+#### main_test
+=======
 # test12312312313123123123
+>>>>>>> master
+# test_callback = CallbackData('тест', 'schedule_name')
+

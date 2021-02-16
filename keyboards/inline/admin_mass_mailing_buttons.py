@@ -2,13 +2,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 # Рассылка
-def inline_keyboard_massive_send_all():
-    markup = InlineKeyboardMarkup()
-    callback_button1 = InlineKeyboardButton(text="➕ Добавить фото или документ", callback_data="add_photo_mass")
-    callback_button2 = InlineKeyboardButton(text="✅ Отправить", callback_data="send_send_to_all")
+def inline_keyboard_mass_mailing_send_or_attach():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button1 = InlineKeyboardButton(text="➕ Прикрепить файл или фото", callback_data="attach_pic_or_doc")
+    callback_button2 = InlineKeyboardButton(text="✅ Отправить рассылку", callback_data="send_send_to_all")
     callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_massive_sending")
-    markup.row(callback_button1)
-    markup.row(callback_button2, callback_button3)
+    markup.add(callback_button1, callback_button2, callback_button3)
     return markup
 
 

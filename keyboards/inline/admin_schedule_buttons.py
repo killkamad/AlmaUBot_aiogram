@@ -43,7 +43,7 @@ def cancel_or_delete_schedule():
 
 # Расписание динамические кнопки, для обновления
 async def inline_keyboard_update_schedule():
-    markup = InlineKeyboardMarkup(row_width=3)
+    markup = InlineKeyboardMarkup(row_width=2)
     schedule = await db.aws_select_data_schedule()
     markup.add(*[InlineKeyboardButton(text=item['name_sched'],
                                       callback_data=schedule_update_callback.new(schedule_name=item["name_sched"])) for
@@ -54,8 +54,18 @@ async def inline_keyboard_update_schedule():
 
 # Расписание динамические кнопки, для удаления
 async def inline_keyboard_delete_schedule():
-    markup = InlineKeyboardMarkup(row_width=3)
+    markup = InlineKeyboardMarkup(row_width=2)
     schedule = await db.aws_select_data_schedule()
-    markup.add(*[InlineKeyboardButton(text=item['name_sched'], callback_data=schedule_delete_callback.new(schedule_name=item["name_sched"])) for item in schedule])
+    markup.add(*[InlineKeyboardButton(text=item['name_sched'],
+                                      callback_data=schedule_delete_callback.new(schedule_name=item["name_sched"])) for
+                 item in schedule])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))
+    return markup
+
+
+# Расписание Отмена
+def inline_keyboard_cancel_schedule():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена отправки расписания", callback_data="cancel_step_schedule")
+    markup.add(cancel_button)
     return markup

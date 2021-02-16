@@ -18,6 +18,6 @@ main_faq_edit_callback = CallbackData('edit_main_faq', 'callback_id')
 last_ten_users_callback = CallbackData('L10', 'telegram_id')
 
 # Schedule
-schedule_callback = CallbackData('schedule_call', 'schedule_name')
-schedule_update_callback = CallbackData('schedule_upd_call', 'schedule_name')
-schedule_delete_callback = CallbackData('schedule_del_call', 'schedule_name')
+schedule_callback = CallbackData('sch', 'schedule_name')
+schedule_update_callback = CallbackData('schupd', 'schedule_name')
+schedule_delete_callback = CallbackData('schdel', 'schedule_name')

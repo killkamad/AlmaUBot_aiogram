@@ -6,7 +6,7 @@ from .admin_almaushop_buttons import inline_keyboard_almau_shop_admin, inline_ke
 
 # Админ кнопки для Расписания
 from .admin_schedule_buttons import inline_keyboard_schedule_admin, cancel_or_send_schedule, cancel_or_update_schedule, \
-    cancel_or_delete_schedule, inline_keyboard_update_schedule, inline_keyboard_delete_schedule
+    cancel_or_delete_schedule, inline_keyboard_update_schedule, inline_keyboard_delete_schedule, inline_keyboard_cancel_schedule
 
 # Админ кнопки для F.A.Q главного меню
 from .admin_faq_buttons import inline_keyboard_faq_admin, inline_keyboard_add_main_faq_or_cancel, \
@@ -18,7 +18,7 @@ from .admin_users_buttons import inline_keyboard_users_admin, inline_keyboard_us
     inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users
 
 # Админ кнопки для Массовой рассылки
-from .admin_mass_mailing_buttons import inline_keyboard_massive_send_all, inline_keyboard_cancel_or_send, \
+from .admin_mass_mailing_buttons import inline_keyboard_mass_mailing_send_or_attach, inline_keyboard_cancel_or_send, \
     inline_keyboard_cancel
 
 # Админ кнопки для Академического календаря

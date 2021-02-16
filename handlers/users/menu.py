@@ -49,13 +49,12 @@ async def cmd_set_commands(message: types.Message):
 @dp.message_handler(commands=['menu'])
 async def menu_handler(message):
     logging.info(f"User({message.chat.id}) вошел в меню")
-    await bot.send_message(message.chat.id, f'Вы находитесь в главном меню.',
-                           reply_markup=always_stay_keyboard())
     await bot.send_message(message.chat.id, _main_menu_text,
                            reply_markup=inline_keyboard_menu())
 
 
 ################# Регистрация номера в таблицу Users ###########################
+@rate_limit(6, 'phone_reg')
 @dp.message_handler(commands=['phone_reg'])
 async def register_user_phone(message):
     logging.info(f"User({message.chat.id}) начал регистрацию номера телефона")
@@ -83,6 +82,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 
 
 ################# КОНЕЦ Регистрация номера в таблицу Users КОНЕЦ ###########################
+
 @dp.callback_query_handler(text='/schedule')
 async def callback_inline_schedule(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Расписание")

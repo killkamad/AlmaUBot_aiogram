@@ -1,9 +1,9 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
-class SendAll(StatesGroup):
+class MassMailSending(StatesGroup):
     message_text = State()
-    message_photo = State()
+    message_attached = State()
     message_send_all_users = State()
 
 

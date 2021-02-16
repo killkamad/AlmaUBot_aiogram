@@ -19,6 +19,13 @@ async def bot_start(message: types.Message):
         logging.info('Данный пользователь уже находится в базе данных')
     else:
         await db.add_data(message.chat.username, message.chat.first_name, message.chat.last_name, message.chat.id)
-    await bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name} 😃',
-                           reply_markup=always_stay_keyboard())
+    if message.from_user.first_name:
+        await bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name} 😃',
+                               reply_markup=always_stay_keyboard())
+    elif message.from_user.last_name:
+        await bot.send_message(message.chat.id, f'Привет, {message.from_user.last_name} 😃',
+                               reply_markup=always_stay_keyboard())
+    elif message.from_user.username:
+        await bot.send_message(message.chat.id, f'Привет, {message.from_user.username} 😃',
+                               reply_markup=always_stay_keyboard())
     await bot.send_message(message.chat.id, _main_menu_text, reply_markup=inline_keyboard_menu())

@@ -36,8 +36,8 @@ from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel
     inline_keyboard_update_certificate, inline_keyboard_del_req_certificate, inline_keyboard_delete_certificate, \
     inline_keyboard_get_request_certificate
 
-# Кнопки для главного админ меню
-from .admin_main_buttons import inline_keyboard_admin
+# Кнопки для главного админ меню и админ меню для ролей
+from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin
 
 # CALLBACK DATAS фильтр
 from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callback, almau_shop_faq_delete_callback, \

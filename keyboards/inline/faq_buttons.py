@@ -10,7 +10,7 @@ async def inline_keyboard_main_faq():
     markup.add(
         *[InlineKeyboardButton(text=item["question"], callback_data=main_faq_callback.new(callback_id=item["id"]))
           for item in faq_questions])
-    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="go_back"))
+    # markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="go_back"))
     return markup
 
 

@@ -7,8 +7,8 @@ async def inline_keyboard_certificate():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text="📌 Готовые справки", callback_data='complete_certificates')
     callback_button1 = InlineKeyboardButton(text="✉ Оставить заявку", callback_data='request_certificate')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
-    markup.add(callback_button, callback_button1, callback_button2)
+    # callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
+    markup.add(callback_button, callback_button1)
     return markup
 
 

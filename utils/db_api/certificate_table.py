@@ -176,7 +176,7 @@ async def mark_as_loaded_request(id, is_loaded):
                 """
             # record: Record = await pool.fetchval(sql_ex)
             record: Record = await connection.fetchrow(sql_ex, int(id), bool(is_loaded))
-            print('Table certificate successfully created')
+            logging.info('UPDATED request_certificate, function - mark_as_loaded_request')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)

@@ -47,7 +47,7 @@ async def bot_echo(message: types.Message):
                              '- Для просмотра мерча AlmaU и получении информации о AlmaU Shop в меню '
                              'нажать на кнопку <b>"🌀 AlmaU Shop"</b>.',
                              parse_mode='HTML')
-    elif message.text == '⬅ В главное меню':
-        await message.answer('Возвращение в главное меню', reply_markup=always_stay_keyboard())
-        await message.answer(text=_main_menu_text,
-                             reply_markup=inline_keyboard_menu())
+    # elif message.text == '⬅ В главное меню':
+    #     await message.answer('Возвращение в главное меню', reply_markup=always_stay_keyboard())
+    #     await message.answer(text=_main_menu_text,
+    #                          reply_markup=inline_keyboard_menu())

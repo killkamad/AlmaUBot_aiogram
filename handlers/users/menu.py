@@ -2,13 +2,13 @@ import ast
 import logging
 from loader import dp, bot
 
-from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
+from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove, Message
 from aiogram import types
 from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback, \
-    keyboard_send_phone_to_register_in_db
+    keyboard_send_phone_to_register_in_db, always_stay_menu_keyboard
 from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_keyboard_schedule, \
-    inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback
-
+    inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback, \
+    inline_keyboard_nav_unifi
 
 from data.config import admins
 # Импортирование функций из БД контроллера
@@ -37,8 +37,9 @@ async def cmd_set_commands(message: types.Message):
         try:
             if message.from_user.id == admin:
                 commands = [types.BotCommand(command="/menu", description="главное меню"),
+                            types.BotCommand(command="/help", description="помощь"),
                             types.BotCommand(command="/admin", description="админ меню"),
-                            types.BotCommand(command="/set_commands", description="настройка команд бота")
+                            types.BotCommand(command="/set_commands", description="установка команд бота")
                             ]
                 await bot.set_my_commands(commands)
                 await message.answer("Команды настроены.")
@@ -46,12 +47,20 @@ async def cmd_set_commands(message: types.Message):
             logging.exception(err)
 
 
-@rate_limit(6, 'menu')
-@dp.message_handler(commands=['menu'])
+@rate_limit(6, 'menu_old')
+@dp.message_handler(commands=['menu_old'])
 async def menu_handler(message):
     logging.info(f"User({message.chat.id}) вошел в меню")
     await bot.send_message(message.chat.id, _main_menu_text,
                            reply_markup=inline_keyboard_menu())
+
+
+@rate_limit(5, 'menu')
+@dp.message_handler(commands=['menu'])
+async def menu_handler(message):
+    logging.info(f"User({message.chat.id}) вошел в меню")
+    await bot.send_message(message.chat.id, 'Главное меню ↘',
+                           reply_markup=always_stay_menu_keyboard())
 
 
 ################# Регистрация номера в таблицу Users ###########################
@@ -67,7 +76,8 @@ async def register_user_phone(message):
 async def register_user_phone_next(message: types.Message, state: FSMContext):
     if message.chat.id == message.contact.user_id:
         logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
-        await message.reply("✅ Номер телефона получен, и успешно зарегистрирован", reply_markup=always_stay_keyboard())
+        await message.reply("✅ Номер телефона получен, и успешно зарегистрирован",
+                            reply_markup=always_stay_menu_keyboard())
         phone = message.contact.phone_number
         if phone.startswith("+"):
             phone = phone
@@ -83,6 +93,44 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 
 
 ################# КОНЕЦ Регистрация номера в таблицу Users КОНЕЦ ###########################
+
+
+@rate_limit(1, 'Меню')
+@dp.message_handler(lambda message: message.text in ["📅 Расписание", "⁉ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
+                                                     "🗒 Академический календарь", "🏢 Получить справку",
+                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"])
+async def main_menu_handler(message: Message):
+    logging.info(f"User({message.chat.id}) enter {message.text}")
+    if message.text == "📅 Расписание":
+        await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
+    elif message.text == "⁉ FAQ":
+        await message.answer(text='F.A.Q ↘', reply_markup=await inline_keyboard_main_faq())
+    elif message.text == "📚 Библиотека":
+        await message.answer(text='Библиотека ↘', reply_markup=keyboard_library())
+    elif message.text == "🌀 AlmaU Shop":
+        await message.answer(text='AlmaU Shop ↘', reply_markup=keyboard_almaushop())
+    elif message.text == "🗒 Академический календарь":
+        file_id = await db.find_id_academic_calendar()
+        await bot.send_document(message.chat.id, file_id)
+    elif message.text == "🏢 Получить справку":
+        await message.answer(text='Получение справки с места учебы\n' \
+                                  'Вы можете получить справку или оставить заявку на получение справки с места учебы по месту требования (военкомат и тд.) ↘',
+                             reply_markup=await inline_keyboard_certificate())
+    elif message.text == "📝 Связь с ректором":
+        await message.answer(
+            text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
+                 'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.',
+            reply_markup=keyboard_feedback())
+    elif message.text == "🗺️ Навигация по университету":
+        await message.answer(text='Навигация по университету', reply_markup=inline_keyboard_nav_unifi())
+
+
+@dp.message_handler(lambda message: message.text in ["⬅ В главное меню"])
+async def main_menu_handler(message: Message):
+    logging.info(f"User({message.chat.id}) enter {message.text}")
+    if message.text == "⬅ В главное меню":
+        await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
+
 
 @dp.callback_query_handler(text='/schedule')
 async def callback_inline_schedule(call: CallbackQuery):
@@ -132,13 +180,10 @@ async def callback_inline_certificate(call: CallbackQuery):
                                 reply_markup=await inline_keyboard_certificate())
 
 
-#  Динамические кнопки Расписания
-@dp.callback_query_handler(schedule_callback.filter())
-async def callback_inline(call: CallbackQuery, callback_data: dict):
-    logging.info(f'call = {call.data}')
-    schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
-    file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
-    await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
+@dp.callback_query_handler(text='/academ_calendar')
+async def callback_academ_calendar(call: CallbackQuery):
+    file_id = await db.find_id_academic_calendar()
+    await bot.send_document(call.message.chat.id, file_id)
 
 
 @dp.callback_query_handler(text='go_back')
@@ -149,12 +194,18 @@ async def callback_inline(call: CallbackQuery):
                                 reply_markup=inline_keyboard_menu())
 
 
-@dp.callback_query_handler(text='/academ_calendar')
-async def callback_academ_calendar(call: CallbackQuery):
-    file_id = await db.find_id_academic_calendar()
-    await bot.send_document(call.message.chat.id, file_id)
+######################  Динамические кнопки Расписания ##################################################
 
 
+@dp.callback_query_handler(schedule_callback.filter())
+async def callback_inline(call: CallbackQuery, callback_data: dict):
+    logging.info(f'call = {call.data}')
+    schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
+    file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
+    await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
+
+
+###################### КОНЕЦ Динамические кнопки Расписания КОНЕЦ #################################################
 ############################ Меню F.A.Q #########################################################
 @dp.callback_query_handler(main_faq_callback.filter())
 async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
@@ -172,11 +223,3 @@ async def callback_inline_faq_menu_back(call: CallbackQuery):
                                 reply_markup=await inline_keyboard_main_faq())
 
 ############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################
-
-
-# @dp.message_handler(
-#     text=['message_to_rector'],
-#     state=None)
-# async def process_name(message: types.Message, state: FSMContext):
-#     await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
-#     await FeedbackMessage.names.set()

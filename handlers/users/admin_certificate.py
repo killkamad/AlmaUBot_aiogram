@@ -172,8 +172,6 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 async def message_send_button_name(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
     await state.update_data(button_name=call.data[5:], user_id=call.message.chat.id)
-    lol = True
-    print(lol)
     await bot.send_message(chat_id=call.message.chat.id, text='Отправьте файл со справкой', reply_markup=inline_keyboard_cancel_certificate())
     await SendCertificate.send_file.set()
 

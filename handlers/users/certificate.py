@@ -11,7 +11,7 @@ from loader import dp, bot
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback
 from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
-    keyboard_feedback_send_phone
+    keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
 
 # Импорт стейтов
@@ -118,7 +118,7 @@ async def callback_inline_request_cancel(call: CallbackQuery, state: FSMContext)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка отменена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Отправка отменена\n'
-                                'Возвращение в главное меню', reply_markup=always_stay_keyboard())
+                                'Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
 
 
 # Успешное отправление запроса для справки
@@ -132,4 +132,4 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка успешно отправлена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Заявка успешно отправлена',
-                           reply_markup=always_stay_keyboard())
+                           reply_markup=always_stay_menu_keyboard())

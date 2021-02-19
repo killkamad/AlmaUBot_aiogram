@@ -4,7 +4,7 @@ from data.config import admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
-from keyboards.default import always_stay_keyboard, keyboard_feedback_send_phone
+from keyboards.default import always_stay_keyboard, keyboard_feedback_send_phone, always_stay_menu_keyboard
 from keyboards.inline import inline_keyboard_menu
 from states.feedback_state import FeedbackMessage
 from loader import dp, bot
@@ -107,7 +107,7 @@ async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Отправка письма отменена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Отправка отменена\n'
-                                'Возвращение в главное меню', reply_markup=always_stay_keyboard())
+                                'Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
     await state.reset_state()
 
 
@@ -155,7 +155,7 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Письмо успешно отправлено")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Письмо успешно отправлено',
-                           reply_markup=always_stay_keyboard())
+                           reply_markup=always_stay_menu_keyboard())
     for admin in admins:
         try:
             await bot.send_message(admin, f"Пришло письмо в адрес ректора:\n"

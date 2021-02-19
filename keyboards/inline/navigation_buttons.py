@@ -8,8 +8,8 @@ def inline_keyboard_nav_unifi():
     callback_button1 = InlineKeyboardButton(text="Контакты ключевых центров", callback_data='contacts_center')
     callback_button2 = InlineKeyboardButton(text="Профессорско-преподавательский состав",
                                             callback_data='tutors_university')
-    callback_button3 = InlineKeyboardButton(text="Назад", callback_data="go_back")
-    markup.add(callback_button, callback_button1, callback_button2, callback_button3)
+    # callback_button3 = InlineKeyboardButton(text="Назад", callback_data="go_back")
+    markup.add(callback_button, callback_button1, callback_button2)
     return markup
 
 

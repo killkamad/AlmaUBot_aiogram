@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
+from .callback_datas import certificate_callback
 
 
 async def inline_keyboard_certificate():
@@ -13,17 +14,10 @@ async def inline_keyboard_certificate():
 
 async def inline_keyboard_get_certificate(user_id):
     markup = InlineKeyboardMarkup(row_width=1)
-    request = await db.select_data_certificate(user_id)
-    call_list = []
-    request_name = []
-    for call_value in request:
-        callback_data = "['certificate_call', '" + call_value[-1] + "']"
-        print(callback_data)
-        request_name.append(call_value[-1])
-        call_list.append(callback_data)
-    markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
-                 zip(request_name, call_list)])
-    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="go_back"))
+    certificate = await db.select_data_certificate(user_id)
+    markup.add(*[InlineKeyboardButton(text=item['name_certif'],
+                                      callback_data=certificate_callback.new(certificate_name=item["name_certif"])) for item in certificate])
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="/certificate"))
     return markup
 
 

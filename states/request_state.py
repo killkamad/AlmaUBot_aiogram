@@ -6,3 +6,4 @@ class CertificateRequest(StatesGroup):
     email = State()
     phone = State()
     type = State()
+    upload = State()

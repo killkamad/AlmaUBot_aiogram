@@ -88,13 +88,24 @@ async def check_id(id):
         pass
 
 
-async def check_role(id, role):
+# async def check_role(id, role):
+#     pool: Connection = db
+#     try:
+#         async with pool.acquire() as connection:
+#             sql_ex = "SELECT role FROM users WHERE idt = $1 AND role = $2;"
+#             record: Record = await connection.fetchrow(sql_ex, int(id), role)
+#             return record[0]
+#     except(Exception, ErrorInAssignmentError) as error:
+#         logging.info(error)
+
+
+async def check_role_by_id(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "SELECT role FROM users WHERE idt = $1 AND role = $2;"
-            record: Record = await connection.fetchrow(sql_ex, int(id), role)
-            return record[0]
+            sql_ex = "SELECT role FROM users WHERE idt = $1;"
+            record: Record = await connection.fetchval(sql_ex, int(id))
+            return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
@@ -143,6 +154,7 @@ async def edit_user_role(role, phone):
 
 async def main():
     print(await select_users())
+    print(await check_role_by_id(468899120))
 
 
 if __name__ == '__main__':

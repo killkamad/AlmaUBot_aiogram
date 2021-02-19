@@ -9,6 +9,7 @@ from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_a
 from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_keyboard_schedule, \
     inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback
 
+
 from data.config import admins
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -138,15 +139,6 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
     file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
     await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
-
-
-@dp.callback_query_handler(text_contains="['certificate_call'")
-async def callback_inline(call: CallbackQuery):
-    logging.info(f'call = {call.data}')
-    valueFromCallBack = ast.literal_eval(call.data)[1]
-    file_id = await db.find_certificate_id(valueFromCallBack)
-    print(file_id)
-    await bot.send_document(call.message.chat.id, file_id)
 
 
 @dp.callback_query_handler(text='go_back')

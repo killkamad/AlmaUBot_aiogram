@@ -9,7 +9,7 @@ from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data
+from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback
 from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
     keyboard_feedback_send_phone
 from utils import db_api as db
@@ -33,6 +33,14 @@ async def callback_inline_completes(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Готовые справки:',
                                 reply_markup=await inline_keyboard_get_certificate(call.message.chat.id))
+
+
+@dp.callback_query_handler(certificate_callback.filter())
+async def callback_inline(call: CallbackQuery, callback_data: dict):
+    logging.info(f'call = {call.data}')
+    certificate_name = callback_data.get('certificate_name')
+    file_id = await db.find_certificate_id(certificate_name)
+    await bot.send_document(call.message.chat.id, file_id)
 
 
 # Запрос на получение справки

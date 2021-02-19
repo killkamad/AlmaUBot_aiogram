@@ -21,3 +21,14 @@ last_ten_users_callback = CallbackData('L10', 'telegram_id')
 schedule_callback = CallbackData('sch', 'schedule_name')
 schedule_update_callback = CallbackData('schupd', 'schedule_name')
 schedule_delete_callback = CallbackData('schdel', 'schedule_name')
+
+# Certificate
+certificate_callback = CallbackData('crt', 'certificate_name')
+certificate_update_callback = CallbackData('crtu', 'certificate_name')
+certificate_delete_callback = CallbackData('crtd', 'certificate_name')
+
+# Request
+request_callback = CallbackData('req', 'request_name')
+request_type_callback = CallbackData('reqt', 'request_name')
+request_update_callback = CallbackData('requ', 'request_name')
+request_delete_callback = CallbackData('reqd', 'request_name')

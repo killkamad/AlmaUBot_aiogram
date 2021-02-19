@@ -98,6 +98,8 @@ class SendCertificate(StatesGroup):
     request = State()
     button_name = State()
     send_file = State()
+    upload = State()
+    request_state = State()
 
 
 class UpdateCertificate(StatesGroup):

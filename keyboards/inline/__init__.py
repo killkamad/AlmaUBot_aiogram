@@ -34,7 +34,8 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
     cancel_or_update_certificate, cancel_or_delete_certificate, inline_keyboard_upd_req_certificate, \
     inline_keyboard_update_certificate, inline_keyboard_del_req_certificate, inline_keyboard_delete_certificate, \
-    inline_keyboard_get_request_certificate
+    inline_keyboard_get_request_certificate, inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
+    inline_keyboard_on_send_request_certificate
 
 # Кнопки для главного админ меню
 from .admin_main_buttons import inline_keyboard_admin
@@ -42,7 +43,8 @@ from .admin_main_buttons import inline_keyboard_admin
 # CALLBACK DATAS фильтр
 from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callback, almau_shop_faq_delete_callback, \
     main_faq_edit_callback, main_faq_delete_callback, main_faq_callback, schedule_callback, schedule_update_callback, \
-    schedule_delete_callback
+    schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
+    request_callback, request_type_callback, request_update_callback, request_delete_callback
 
 from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back

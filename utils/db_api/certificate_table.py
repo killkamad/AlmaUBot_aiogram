@@ -15,13 +15,14 @@ async def select_data_certificate(user_id):
                          crt.id_telegram,
                          crt.id_request,
                          crt.id_certif,
-                         crt.name_certif
+                         crt.name_certif,
+                         crt.is_loaded
                     FROM certificate crt
                     JOIN request_certificate req
                       ON crt.id_request = req.id
                     JOIN users usr
                       ON req.id_telegram = usr.idt
-                   WHERE usr.idt = $1
+                   WHERE usr.idt = $1 AND crt.is_loaded
                    """
             record: Record = await connection.fetch(sql_select, user_id)
             return record
@@ -53,13 +54,13 @@ async def find_certificate_name(name):
         logging.info(error)
 
 
-async def add_certificate_data(id_Telegram, id_request, id_certif, name_certif):
+async def add_certificate_data(id_Telegram, id_request, id_certif, name_certif, is_loaded):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Insert into certificate(id_Telegram, id_request ,id_certif, name_certif) values ($1,$2,$3,$4)"
+            sql_ex = "Insert into certificate(id_Telegram, id_request ,id_certif, name_certif, date_time, is_loaded) values ($1,$2,$3,$4, now(),$5)"
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), int(id_request), str(id_certif),
-                                                       str(name_certif))
+                                                       str(name_certif), bool(is_loaded))
             logging.info(f"ADD certificate ({name_certif})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -122,11 +123,63 @@ async def select_data_request_certificate():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT * FROM request_certificate ORDER BY id;"
+            sql_select = "SELECT DISTINCT ON (phone) * FROM request_certificate;"
             record: Record = await connection.fetch(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
+
+
+async def select_data_on_send_request_certificate():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT DISTINCT ON (phone) * FROM request_certificate WHERE is_loaded IS FALSE;"
+            record: Record = await connection.fetch(sql_select)
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def select_data_certificate_type(user_id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = """
+                  SELECT DISTINCT ON (req.certif_type)
+                		 req.id,
+                		 req.id_telegram,
+                		 req.full_name,
+                		 req.phone,
+                		 req.email,
+                		 req.certif_type,
+                		 req.date_time,
+                         req.is_loaded
+                	FROM request_certificate req
+                	JOIN users usr
+                	  ON req.id_telegram = usr.idt
+                   WHERE usr.idt = $1 AND req.is_loaded IS NOT TRUE;
+                   """
+            record: Record = await connection.fetch(sql_select, user_id)
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def mark_as_loaded_request(id, is_loaded):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                UPDATE request_certificate SET is_loaded = $2 WHERE id = $1;
+                """
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchrow(sql_ex, int(id), bool(is_loaded))
+            print('Table certificate successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
 
 
 async def find_request_id(name):
@@ -165,8 +218,24 @@ async def find_request_full_name(name):
         logging.info(error)
 
 
+async def alter_table_certificate():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                ALTER TABLE certificate ALTER COLUMN is_loaded BOOLEAN SET DEFAULT FALSE
+                """
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table certificate successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 async def main():
-    print(await find_request_full_name('Маштаков Кирилл Юрьевич'))
+    await alter_table_certificate()
 
 
 if __name__ == '__main__':

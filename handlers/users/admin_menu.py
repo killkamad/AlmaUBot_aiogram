@@ -9,7 +9,8 @@ from utils.delete_messages import bot_delete_messages
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_calendar, \
     cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, \
-    inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin
+    inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin, \
+    inline_keyboard_library_admin, inline_keyboard_marketing_admin
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -24,15 +25,58 @@ from utils.misc import rate_limit
 @rate_limit(5, 'admin')
 @dp.message_handler(commands=['admin'])
 async def admin_menu(message):
+    role = await db.check_role_by_id(message.chat.id)
     try:
-        if await db.check_role(message.chat.id, 'admin') == 'admin':
+        if role == 'admin':
             logging.info(f'User({message.chat.id}) вошел в админ меню')
-            users = await db.count_users()
-            await bot.send_message(message.chat.id, f'Меню Админа:\nКоличество пользователей = {users}\n',
+            await bot.send_message(message.chat.id, f'Меню Админа:\n'
+                                                    f'Количество пользователей = {await db.count_users()}\n',
                                    reply_markup=inline_keyboard_admin())
+        elif role == 'library_admin':
+            logging.info(f'User({message.chat.id}) вошел в админ меню библиотеки')
+            await bot.send_message(message.chat.id, f'Меню Админа Библиотеки:\n'
+                                                    f'Количество пользователей = {await db.count_users()}\n',
+                                   reply_markup=inline_keyboard_library_admin())
+        elif role == 'marketing_admin':
+            logging.info(f'User({message.chat.id}) вошел в админ меню маркетинга')
+            await bot.send_message(message.chat.id, f'Меню Админа Маркетинга:\n'
+                                                    f'Количество пользователей = {await db.count_users()}\n',
+                                   reply_markup=inline_keyboard_marketing_admin())
         else:
             await bot.send_message(message.chat.id, 'Недостаточный уровень доступа')
             logging.info(f'User({message.chat.id}) попытался войти в админ меню')
+    except Exception as e:
+        logging.info(f'Ошибка - {e}')
+
+
+# Кнопка возвращения обратно в главное админ меню
+@dp.callback_query_handler(text='back_to_admin_menu')
+async def callback_inline_back_to_admin_menu(call: CallbackQuery):
+    role = await db.check_role_by_id(call.message.chat.id)
+    try:
+        if role == 'admin':
+            logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=f'Меню Админа:\n'
+                                             f'Количество пользователей = {await db.count_users()}\n',
+                                        reply_markup=inline_keyboard_admin())
+        elif role == 'library_admin':
+            logging.info(f'User({call.message.chat.id}) вошел в админ меню библиотеки')
+            await bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=call.message.message_id,
+                                        text=f'Меню Админа Библиотеки:\n'
+                                             f'Количество пользователей = {await db.count_users()}\n',
+                                        reply_markup=inline_keyboard_library_admin())
+        elif role == 'marketing_admin':
+            logging.info(f'User({call.message.chat.id}) вошел в админ меню библиотеки')
+            await bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=call.message.message_id,
+                                        text=f'Меню Админа Маркетинга:\n'
+                                             f'Количество пользователей = {await db.count_users()}\n',
+                                        reply_markup=inline_keyboard_marketing_admin())
+        else:
+            await bot.send_message(call.message.chat.id, 'Недостаточный уровень доступа')
+            logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')
     except Exception as e:
         logging.info(f'Ошибка - {e}')
 
@@ -45,7 +89,7 @@ async def cancel_from_anywhere(message: types.Message, state: FSMContext):
 
 
 # Переход в Админ меню для Расписания
-@dp.callback_query_handler(text_contains='schedule_admin_menu')
+@dp.callback_query_handler(text='schedule_admin_menu')
 async def schedule_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Расписания, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -53,7 +97,7 @@ async def schedule_admin_menu(call: CallbackQuery):
 
 
 # Переход Админ меню для FAQ главного меню
-@dp.callback_query_handler(text_contains='faq_admin_menu')
+@dp.callback_query_handler(text='faq_admin_menu')
 async def almaushop_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню FAQ главного меню, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -61,7 +105,7 @@ async def almaushop_admin_menu(call: CallbackQuery):
 
 
 # Переход Админ меню для Almau shop
-@dp.callback_query_handler(text_contains='almaushop_admin_menu')
+@dp.callback_query_handler(text='almaushop_admin_menu')
 async def almaushop_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню AlmaU Shop, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -69,7 +113,7 @@ async def almaushop_admin_menu(call: CallbackQuery):
 
 
 # Переход Админ меню для Пользователей
-@dp.callback_query_handler(text_contains='users_admin')
+@dp.callback_query_handler(text='users_admin')
 async def users_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Пользователей, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -124,7 +168,7 @@ async def callback_inline_cancel_step_academic_calendar(call: CallbackQuery, sta
 
 
 # Отмена отправки календаря
-@dp.callback_query_handler(text_contains='cancel_academic_calendar')
+@dp.callback_query_handler(text='cancel_academic_calendar')
 async def callback_inline_cancel_acdemic_calendar(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил отправку Академического календаря call.data - {call.data}')
     await bot_delete_messages(call.message, 4)
@@ -135,25 +179,9 @@ async def callback_inline_cancel_acdemic_calendar(call: CallbackQuery, state: FS
 
 ############## КОНЕЦ Академ календарь КОНЕЦ ###########################################################################
 
-# Кнопка возвращения из админ меню almaushop и расписания обратно в главное админ меню
-@dp.callback_query_handler(text_contains='back_to_admin_menu')
-async def callback_inline_back_to_admin_menu(call: CallbackQuery):
-    try:
-        if await db.check_role(call.message.chat.id, 'admin') == 'admin':
-            logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
-            users = await db.count_users()
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=f'Меню Админа:\nКоличество пользователей = {users}\n',
-                                        reply_markup=inline_keyboard_admin())
-        else:
-            await bot.send_message(call.message.chat.id, 'Недостаточный уровень доступа')
-            logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')
-    except Exception as e:
-        logging.info(f'Ошибка - {e}')
-
 
 # Переход в Админ меню для Справок
-@dp.callback_query_handler(text_contains='certificate_admin_menu')
+@dp.callback_query_handler(text='certificate_admin_menu')
 async def certificate_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Справки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,

@@ -306,6 +306,31 @@ async def create_table_request_certificate():
     except(Exception, ErrorInAssignmentError) as error:
         print(error)
 
+
+# Создание таблицы для карты навигации
+async def create_table_map_navigation():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists map_navigation(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                building VARCHAR (200),
+                floor VARCHAR (200),
+                cabinet VARCHAR (200),
+                cabinet_description VARCHAR (990),
+                date_time TIMESTAMP)
+                """
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table map_navigation successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # async def create_table_test():
 #     pool: Connection = db
 #     try:
@@ -337,6 +362,7 @@ async def set_up_tables():
         await create_table_pps()
         await create_table_certificate()
         await create_table_request_certificate()
+        await create_table_map_navigation()
     except Exception as error:
         print(f'Error - {error}')
 

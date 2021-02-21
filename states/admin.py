@@ -112,3 +112,24 @@ class DeleteCertificate(StatesGroup):
     request = State()
     button_name = State()
     confirm_delete = State()
+
+
+
+class Map_navigation(StatesGroup):
+    building = State()
+    floor = State()
+    cabinet = State()
+    description = State()
+
+
+class Map_navigation_update(StatesGroup):
+    building = State()
+    floor = State()
+    cabinet = State()
+    description = State()
+
+
+class Map_navigation_delete(StatesGroup):
+    building = State()
+    floor = State()
+    cabinet = State()

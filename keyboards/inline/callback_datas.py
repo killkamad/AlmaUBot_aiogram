@@ -32,3 +32,8 @@ request_callback = CallbackData('req', 'request_name')
 request_type_callback = CallbackData('reqt', 'request_name')
 request_update_callback = CallbackData('requ', 'request_name')
 request_delete_callback = CallbackData('reqd', 'request_name')
+
+
+cabinet_callback = CallbackData('cabinet_call', 'cabinet')
+cabinet_callback_update = CallbackData('cabinet_upd_call', 'cabinet')
+cabinet_callback_delete = CallbackData('cabinet_del_call', 'cabinet')

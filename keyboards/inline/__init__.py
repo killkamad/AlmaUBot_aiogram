@@ -28,7 +28,8 @@ from .admin_academic_calendar_buttons import cancel_academic_calendar, cancel_or
 from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu, inline_keyboard_contact_center_admin, \
     cancel_or_send_contact_center_admin, inline_keyboard_contacts_center_update, cancel_or_update_contact_center_admin, \
     inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin, \
-    inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management
+    inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management, inline_keyboard_map_nav_admin_menu, \
+    cancel_or_send_map_nav_admin, inline_keyboard_cabinets_admin, cancel_or_update_map_nav_admin, cancel_or_delete_map_nav_admin
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
@@ -44,7 +45,8 @@ from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_a
 from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callback, almau_shop_faq_delete_callback, \
     main_faq_edit_callback, main_faq_delete_callback, main_faq_callback, schedule_callback, schedule_update_callback, \
     schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
-    request_callback, request_type_callback, request_update_callback, request_delete_callback
+    request_callback, request_type_callback, request_update_callback, request_delete_callback, \
+    cabinet_callback, cabinet_callback_update
 
 from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back

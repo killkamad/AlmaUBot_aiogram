@@ -10,9 +10,15 @@ from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inlin
     inline_keyboard_pps_rectorat_back, inline_keyboard_pps_shcool_bussines_back, \
     inline_keyboard_pps_shcool_engineer_back, inline_keyboard_pps_shcool_economic_back, \
     inline_keyboard_pps_shcool_inovation_back, inline_keyboard_pps_shcool_law_back, \
-    inline_keyboard_pps_shcool_management_back
+    inline_keyboard_pps_shcool_management_back ,inline_keyboard_map_nav, \
+    inline_keyboard_old_building, inline_keyboard_new_building, inline_keyboard_new_building_back,\
+    inline_keyboard_old_building_back, inline_keyboard_cabinets_first_old, inline_keyboard_cabinets_second_old, \
+    inline_keyboard_cabinets_third_old, inline_keyboard_cabinets_first_new, inline_keyboard_cabinets_second_new, \
+    inline_keyboard_cabinets_third_new, inline_keyboard_cabinets_fourth_new, inline_keyboard_cabinets_fourth_old, \
+    inline_keyboard_cabinets_fifth_old, inline_keyboard_cabinets_sixth_old
 from utils import db_api as db
 
+from keyboards.inline import cabinet_callback
 
 @dp.callback_query_handler(text='/nav_unifi')
 async def callback_inline_nav_unifi(call: CallbackQuery):
@@ -234,3 +240,107 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup = inline_keyboard_pps_rectorat_back())
 
+
+########
+@dp.callback_query_handler(text='map_nav')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Карта-навигация по университету, выбирете здание:', reply_markup=inline_keyboard_map_nav())
+
+
+########
+@dp.callback_query_handler(text='old_building')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Старое здание университета, выберите этаж:', reply_markup=inline_keyboard_old_building())
+
+
+#######
+@dp.callback_query_handler(text='new_building')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Новое здание университета, выберите этаж:', reply_markup=inline_keyboard_new_building())
+
+
+#########
+@dp.callback_query_handler(text='new_building_first')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_new())
+
+
+@dp.callback_query_handler(text='new_building_second')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 2 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_new())
+
+
+@dp.callback_query_handler(text='new_building_third')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 3 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_new())
+
+
+@dp.callback_query_handler(text='new_building_fourth')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 4 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_new())
+
+
+##############
+@dp.callback_query_handler(text='old_building_first')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 1 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_old())
+
+
+@dp.callback_query_handler(text='old_building_second')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 2 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_old())
+
+
+@dp.callback_query_handler(text='old_building_third')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 3 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_old())
+
+
+@dp.callback_query_handler(text='old_building_fourth')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 4 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_old())
+
+
+@dp.callback_query_handler(text='old_building_fifth')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 5 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fifth_old())
+
+
+@dp.callback_query_handler(text='old_building_sixth')
+async def callback_inline_nav_unifi(call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 6 этаж")
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_sixth_old())
+
+
+@dp.callback_query_handler(cabinet_callback.filter())
+async def callback_inline(call: CallbackQuery, callback_data: dict):
+    logging.info(f'call = {call.data}')
+    cabinet = callback_data.get('cabinet')
+    description = await db.find_cabinet_description(cabinet)
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back())

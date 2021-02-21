@@ -13,3 +13,4 @@ from .message_to_rector_table import *
 from .schedule_table import *
 from .tutors_and_employees_table import *
 from .users_table import *
+from .map_navigation_table import * 

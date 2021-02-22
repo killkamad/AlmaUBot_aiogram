@@ -9,13 +9,10 @@ from loader import dp, bot
 from keyboards.inline import main_faq_edit_callback, main_faq_delete_callback, inline_keyboard_add_main_faq_or_cancel, \
     inline_keyboard_faq_admin, inline_keyboard_edit_main_faq, \
     inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel, inline_keyboard_delete_main_faq, \
-    cancel_or_delete_main_faq
+    cancel_or_delete_main_faq, inline_keyboard_cancel_faq
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
-
-# Импорт класса парсеров
-from utils.almaushop_parser import AlmauShop, AlmauShopBooks
 
 # Импорт стейтов
 from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop, EditButtonContentAlmauShop, \
@@ -28,8 +25,7 @@ from utils.misc import rate_limit
 @dp.callback_query_handler(text='add_main_faq', state=None)
 async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await call.message.answer('Напишите вопрос:\n'
-                              'Для отмены - /cancel')
+    await call.message.answer('Напишите вопрос:\n', reply_markup=inline_keyboard_cancel_faq())
     await CreateMainFaq.question.set()
 
 
@@ -37,24 +33,41 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
 async def callback_inline_add_main_faq_question_step(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 300:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id,
+                                                    message.message_id - 1)  # Убирает инлайн клавиатуру
+            except:
+                pass
             await state.update_data(question=message.text)
             await message.reply('✅ Вопрос получен.\n'
-                                'Теперь отправьте ответ:')
+                                'Теперь отправьте ответ:', reply_markup=inline_keyboard_cancel_faq())
             await CreateMainFaq.answer.set()
         else:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id,
+                                                    message.message_id - 1)  # Убирает инлайн клавиатуру
+            except:
+                pass
             await message.reply(
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
-                parse_mode='HTML')
+                parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
-        print(message.content_type)
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
+        except:
+            pass
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
-                            'Повторите снова')
+                            'Повторите снова', reply_markup=inline_keyboard_cancel_faq())
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=CreateMainFaq.answer)
 async def callback_inline_add_main_faq_answer_step(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 4000:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+            except:
+                pass
             await state.update_data(answer=message.text)
             await message.reply('✅ Ответ получен.\n')
             data = await state.get_data()
@@ -63,13 +76,21 @@ async def callback_inline_add_main_faq_answer_step(message: types.Message, state
                                  f'Сохранить их в F.A.Q?', reply_markup=inline_keyboard_add_main_faq_or_cancel())
             await state.reset_state(with_data=False)
         else:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id,
+                                                    message.message_id - 1)  # Убирает инлайн клавиатуру
+            except:
+                pass
             await message.reply(
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
-                parse_mode='HTML')
+                parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
-        print(message.content_type)
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
+        except:
+            pass
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
-                            'Повторите снова')
+                            'Повторите снова', reply_markup=inline_keyboard_cancel_faq())
 
 
 @dp.callback_query_handler(text='save_main_faq', state=None)
@@ -79,10 +100,9 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
         data = await state.get_data()
         await db.add_data_main_faq(call.message.chat.id, data['question'], data['answer'])
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-        await bot.send_message(call.message.chat.id,
-                               '✅ Успешно сохранен вопрос и ответ для раздела F.A.Q в главном меню')
         await bot.send_message(chat_id=call.message.chat.id,
-                               text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
+                               text='✅ Успешно сохранен вопрос и ответ для раздела F.A.Q в главном меню\n'
+                                    'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
         await state.reset_state()
     except Exception as error:
         logging.info(f'Error - {error}')
@@ -93,9 +113,9 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
 async def callback_inline_cancel_creation_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-    await bot.send_message(call.message.chat.id, '❌ Отмена создания вопроса и ответа для F.A.Q в главном меню')
     await bot.send_message(chat_id=call.message.chat.id,
-                           text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
+                           text='❌ Отмена создания вопроса и ответа для F.A.Q в главном меню\n'
+                                'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
 
 
@@ -132,7 +152,7 @@ async def edit_main_faq_choice_step_question(call: CallbackQuery, state: FSMCont
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.send_message(chat_id=call.message.chat.id,
-                           text='Напишите на какой текст изменить вопрос')
+                           text='Напишите на какой текст изменить вопрос', reply_markup=inline_keyboard_cancel_faq())
     await EditMainFaq.question_confirm.set()
 
 
@@ -140,6 +160,7 @@ async def edit_main_faq_choice_step_question(call: CallbackQuery, state: FSMCont
 async def edit_main_faq_choice_step_question_final(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 300:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
             await state.update_data(selected_item=message.text,
                                     thing_to_change='question_to_change')
             data = await state.get_data()
@@ -149,13 +170,20 @@ async def edit_main_faq_choice_step_question_final(message: types.Message, state
                                  reply_markup=inline_keyboard_edit_main_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+            except:
+                pass
             await message.reply(
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
-                parse_mode='HTML')
+                parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
-        print(message.content_type)
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        except:
+            pass
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
-                            'Повторите снова')
+                            'Повторите снова', reply_markup=inline_keyboard_cancel_faq())
 
 
 @dp.callback_query_handler(text='edit_main_faq_a', state=EditMainFaq.choice)
@@ -163,7 +191,7 @@ async def edit_main_faq_choice_step_answer(call: CallbackQuery, state: FSMContex
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.send_message(chat_id=call.message.chat.id,
-                           text='Напишите на какой текст изменить ответ')
+                           text='Напишите на какой текст изменить ответ', reply_markup=inline_keyboard_cancel_faq())
     await EditMainFaq.answer_confirm.set()
 
 
@@ -171,6 +199,7 @@ async def edit_main_faq_choice_step_answer(call: CallbackQuery, state: FSMContex
 async def edit_main_faq_choice_step_answer_final(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 4000:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
             await state.update_data(selected_item=message.text,
                                     thing_to_change='answer_to_change')
             data = await state.get_data()
@@ -180,13 +209,20 @@ async def edit_main_faq_choice_step_answer_final(message: types.Message, state: 
                                  reply_markup=inline_keyboard_edit_main_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+            except:
+                pass
             await message.reply(
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
-                parse_mode='HTML')
+                parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
-        print(message.content_type)
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        except:
+            pass
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
-                            'Повторите снова')
+                            'Повторите снова', reply_markup=inline_keyboard_cancel_faq())
 
 
 @dp.callback_query_handler(text='edit_main_faq_conf', state=None)
@@ -201,10 +237,9 @@ async def edit_main_faq_choice_step_question_final_save(call: CallbackQuery, sta
             await db.edit_main_faq_answer(data['user_id'], data['selected_item'], data['faq_id'])
             await state.reset_state()
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-        await bot.send_message(call.message.chat.id,
-                               '✅ Ваши изменения для раздела F.A.Q главного меню успешно изменены')
         await bot.send_message(chat_id=call.message.chat.id,
-                               text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+                               text='✅ Ваши изменения для раздела F.A.Q главного меню успешно изменены\n'
+                                    'Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
@@ -214,9 +249,9 @@ async def edit_main_faq_choice_step_question_final_save(call: CallbackQuery, sta
 async def edit_main_faq_choice_step_question_final_decline(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-    await bot.send_message(call.message.chat.id, '❌ Отмена изменения вопроса для раздела F.A.Q главного меню')
     await bot.send_message(chat_id=call.message.chat.id,
-                           text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+                           text='❌ Отмена изменения вопроса для раздела F.A.Q главного меню\n'
+                                'Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
 
 
@@ -282,4 +317,15 @@ async def callback_inline_delete_faq_almaushop_back(call: CallbackQuery, state: 
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+    await state.reset_state()
+
+
+@dp.callback_query_handler(text='cancel_step_faq', state=['*'])
+async def callback_inline_cancel_step_faq(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='<b>❌ Успешно отменено</b>\n'
+                                     'Возврат в Админ меню F.A.Q:',
+                                parse_mode='HTML',
+                                reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()

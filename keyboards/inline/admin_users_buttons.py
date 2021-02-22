@@ -62,3 +62,11 @@ def back_to_last_ten_users():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_last_ten_users"))
     return markup
+
+
+# Изменение роли для пользователя Отмена
+def inline_keyboard_cancel_users_role_change():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_users")
+    markup.add(cancel_button)
+    return markup

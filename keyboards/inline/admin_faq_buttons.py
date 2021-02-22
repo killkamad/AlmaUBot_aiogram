@@ -71,3 +71,11 @@ def inline_keyboard_edit_main_faq_or_cancel():
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="edit_main_faq_dec")
     markup.add(callback_button, callback_button2)
     return markup
+
+
+# Добавление F.A.Q Отмена
+def inline_keyboard_cancel_faq():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_faq")
+    markup.add(cancel_button)
+    return markup

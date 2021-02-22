@@ -20,9 +20,17 @@ def inline_keyboard_cancel_or_send():
     return markup
 
 
-# Расписание Отмена
-def inline_keyboard_cancel():
+# # Расписание Отмена
+# def inline_keyboard_cancel():
+#     markup = InlineKeyboardMarkup()
+#     cancel_button = InlineKeyboardButton(text="❌ Отмена отправки расписания", callback_data="cancel_step")
+#     markup.add(cancel_button)
+#     return markup
+
+
+# Добавление F.A.Q Отмена
+def inline_keyboard_cancel_mass_mailing():
     markup = InlineKeyboardMarkup()
-    cancel_button = InlineKeyboardButton(text="❌ Отмена отправки расписания", callback_data="cancel_step")
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_mass_mailing")
     markup.add(cancel_button)
     return markup

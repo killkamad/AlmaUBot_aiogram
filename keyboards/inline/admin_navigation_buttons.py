@@ -4,6 +4,7 @@ from utils import db_api as db
 import logging
 from .callback_datas import cabinet_callback_update
 
+
 def inline_keyboard_nav_university_admin_menu():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text="Карта-навигация по университету ", callback_data='map_nav_admin')
@@ -108,7 +109,7 @@ def inline_keyboard_map_nav_admin_menu():
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data='nav_university_admin_menu')
     markup.add(callback_button, callback_button1, callback_button2, callback_back)
     return markup
-    
+
 
 def cancel_or_send_map_nav_admin():
     markup = InlineKeyboardMarkup()
@@ -121,7 +122,9 @@ def cancel_or_send_map_nav_admin():
 async def inline_keyboard_cabinets_admin(building, floor):
     markup = InlineKeyboardMarkup(row_width=2)
     mapnav = await db.map_nav_description(building, floor)
-    markup.add(*[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback_update.new(cabinet=item["cabinet"])) for item in mapnav])
+    markup.add(
+        *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback_update.new(cabinet=item["cabinet"]))
+          for item in mapnav])
     return markup
 
 

@@ -7,7 +7,7 @@ def keyboard_certificate_type():
     callback_button2 = KeyboardButton(text="Справка ГЦВП")
     callback_button3 = KeyboardButton(text="Справка по месту требования")
     callback_button4 = KeyboardButton(text="⬅ В главное меню")
-    markup.add(callback_button1, callback_button2, callback_button3)
+    markup.add(callback_button1, callback_button2, callback_button3, callback_button4)
     return markup
 
 

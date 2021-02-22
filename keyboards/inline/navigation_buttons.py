@@ -211,7 +211,7 @@ def inline_keyboard_old_building_back():
 
 
 async def inline_keyboard_cabinets_first_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "1 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -220,7 +220,7 @@ async def inline_keyboard_cabinets_first_old():
     return markup
 
 async def inline_keyboard_cabinets_second_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "2 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -230,7 +230,7 @@ async def inline_keyboard_cabinets_second_old():
 
 
 async def inline_keyboard_cabinets_third_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "3 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -240,7 +240,7 @@ async def inline_keyboard_cabinets_third_old():
 
 
 async def inline_keyboard_cabinets_fourth_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "4 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -250,7 +250,7 @@ async def inline_keyboard_cabinets_fourth_old():
 
 
 async def inline_keyboard_cabinets_fifth_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "5 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -260,7 +260,7 @@ async def inline_keyboard_cabinets_fifth_old():
 
 
 async def inline_keyboard_cabinets_sixth_old():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "6 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -270,7 +270,7 @@ async def inline_keyboard_cabinets_sixth_old():
 
 
 async def inline_keyboard_cabinets_first_new():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "1 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -279,7 +279,7 @@ async def inline_keyboard_cabinets_first_new():
     return markup
 
 async def inline_keyboard_cabinets_second_new():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "2 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -289,7 +289,7 @@ async def inline_keyboard_cabinets_second_new():
 
 
 async def inline_keyboard_cabinets_third_new():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "3 этаж"
     mapnav = await db.map_nav_description(building, floor)
@@ -299,7 +299,7 @@ async def inline_keyboard_cabinets_third_new():
 
 
 async def inline_keyboard_cabinets_fourth_new():
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "4 этаж"
     mapnav = await db.map_nav_description(building, floor)

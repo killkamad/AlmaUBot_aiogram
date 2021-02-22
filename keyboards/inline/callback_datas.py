@@ -23,9 +23,9 @@ schedule_update_callback = CallbackData('schupd', 'schedule_name')
 schedule_delete_callback = CallbackData('schdel', 'schedule_name')
 
 # Certificate
-certificate_callback = CallbackData('crt', 'certificate_name')
-certificate_update_callback = CallbackData('crtu', 'certificate_name')
-certificate_delete_callback = CallbackData('crtd', 'certificate_name')
+certificate_callback = CallbackData('crt', 'id')
+certificate_update_callback = CallbackData('crtu', 'id')
+certificate_delete_callback = CallbackData('crtd', 'id')
 
 # Request
 request_callback = CallbackData('req', 'request_name')

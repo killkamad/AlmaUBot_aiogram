@@ -1,10 +1,9 @@
-import ast
 import logging
 from loader import dp, bot
 
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove, Message
 from aiogram import types
-from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_almaushop, keyboard_feedback, \
+from keyboards.default import keyboard_library, keyboard_almaushop, keyboard_feedback, \
     keyboard_send_phone_to_register_in_db, always_stay_menu_keyboard
 from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_keyboard_schedule, \
     inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback, \
@@ -98,7 +97,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 @rate_limit(1, 'Меню')
 @dp.message_handler(lambda message: message.text in ["📅 Расписание", "⁉ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
                                                      "🗒 Академический календарь", "🏢 Получить справку",
-                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"])
+                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"], state=['*'])
 async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == "📅 Расписание":

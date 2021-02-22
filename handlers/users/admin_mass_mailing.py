@@ -10,7 +10,8 @@ from loader import dp, bot
 from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_mass_mailing_send_or_attach, inline_keyboard_cancel_or_send
+from keyboards.inline import inline_keyboard_mass_mailing_send_or_attach, inline_keyboard_cancel_or_send, \
+    inline_keyboard_cancel_mass_mailing
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -24,7 +25,8 @@ from utils.misc import rate_limit
 @dp.callback_query_handler(text='send_all', state=None)
 async def callback_inline_send_all(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку 📣 Рассылка - {call.data}')
-    await call.message.answer('Напишите текст сообщения для массовой рассылки:')
+    await call.message.answer('Напишите текст сообщения для массовой рассылки:',
+                              reply_markup=inline_keyboard_cancel_mass_mailing())
     await MassMailSending.message_text.set()
 
 
@@ -32,6 +34,10 @@ async def callback_inline_send_all(call: CallbackQuery):
 async def message_send_text(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 4000:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+            except:
+                pass
             await state.update_data(message_text_all=message.text)
             message_txt = 'Ваше сообщение:\n' + message.text + '\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
             await bot.send_message(message.chat.id, message_txt,
@@ -39,13 +45,21 @@ async def message_send_text(message: types.Message, state: FSMContext):
                                    reply_markup=inline_keyboard_mass_mailing_send_or_attach())
             await state.reset_state(with_data=False)
         else:
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+            except:
+                pass
             await bot.send_message(message.chat.id,
                                    f'Ваше сообщение содержит <b>{len(message.text)}</b> символов. Бот может обработать максимум 4000 символов. Сократите количество и попробуйте снова',
-                                   parse_mode='HTML')
+                                   parse_mode='HTML', reply_markup=inline_keyboard_cancel_mass_mailing())
     else:
-        print(message.content_type)
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        except:
+            pass
         await bot.send_message(message.chat.id,
-                               'Ошибка - ваше сообщение должно содержать только текст\nНапишите текст сообщения для массовой рассылки:')
+                               'Ошибка - ваше сообщение должно содержать только текст\nНапишите текст сообщения для массовой рассылки:',
+                               reply_markup=inline_keyboard_cancel_mass_mailing())
 
 
 @dp.callback_query_handler(text='attach_pic_or_doc')
@@ -94,7 +108,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
     if len(data) > 2:
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
         await bot.send_message(call.message.chat.id,
-                               '<b>🔄 Началась массовая рассылка, это может занять некоторое время.</b>',
+                               '<b>🔄 Началась массовая рассылка, это может занять некоторое время...</b>',
                                parse_mode='HTML')
         await admin_menu(call.message)
         all_users = await db.select_users()
@@ -154,7 +168,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
         await state.reset_state()
 
 
-@dp.callback_query_handler(text='cancel_massive_sending')
+@dp.callback_query_handler(text=['cancel_massive_sending', 'cancel_mass_mailing'], state=['*'])
 async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку ❌ Отмена - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,

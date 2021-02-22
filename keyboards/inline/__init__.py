@@ -6,20 +6,22 @@ from .admin_almaushop_buttons import inline_keyboard_almau_shop_admin, inline_ke
 
 # Админ кнопки для Расписания
 from .admin_schedule_buttons import inline_keyboard_schedule_admin, cancel_or_send_schedule, cancel_or_update_schedule, \
-    cancel_or_delete_schedule, inline_keyboard_update_schedule, inline_keyboard_delete_schedule, inline_keyboard_cancel_schedule
+    cancel_or_delete_schedule, inline_keyboard_update_schedule, inline_keyboard_delete_schedule, \
+    inline_keyboard_cancel_schedule
 
 # Админ кнопки для F.A.Q главного меню
 from .admin_faq_buttons import inline_keyboard_faq_admin, inline_keyboard_add_main_faq_or_cancel, \
     inline_keyboard_delete_main_faq, inline_keyboard_edit_main_faq, cancel_or_delete_main_faq, \
-    inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel
+    inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel, inline_keyboard_cancel_faq
 
 # Админ кнопки для Пользователей
 from .admin_users_buttons import inline_keyboard_users_admin, inline_keyboard_users_admin_roles, \
-    inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users
+    inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users, \
+    inline_keyboard_cancel_users_role_change
 
 # Админ кнопки для Массовой рассылки
 from .admin_mass_mailing_buttons import inline_keyboard_mass_mailing_send_or_attach, inline_keyboard_cancel_or_send, \
-    inline_keyboard_cancel
+    inline_keyboard_cancel_mass_mailing
 
 # Админ кнопки для Академического календаря
 from .admin_academic_calendar_buttons import cancel_academic_calendar, cancel_or_send_academic_calendar
@@ -29,7 +31,8 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
     cancel_or_send_contact_center_admin, inline_keyboard_contacts_center_update, cancel_or_update_contact_center_admin, \
     inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin, \
     inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management, inline_keyboard_map_nav_admin_menu, \
-    cancel_or_send_map_nav_admin, inline_keyboard_cabinets_admin, cancel_or_update_map_nav_admin, cancel_or_delete_map_nav_admin
+    cancel_or_send_map_nav_admin, inline_keyboard_cabinets_admin, cancel_or_update_map_nav_admin, \
+    cancel_or_delete_map_nav_admin
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \

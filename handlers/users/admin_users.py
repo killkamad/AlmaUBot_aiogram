@@ -10,7 +10,8 @@ from loader import dp, bot
 
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_users_admin_roles, inline_keyboard_users_admin, \
-    inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users
+    inline_keyboard_users_admin_roles_accept_decline, inline_keyboard_select_last_ten_users, back_to_last_ten_users, \
+    inline_keyboard_cancel_users_role_change
 from keyboards.inline.callback_datas import last_ten_users_callback
 
 # Импортирование функций из БД контроллера
@@ -27,8 +28,8 @@ async def callback_inline_edit_users_role(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await call.message.answer(
         '- Для успешного изменения роли, пользователь должен зарегистрировать свой номер командой /phone_reg .\n'
-        '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n'
-        '- Для отмены - /cancel')
+        '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
+        reply_markup=inline_keyboard_cancel_users_role_change())
     await UpdateUserRole.phone.set()
 
 
@@ -41,6 +42,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
     else:
         phone = f"+{phone}"
     if await db.check_phone_in_users(phone):
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
         role_at_the_moment = await db.check_role_for_admin(phone)
         await message.reply(f"✅ Номер телефона получен.\n"
                             f"В данный момент этот пользователь имеет роль - {role_at_the_moment}\n"
@@ -59,6 +61,7 @@ async def callback_inline_edit_users_role_phone(message: types.Message, state: F
     if message.content_type == 'text':
         if len(message.text) == 12:
             if await db.check_phone_in_users(message.text):
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
                 role_at_the_moment = await db.check_role_for_admin(message.text)
                 await message.reply(f"✅ Номер телефона получен.\n"
                                     f"В данный момент этот пользователь имеет роль - {role_at_the_moment}\n"

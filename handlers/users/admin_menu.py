@@ -85,6 +85,7 @@ async def callback_inline_back_to_admin_menu(call: CallbackQuery):
 @dp.message_handler(commands=['cancel'], state=['*'])
 async def cancel_from_anywhere(message: types.Message, state: FSMContext):
     await bot.send_message(message.chat.id, 'Успешно отменено')
+    await admin_menu(message)
     await state.reset_state()
 
 

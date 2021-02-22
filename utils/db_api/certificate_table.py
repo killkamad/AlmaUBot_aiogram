@@ -16,7 +16,8 @@ async def select_data_certificate(user_id):
                          crt.id_request,
                          crt.id_certif,
                          crt.name_certif,
-                         crt.is_loaded
+                         crt.is_loaded,
+                         crt.date_time
                     FROM certificate crt
                     JOIN request_certificate req
                       ON crt.id_request = req.id
@@ -30,24 +31,24 @@ async def select_data_certificate(user_id):
         logging.info(error)
 
 
-async def find_certificate_id(name):
+async def find_certificate_id(id_req):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT id_certif FROM certificate WHERE name_certif = $1;"
-            record: Record = await connection.fetchrow(sql_select, name)
+            sql_select = "SELECT id_certif FROM certificate WHERE id_request = $1;"
+            record: Record = await connection.fetchrow(sql_select, int(id_req))
             record = list(record)[0]
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def find_certificate_name(name):
+async def find_certificate_name(id_req):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT name_certif FROM certificate WHERE name_certif = $1;"
-            record: Record = await connection.fetchrow(sql_select, name)
+            sql_select = "SELECT name_certif FROM certificate WHERE id_request = $1;"
+            record: Record = await connection.fetchrow(sql_select, int(id_req))
             record = list(record)[0]
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -67,26 +68,26 @@ async def add_certificate_data(id_Telegram, id_request, id_certif, name_certif, 
         logging.info(error)
 
 
-async def update_certificate_data(id_Telegram, id_request, id_certif, name_certif):
+async def update_certificate_data(id_Telegram, id_request, id_certif, id_req):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Update certificate set id_Telegram = $1, id_request = $2, id_certif = $3 Where name_certif = $4"
+            sql_ex = "Update certificate set id_Telegram = $1, id_request = $2, id_certif = $3 Where id_request = $4"
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), int(id_request), str(id_certif),
-                                                       str(name_certif))
-            logging.info(f"UPDATED certificate ({name_certif})")
+                                                       int(id_req))
+            logging.info(f"UPDATED certificate ({id_req})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def delete_certificate_button(name_certif):
+async def delete_certificate_button(id_req):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Delete from certificate where name_certif = $1"
-            record: Record = await connection.fetchrow(sql_ex, str(name_certif))
-            logging.info(f"DELETED certificate ({name_certif})")
+            sql_ex = "Delete from certificate where id_request = $1"
+            record: Record = await connection.fetchrow(sql_ex, int(id_req))
+            logging.info(f"DELETED certificate ({id_req})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)

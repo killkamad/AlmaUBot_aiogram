@@ -38,8 +38,9 @@ async def callback_inline_completes(call: CallbackQuery):
 @dp.callback_query_handler(certificate_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    certificate_name = callback_data.get('certificate_name')
-    file_id = await db.find_certificate_id(certificate_name)
+    # certificate_name = callback_data.get('certificate_name')
+    certificate_id = callback_data.get('id')
+    file_id = await db.find_certificate_id(certificate_id)
     await bot.send_document(call.message.chat.id, file_id)
 
 
@@ -55,10 +56,14 @@ async def callback_inline_request(call: CallbackQuery):
 
 @dp.message_handler(state=CertificateRequest.type)
 async def process_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['type'] = message.text
-    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
-    await CertificateRequest.names.set()
+    if message.text == "⬅ В главное меню":
+        await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
+        await state.reset_state()
+    else:
+        async with state.proxy() as data:
+            data['type'] = message.text
+        await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+        await CertificateRequest.names.set()
 
 
 @dp.message_handler(state=CertificateRequest.names)

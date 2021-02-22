@@ -59,8 +59,8 @@ async def inline_keyboard_upd_req_certificate():
 async def inline_keyboard_update_certificate(user_id):
     markup = InlineKeyboardMarkup(row_width=1)
     certificate = await db.select_data_certificate(user_id)
-    markup.add(*[InlineKeyboardButton(text=item['name_certif'],
-                                      callback_data=certificate_update_callback.new(certificate_name=item["name_certif"])) for item in certificate])
+    markup.add(*[InlineKeyboardButton(text=f"{item['name_certif']} {item['date_time'].strftime('%d.%m.%y')}",
+                                      callback_data=certificate_update_callback.new(id=item['id_request'])) for item in certificate])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="update_certificate_bot"))
     return markup
 
@@ -77,8 +77,8 @@ async def inline_keyboard_del_req_certificate():
 async def inline_keyboard_delete_certificate(user_id):
     markup = InlineKeyboardMarkup(row_width=1)
     certificate = await db.select_data_certificate(user_id)
-    markup.add(*[InlineKeyboardButton(text=item['name_certif'],
-                                      callback_data=certificate_delete_callback.new(certificate_name=item["name_certif"])) for item in certificate])
+    markup.add(*[InlineKeyboardButton(text=f"{item['name_certif']} {item['date_time'].strftime('%d.%m.%y')}",
+                                      callback_data=certificate_delete_callback.new(id=item['id_request'])) for item in certificate])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="delete_certificate_bot"))
     return markup
 

@@ -32,7 +32,11 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
     inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin, \
     inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management, inline_keyboard_map_nav_admin_menu, \
     cancel_or_send_map_nav_admin, inline_keyboard_cabinets_admin, cancel_or_update_map_nav_admin, \
-    cancel_or_delete_map_nav_admin
+    cancel_or_delete_map_nav_admin, inline_keyboard_cancel_map_nav_admin, map_nav_admin_choice_floor_new_delete, \
+    map_nav_admin_choice_floor_old_delete, keyboard_map_nav_choice_building_delete, keyboard_map_nav_choice_building_update, \
+    map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
+    map_nav_admin_choice_floor_old, keyboard_map_nav_choice_building
+
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \

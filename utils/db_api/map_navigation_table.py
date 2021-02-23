@@ -51,7 +51,17 @@ async def select_cabinet_admin(id):
         logging.info(error)
 
 
-# обновление описания центра
+async def select_cabinet_admin_check():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT cabinet FROM map_navigation ORDER BY id;"
+            record: Record = await connection.fetch(sql_select)
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def update_map_nav_description_data(id_Telegram, building, floor, cabinet, cabinet_description):
     pool: Connection = db
     try:

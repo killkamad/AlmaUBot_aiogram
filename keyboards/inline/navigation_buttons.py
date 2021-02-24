@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 
-from .callback_datas import cabinet_callback
+from .callback_datas import cabinet_callback, nav_center_callback
 
 def inline_keyboard_nav_unifi():
     markup = InlineKeyboardMarkup(row_width=1)
@@ -14,17 +14,27 @@ def inline_keyboard_nav_unifi():
     return markup
 
 
+# async def inline_keyboard_contacts_center():
+#     markup = InlineKeyboardMarkup(row_width=1)
+#     schedule = await db.select_data_contact_centers()
+#     call_list = []
+#     name = []
+#     for call_value in schedule:
+#         callback_data = "['contacts_center_call', '" + call_value[-1] + "']"
+#         name.append(call_value[3])
+#         call_list.append(callback_data)
+#     markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
+#                  zip(name, call_list)])
+#     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="/nav_unifi"))
+#     return markup
+
+
 async def inline_keyboard_contacts_center():
-    markup = InlineKeyboardMarkup(row_width=1)
-    schedule = await db.select_data_contact_centers()
-    call_list = []
-    name = []
-    for call_value in schedule:
-        callback_data = "['contacts_center_call', '" + call_value[-1] + "']"
-        name.append(call_value[3])
-        call_list.append(callback_data)
-    markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
-                 zip(name, call_list)])
+    markup = InlineKeyboardMarkup(row_width=2)
+    ceneters = await db.select_data_contact_centers()
+    markup.add(
+        *[InlineKeyboardButton(text=item['name_contact_center'], callback_data=nav_center_callback.new(name=item["name_contact_center"]))
+          for item in ceneters])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="/nav_unifi"))
     return markup
 

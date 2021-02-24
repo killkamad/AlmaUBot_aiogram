@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from utils import db_api as db
 import logging
-from .callback_datas import cabinet_callback_update
+from .callback_datas import cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete
 
 
 def inline_keyboard_nav_university_admin_menu():
@@ -38,16 +38,11 @@ def cancel_or_send_contact_center_admin():
 
 
 async def inline_keyboard_contacts_center_update():
-    markup = InlineKeyboardMarkup(row_width=1)
-    contacts_center = await db.select_data_contact_centers()
-    call_list = []
-    name = []
-    for call_value in contacts_center:
-        callback_data = "['updade_contact_center', '" + call_value[-1] + "']"
-        name.append(call_value[3])
-        call_list.append(callback_data)
-    markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
-                 zip(name, call_list)])
+    markup = InlineKeyboardMarkup(row_width=2)
+    ceneters = await db.select_data_contact_centers()
+    markup.add(
+        *[InlineKeyboardButton(text=item['name_contact_center'], callback_data=nav_center_callback_update.new(name=item["name_contact_center"]))
+          for item in ceneters])
     markup.add(InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin"))
     return markup
 
@@ -61,16 +56,11 @@ def cancel_or_update_contact_center_admin():
 
 
 async def inline_keyboard_contacts_center_delete():
-    markup = InlineKeyboardMarkup(row_width=1)
-    contacts_center = await db.select_data_contact_centers()
-    call_list = []
-    name = []
-    for call_value in contacts_center:
-        callback_data = "['delete_contact_center', '" + call_value[-1] + "']"
-        name.append(call_value[3])
-        call_list.append(callback_data)
-    markup.add(*[InlineKeyboardButton(text=button, callback_data=call_data) for button, call_data in
-                 zip(name, call_list)])
+    markup = InlineKeyboardMarkup(row_width=2)
+    ceneters = await db.select_data_contact_centers()
+    markup.add(
+        *[InlineKeyboardButton(text=item['name_contact_center'], callback_data=nav_center_callback_delete.new(name=item["name_contact_center"]))
+          for item in ceneters])
     markup.add(InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin"))
     return markup
 

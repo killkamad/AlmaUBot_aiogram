@@ -18,7 +18,7 @@ from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inlin
     inline_keyboard_cabinets_fifth_new, inline_keyboard_cabinets_sixth_new
 from utils import db_api as db
 
-from keyboards.inline import cabinet_callback
+from keyboards.inline import cabinet_callback, nav_center_callback
 
 
 @dp.callback_query_handler(text='/nav_unifi')
@@ -35,13 +35,23 @@ async def callback_inline_contacts_center(call: CallbackQuery):
                                 text='Контакты ключевых центров', reply_markup=await inline_keyboard_contacts_center())
 
 
-@dp.callback_query_handler(text_contains="['contacts_center_call'")
-async def callback_inline_contacts_center_call(call: CallbackQuery):
+
+@dp.callback_query_handler(nav_center_callback.filter())
+async def callback_inline_contacts_center_call(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    valueFromCallBack = ast.literal_eval(call.data)[1]
-    description = await db.contact_center_description(valueFromCallBack)
+    callback_center = callback_data.get('name')
+    description = await db.contact_center_description(callback_center)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
+
+
+# @dp.callback_query_handler(text_contains="['contacts_center_call'")
+# async def callback_inline_contacts_center_call(call: CallbackQuery):
+#     logging.info(f'call = {call.data}')
+#     valueFromCallBack = ast.literal_eval(call.data)[1]
+#     description = await db.contact_center_description(valueFromCallBack)
+#     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+#                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
 
 
 @dp.callback_query_handler(text='tutors_university')

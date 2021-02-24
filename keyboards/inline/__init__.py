@@ -53,7 +53,7 @@ from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callbac
     main_faq_edit_callback, main_faq_delete_callback, main_faq_callback, schedule_callback, schedule_update_callback, \
     schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
     request_callback, request_type_callback, request_update_callback, request_delete_callback, \
-    cabinet_callback, cabinet_callback_update
+    cabinet_callback, cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete, nav_center_callback
 
 from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back

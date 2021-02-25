@@ -1,7 +1,7 @@
 import ast
 import logging
 import re
-
+import aiogram.utils.markdown as fmt
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove
 from aiogram.dispatcher import FSMContext
@@ -61,7 +61,7 @@ async def process_name(message: types.Message, state: FSMContext):
         await state.reset_state()
     else:
         async with state.proxy() as data:
-            data['type'] = message.text
+            data['type'] = fmt.quote_html(message.text)
         await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
         await CertificateRequest.names.set()
 
@@ -80,7 +80,7 @@ async def process_name(message: types.Message, state: FSMContext):
         email = message.text.strip()
         if is_valid_email(email):
             async with state.proxy() as data:
-                data['email'] = message.text
+                data['email'] = fmt.quote_html(message.text)
             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
             await CertificateRequest.phone.set()
         else:

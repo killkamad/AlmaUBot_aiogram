@@ -1,5 +1,5 @@
 import logging
-
+import aiogram.utils.markdown as fmt
 from data.config import admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
@@ -45,7 +45,7 @@ async def feedback_text_buttons_handler(message: types.Message, state: FSMContex
 @dp.message_handler(state=FeedbackMessage.content)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['content'] = message.text
+        data['content'] = fmt.quote_html(message.text)
     await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
     await FeedbackMessage.names.set()
 
@@ -53,7 +53,7 @@ async def process_name(message: types.Message, state: FSMContext):
 @dp.message_handler(state=FeedbackMessage.names)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['names'] = message.text
+        data['names'] = fmt.quote_html(message.text)
     await message.reply("Напишите ваш Email")
     await FeedbackMessage.email.set()
 
@@ -64,7 +64,7 @@ async def process_name(message: types.Message, state: FSMContext):
         email = message.text.strip()
         if is_valid_email(email):
             async with state.proxy() as data:
-                data['email'] = message.text
+                data['email'] = fmt.quote_html(message.text)
             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
             await FeedbackMessage.phone.set()
         else:

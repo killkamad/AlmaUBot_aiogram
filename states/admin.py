@@ -32,7 +32,6 @@ class CreateFaqAlmauShop(StatesGroup):
 
 
 class EditFaqAlmauShop(StatesGroup):
-    button_name = State()
     choice = State()
     selected_item = State()
     question_confirm = State()
@@ -40,7 +39,6 @@ class EditFaqAlmauShop(StatesGroup):
 
 
 class DeleteFaqAlmauShop(StatesGroup):
-    question = State()
     confirm_delete = State()
 
 

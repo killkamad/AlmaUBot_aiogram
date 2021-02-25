@@ -19,6 +19,7 @@ from utils import db_api as db
 # Импорт стейтов
 from states.admin import SendScheduleToBot, UpdateSchedule, DeleteSchedule
 
+import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
 
 
@@ -65,9 +66,11 @@ async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateSchedule.send_file)
 async def change_schedule_id(message: types.Message, state: FSMContext):
-    # data = await state.get_data()
-    # logging.info(data)
-    await UpdateSchedule.send_file.set()
+    try:
+        await bot.edit_message_reply_markup(message.chat.id,
+                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+    except:
+        pass
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
@@ -76,17 +79,9 @@ async def change_schedule_id(message: types.Message, state: FSMContext):
                                 reply_markup=cancel_or_update_schedule())
         await state.reset_state(with_data=False)
     else:
-        try:
-            # Если есть инлайн клавиатура, убирает ее
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием',
-                                   reply_markup=inline_keyboard_cancel_schedule())
-        except:
-            # Если нету инлайн клавиатуры, просто отправляет сообщение
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием',
-                                   reply_markup=inline_keyboard_cancel_schedule())
+        await bot.send_message(message.chat.id,
+                               'Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием',
+                               reply_markup=inline_keyboard_cancel_schedule())
 
 
 #### Удаление расписания ####
@@ -96,11 +91,10 @@ async def callback_inline_send_schedule_bot(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для удаление:',
                                 reply_markup=await inline_keyboard_delete_schedule())
-    await DeleteSchedule.button_name.set()
 
 
 #### ОТМЕНА Удаления расписания
-@dp.callback_query_handler(text='cancel_delete_step', state=DeleteSchedule.button_name)
+@dp.callback_query_handler(text='cancel_delete_step', state=None)
 async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await schedule_admin_menu(call)
@@ -108,13 +102,13 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 
 
 # Нажатие на одну из кнопок с названием расписания, для удаления
-@dp.callback_query_handler(schedule_delete_callback.filter(), state=DeleteSchedule.button_name)
+@dp.callback_query_handler(schedule_delete_callback.filter(), state=None)
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     schedule_button_name = callback_data.get('schedule_name')
     await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы точно уверены, что хотите удалить кнопку расписания для <b>{schedule_button_name}</b>:',
+                                text=f'Вы точно уверены, что хотите удалить кнопку расписания для <b>{schedule_button_name}</b>',
                                 parse_mode='HTML', reply_markup=cancel_or_delete_schedule())
     await DeleteSchedule.confirm_delete.set()
 
@@ -135,7 +129,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 async def message_send_button_name(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 28:
-            await state.update_data(button_name=message.text.lower(),
+            await state.update_data(button_name=fmt.quote_html(message.text.lower()),
                                     user_id=message.chat.id)
             try:
                 await bot.edit_message_reply_markup(message.chat.id,
@@ -234,19 +228,14 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
 # Удаление расписания из базы данных
 @dp.callback_query_handler(text='delete_schedule_button', state=DeleteSchedule.confirm_delete)
 async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
-    try:
-        data = await state.get_data()
-        await db.delete_schedule_button(data["button_name"])
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='✅ Расписание для <b>{data["button_name"]}</b> успешно удалено из базы данных.\n'
-                                         'Выберите кнопку для удаление:',
-                                    reply_markup=await inline_keyboard_delete_schedule())
-        await DeleteSchedule.button_name.set()
-        # await state.reset_state()
-        logging.info(f'User({call.message.chat.id}) удалил расписание для {data["button_name"]}')
-    except Exception as e:
-        await call.message.answer(f'Ошибка расписание не удалено, (Ошибка - {e})')
-        logging.info(f'Ошибка - {e}')
+    data = await state.get_data()
+    await db.delete_schedule_button(data["button_name"])
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=f'✅ Расписание для <b>{data["button_name"]}</b> успешно удалено из базы данных.\n'
+                                     f'Выберите кнопку для удаление:',
+                                reply_markup=await inline_keyboard_delete_schedule())
+    await state.reset_state()
+    logging.info(f'User({call.message.chat.id}) удалил расписание для {data["button_name"]}')
 
 
 @dp.callback_query_handler(text_contains='cancel_schedule')

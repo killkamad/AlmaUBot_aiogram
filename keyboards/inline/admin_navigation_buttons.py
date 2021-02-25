@@ -11,7 +11,7 @@ def inline_keyboard_nav_university_admin_menu():
     callback_button1 = InlineKeyboardButton(text="Контакты ключевых центров", callback_data='contacts_center_admin')
     callback_button2 = InlineKeyboardButton(text="Профессорско-преподавательский состав",
                                             callback_data='tutors_university_admin')
-    callback_button3 = InlineKeyboardButton(text="Назад", callback_data="back_to_admin_menu")
+    callback_button3 = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_admin_menu")
     markup.add(callback_button, callback_button1, callback_button2, callback_button3)
     return markup
 

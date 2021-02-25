@@ -17,7 +17,7 @@ from utils import db_api as db
 # Импорт стейтов
 from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop, EditButtonContentAlmauShop, \
     CreateMainFaq, EditMainFaq, DeleteMainFaq
-
+import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
 
 
@@ -38,7 +38,7 @@ async def callback_inline_add_main_faq_question_step(message: types.Message, sta
                                                     message.message_id - 1)  # Убирает инлайн клавиатуру
             except:
                 pass
-            await state.update_data(question=message.text)
+            await state.update_data(question=fmt.quote_html(message.text))
             await message.reply('✅ Вопрос получен.\n'
                                 'Теперь отправьте ответ:', reply_markup=inline_keyboard_cancel_faq())
             await CreateMainFaq.answer.set()
@@ -68,7 +68,7 @@ async def callback_inline_add_main_faq_answer_step(message: types.Message, state
                 await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
             except:
                 pass
-            await state.update_data(answer=message.text)
+            await state.update_data(answer=fmt.quote_html(message.text))
             await message.reply('✅ Ответ получен.\n')
             data = await state.get_data()
             await message.answer(f'Ваш вопрос - {data["question"]}\n'
@@ -143,7 +143,7 @@ async def callback_inline_edit_main_faq_choice_step(call: CallbackQuery, state: 
                                      f'<u>Вопрос</u> - {question}\n'
                                      f'<u>Ответ</u> - {answer}',
                                 reply_markup=inline_keyboard_edit_main_faq_choice(), parse_mode='HTML')
-    await state.update_data(question_text=question, answer_text=answer, user_id=call.message.chat.id, faq_id=id)
+    await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer), user_id=call.message.chat.id, faq_id=id)
     await EditMainFaq.choice.set()
 
 
@@ -161,7 +161,7 @@ async def edit_main_faq_choice_step_question_final(message: types.Message, state
     if message.content_type == 'text':
         if len(message.text) <= 300:
             await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-            await state.update_data(selected_item=message.text,
+            await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='question_to_change')
             data = await state.get_data()
             await message.answer(f'Ваш новый вопрос - {message.text}\n'
@@ -200,7 +200,7 @@ async def edit_main_faq_choice_step_answer_final(message: types.Message, state: 
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            await state.update_data(selected_item=message.text,
+            await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='answer_to_change')
             data = await state.get_data()
             await message.answer(f'Ваш новый ответ - {data["selected_item"]}\n'
@@ -275,7 +275,7 @@ async def callback_inline_delete_main_faq_final(call: CallbackQuery, state: FSMC
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Вы точно уверены, что хотите удалить кнопку <b>{question}</b>:',
                                 reply_markup=cancel_or_delete_main_faq())
-    await state.update_data(question_text=question, user_id=call.message.chat.id)
+    await state.update_data(question_text=fmt.quote_html(question), user_id=call.message.chat.id)
     await DeleteMainFaq.confirm_delete.set()
 
 

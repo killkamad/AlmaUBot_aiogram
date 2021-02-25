@@ -20,6 +20,7 @@ from utils import db_api as db
 from states.admin import MassMailSending
 
 from utils.misc import rate_limit
+import aiogram.utils.markdown as fmt
 
 
 @dp.callback_query_handler(text='send_all', state=None)
@@ -38,8 +39,10 @@ async def message_send_text(message: types.Message, state: FSMContext):
                 await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
             except:
                 pass
-            await state.update_data(message_text_all=message.text)
-            message_txt = 'Ваше сообщение:\n' + message.text + '\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+            await state.update_data(message_text_all=fmt.quote_html(message.text))
+            message_txt = f'Ваше сообщение:\n' \
+                          f'{fmt.quote_html(message.text)}' \
+                          f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
             await bot.send_message(message.chat.id, message_txt,
                                    parse_mode='HTML',
                                    reply_markup=inline_keyboard_mass_mailing_send_or_attach())
@@ -66,38 +69,51 @@ async def message_send_text(message: types.Message, state: FSMContext):
 async def callback_inline_attach_pic_or_doc(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку ➕ Добавить фото или документ - {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-    await bot.send_message(call.message.chat.id, 'Прикрепите фото или файл к рассылке:')
+    await bot.send_message(call.message.chat.id, 'Прикрепите фото или файл к рассылке:',
+                           reply_markup=inline_keyboard_cancel_mass_mailing())
     await MassMailSending.message_attached.set()
 
 
 # Получение медиа файлы от пользователя для массовой рассылки
 @dp.message_handler(content_types=ContentType.ANY, state=MassMailSending.message_attached)
 async def message_send_photo(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'photo':
         await state.update_data(content_type="photo", file_id=message.photo[-1].file_id)
         # logging.info(message.photo[-1].file_id)
         data = await state.get_data()
-        message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+        message_txt = f'Ваше сообщение:\n' \
+                      f'{data["message_text_all"]}' \
+                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     elif message.content_type == 'document':
         await state.update_data(content_type="document", file_id=message.document.file_id)
         # logging.info(message.document.file_id)
         data = await state.get_data()
-        message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+        message_txt = f'Ваше сообщение:\n' \
+                      f'{data["message_text_all"]}' \
+                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     elif message.content_type == 'voice':
         await state.update_data(content_type="voice", file_id=message.voice.file_id)
         # logging.info(message.voice.file_id)
         data = await state.get_data()
-        message_txt = 'Ваше сообщение:\n' + data['message_text_all'] + '\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+        message_txt = f'Ваше сообщение:\n' \
+                      f'{data["message_text_all"]}' \
+                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     else:
         logging.info(f'Message type - {message.content_type}')
         await bot.send_message(message.chat.id,
-                               'Ошибка - отправьте картинку как "Фото", не как "Файл"')
+                               'Ошибка, не допустимый формат данных\n'
+                               'Бот поддерживает следующие типы данных:"Фото", "Документ", "Голосовое сообщение"',
+                               reply_markup=inline_keyboard_cancel_mass_mailing())
 
 
 @dp.callback_query_handler(text='send_send_to_all')

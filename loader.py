@@ -3,11 +3,13 @@ import asyncio
 import asyncpg
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from data.config import DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
 from data import config
 
 bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
-storage = MemoryStorage()
+# storage = MemoryStorage() # Обычное хранилище, хранит данные в ОЗУ, при перезагрузке бота стирает, все данные
+storage = RedisStorage2()  # NoSQL хранилище, хранит данные в БД, при перезагрузке данные не удалаются
 dp = Dispatcher(bot, storage=storage)
 
 

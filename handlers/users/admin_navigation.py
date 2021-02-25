@@ -184,7 +184,7 @@ async def updade_contact_center_step(message: types.Message, state: FSMContext):
             await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
         except:
             pass
-        await message.answer('Ошибка - вы отправили не текст повторите')
+        await message.answer('Ошибка - вы отправили не текст повторите', reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='update_info_contact_center_admin', state=None)

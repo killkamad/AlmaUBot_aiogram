@@ -97,7 +97,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 @rate_limit(1, 'Меню')
 @dp.message_handler(lambda message: message.text in ["📅 Расписание", "⁉ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
                                                      "🗒 Академический календарь", "🏢 Получить справку",
-                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"], state=['*'])
+                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"])
 async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == "📅 Расписание":

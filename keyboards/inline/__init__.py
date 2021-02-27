@@ -2,7 +2,8 @@
 from .admin_almaushop_buttons import inline_keyboard_almau_shop_admin, inline_keyboard_add_almaushop_faq_or_cancel, \
     inline_keyboard_edit_button_content_almaushop_or_cancel, inline_keyboard_delete_faq_almaushop, \
     inline_keyboard_edit_faq_almaushop, cancel_or_delete_faq_almau_shop, inline_keyboard_edit_faq_almaushop_choice, \
-    inline_keyboard_edit_almaushop_faq_or_cancel
+    inline_keyboard_edit_almaushop_faq_or_cancel, inline_keyboard_cancel_almaushop_faq_create, \
+    inline_keyboard_cancel_almaushop_faq_update
 
 # Админ кнопки для Расписания
 from .admin_schedule_buttons import inline_keyboard_schedule_admin, cancel_or_send_schedule, cancel_or_update_schedule, \
@@ -32,7 +33,11 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
     inline_keyboard_contacts_center_delete, cancel_or_delete_contact_center_admin, \
     inline_keyboard_cancel_contact_center_admin, cancel_or_send_tutors_management, inline_keyboard_map_nav_admin_menu, \
     cancel_or_send_map_nav_admin, inline_keyboard_cabinets_admin, cancel_or_update_map_nav_admin, \
-    cancel_or_delete_map_nav_admin
+    cancel_or_delete_map_nav_admin, inline_keyboard_cancel_map_nav_admin, map_nav_admin_choice_floor_new_delete, \
+    map_nav_admin_choice_floor_old_delete, keyboard_map_nav_choice_building_delete, \
+    keyboard_map_nav_choice_building_update, \
+    map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
+    map_nav_admin_choice_floor_old, keyboard_map_nav_choice_building
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
@@ -52,8 +57,13 @@ from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callbac
     main_faq_edit_callback, main_faq_delete_callback, main_faq_callback, schedule_callback, schedule_update_callback, \
     schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
     request_callback, request_type_callback, request_update_callback, request_delete_callback, \
-    cabinet_callback, cabinet_callback_update
+    cabinet_callback, cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete, \
+    nav_center_callback
 
+from .library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
+    inline_keyboard_back_to_library, inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, \
+    inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib, inline_keyboard_cancel_lic_db_reg, \
+    inline_keyboard_library_choice_db
 from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back
 from .navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \

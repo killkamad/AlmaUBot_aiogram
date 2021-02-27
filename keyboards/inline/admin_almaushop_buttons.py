@@ -70,7 +70,7 @@ async def inline_keyboard_edit_faq_almaushop():
 # AlmaU Shop FAQ Удалить или изменить
 def cancel_or_delete_faq_almau_shop():
     markup = InlineKeyboardMarkup()
-    callback_button = InlineKeyboardButton(text="✅ Удалить", callback_data="delete_faq_almaushop")
+    callback_button = InlineKeyboardButton(text="✅ Удалить", callback_data="delete_faq_almaushop_final")
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_del_faq_almaushop")
     markup.add(callback_button, callback_button2)
     return markup
@@ -91,4 +91,20 @@ def inline_keyboard_edit_almaushop_faq_or_cancel():
     callback_button = InlineKeyboardButton(text="✅ Изменить", callback_data="edit_faq_shop_conf")
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="edit_faq_shop_dec")
     markup.add(callback_button, callback_button2)
+    return markup
+
+
+# Almau Shop F.A.Q Отмена Создания
+def inline_keyboard_cancel_almaushop_faq_create():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_almaushop_faq")
+    markup.add(cancel_button)
+    return markup
+
+
+# Almau Shop F.A.Q Отмена
+def inline_keyboard_cancel_almaushop_faq_update():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_almaushop_faq_update")
+    markup.add(cancel_button)
     return markup

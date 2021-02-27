@@ -1,5 +1,5 @@
 import logging
-
+import aiogram.utils.markdown as fmt
 from data.config import library_admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
@@ -10,8 +10,8 @@ from keyboards.inline import inline_keyboard_menu
 from states.library_state import EmailReg
 from loader import dp, bot
 from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
-    inline_keyboard_back_to_library, inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, \
-    inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib
+    inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, inline_keyboard_cancel_lic_db_reg, \
+    inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib, inline_keyboard_library_choice_db
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit
@@ -81,39 +81,54 @@ async def callback_cancel_lib_reg(message: types.Message, state: FSMContext):
 
 # Отравка клавиатуры для выбора базы данных для регистрации
 @dp.callback_query_handler(text='library_registration_button', state=None)
-async def callback_library_registration(call: CallbackQuery):
+async def callback_library_registration_button(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Регистрация проводится путем отправки данных в библиотеку ALMAU.\n'
-                                     'Если не можете здесь отправить данные то зарегестрируйтесь через сайт lib.almau.edu.kz/page/9 \n')
-    await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться\n'
-                              'Для отмены введите команду /cancel',
-                              reply_markup=keyboard_library_choice_db())
+                                     'Если вы не можете отправить данные через бота, то вы можете зарегестроваться через сайт lib.almau.edu.kz/page/9 \n'
+                                     'Выберите базу данных на которую хотите зарегистрироваться',
+                                disable_web_page_preview=True,
+                                reply_markup=inline_keyboard_library_choice_db())
+    # await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться\n',
+    #                           reply_markup=keyboard_library_choice_db())
     await EmailReg.bookbase.set()
 
 
 # Сохранение выбранной базы данных и запрос ФИО
-@dp.message_handler(
-    lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
-    state=EmailReg.bookbase)
-async def process_name(message: types.Message, state: FSMContext):
+# @dp.message_handler(
+#     lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
+#     state=EmailReg.bookbase)
+@dp.callback_query_handler(state=EmailReg.bookbase)
+async def callback_process_name(call: CallbackQuery, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    except:
+        pass
     async with state.proxy() as data:
-        data['book_database'] = message.text
-    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+        data['book_database'] = call.data
+    await call.message.answer("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_lic_db_reg())
     await EmailReg.names.set()
 
 
 # Сохранение ФИО и запрос Email
 @dp.message_handler(state=EmailReg.names)
-async def process_name(message: types.Message, state: FSMContext):
+async def callback_process_email(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     async with state.proxy() as data:
-        data['names'] = message.text
-    await message.reply("Напишите ваш Email")
+        data['names'] = fmt.quote_html(message.text)
+    await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_lic_db_reg())
     await EmailReg.email.set()
 
 
 # Сохранение Email и запрос номера телефона
 @dp.message_handler(content_types=ContentType.TEXT, state=EmailReg.email)
-async def process_name(message: types.Message, state: FSMContext):
+async def callback_process_phone(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if "@" in message.text:
         email = message.text.strip()
         if is_valid_email(email):
@@ -122,14 +137,16 @@ async def process_name(message: types.Message, state: FSMContext):
             await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_library_send_phone())
             await EmailReg.phone.set()
         else:
-            await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+            await message.reply("Неверный формат электронной почты, напишите правильно почту!",
+                                reply_markup=inline_keyboard_cancel_lic_db_reg())
     else:
-        await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+        await message.reply("Неверный формат электронной почты, напишите правильно почту!",
+                            reply_markup=inline_keyboard_cancel_lic_db_reg())
 
 
 # Сохранение Номера телефона и показ всех записанных данных, с вариантами 'отправить' или 'отменить'
 @dp.message_handler(content_types=ContentType.CONTACT, state=EmailReg.phone)
-async def SendToEmail(message: types.Message, state: FSMContext):
+async def send_license_db_reg_data_to_email(message: types.Message, state: FSMContext):
     if message.chat.id == message.contact.user_id:
         logging.info(f"User({message.chat.id}) ввел правильный номер")
         await message.reply("Номер телефона получен", reply_markup=ReplyKeyboardRemove())
@@ -156,7 +173,7 @@ async def SendToEmail(message: types.Message, state: FSMContext):
 
 # Если пользователь нажал кнопку Отмена происходит отмена и возвращение в меню библиотеки
 @dp.callback_query_handler(text='SendDataCancel')
-async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
+async def send_license_db_reg_data_to_email_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил регистрацию в БД библиотеки - {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     # Добовляет alert вверху экрана
@@ -173,6 +190,13 @@ async def callback_el_res(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Электронные ресурсы\n',
                                 reply_markup=inline_keyboard_library_el_res())
+
+
+# Handler для кнопки возврат в 📕 Лицензионные Базы Данных
+@dp.callback_query_handler(text='back_to_lic_db_reg', state=['*'])
+async def callback_license_db_inline_menu(call: CallbackQuery, state: FSMContext):
+    await state.reset_state()
+    await callback_library_registration(call)
 
 
 # Handler для остальных кнопок баз данных
@@ -197,17 +221,16 @@ async def callback_el_res_choice(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='SendEmailToLibrary')
-async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMContext):
+async def send_email_to_library_and_notification(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил запрос на регистрацию")
     data = await state.get_data()
     await db.add_lib_reg_request_data(call.message.chat.id, data['names'], data['phone'], data['email'],
                                       data['book_database'])
     email_message = MIMEMultipart("alternative")
     email_message["From"] = "almaubot@gmail.com"
-    # email_message["To"] = "killka_m@mail.ru"
-    email_message["To"] = "lib@almau.edu.kz"
+    email_message["To"] = "killka_m@mail.ru"
+    # email_message["To"] = "lib@almau.edu.kz"
     email_message["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
-
     sending_message = MIMEText(
         f"<html>"
         f"<body>"
@@ -230,18 +253,18 @@ async def callback_inline_SendEmailToLibrary(call: CallbackQuery, state: FSMCont
                           start_tls=True,
                           # recipients=["killka_m@mail.ru"],
                           username="almaubot@gmail.com",
-                          password="almaubot12345")
+                          password="mjykwcchpvduwcjy")
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Запрос успешно отправлен")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Запрос на регистрацию успешно отправлен, ожидайте ответа на указанную почту',
                            reply_markup=keyboard_library())
-    for admin in library_admins:
-        try:
-            await bot.send_message(admin, f"Пришла заявка на регистрацию:\n"
-                                          f"ФИО - {data['names']}\n"
-                                          f"Email - {data['email']}\n"
-                                          f"Телефон - {data['phone']}\n"
-                                          f"База Данных - {data['book_database']}")
-        except Exception as err:
-            logging.exception(err)
+    # for admin in library_admins:
+    #     try:
+    #         await bot.send_message(admin, f"Пришла заявка на регистрацию:\n"
+    #                                       f"ФИО - {data['names']}\n"
+    #                                       f"Email - {data['email']}\n"
+    #                                       f"Телефон - {data['phone']}\n"
+    #                                       f"База Данных - {data['book_database']}")
+    #     except Exception as err:
+    #         logging.exception(err)

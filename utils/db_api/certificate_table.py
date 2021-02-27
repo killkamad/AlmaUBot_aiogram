@@ -124,7 +124,7 @@ async def select_data_request_certificate():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT DISTINCT ON (phone) * FROM request_certificate;"
+            sql_select = "SELECT DISTINCT ON (phone) * FROM request_certificate ORDER BY phone, date_time DESC;"
             record: Record = await connection.fetch(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -136,6 +136,31 @@ async def select_data_on_send_request_certificate():
     try:
         async with pool.acquire() as connection:
             sql_select = "SELECT DISTINCT ON (phone) * FROM request_certificate WHERE is_loaded IS FALSE;"
+            record: Record = await connection.fetch(sql_select)
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def select_data_on_edit_request_certificate():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = """
+                          SELECT DISTINCT ON (req.phone)
+                        	     req.id,
+                        	     req.id_telegram,
+                        	     req.full_name,
+                        	     req.phone,
+                        	     req.email,
+                        	     req.certif_type,
+                        	     req.is_loaded,
+                        	     req.date_time
+                            FROM request_certificate req
+                            JOIN certificate crt
+                              ON req.id = crt.id_request
+                            WHERE req.is_loaded IS TRUE
+                            ORDER BY req.phone, req.date_time DESC;"""
             record: Record = await connection.fetch(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:

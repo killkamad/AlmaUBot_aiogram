@@ -9,9 +9,9 @@ from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback
+from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback, inline_keyboard_cancel_request
 from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
-    keyboard_feedback_send_phone, always_stay_menu_keyboard
+                              keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
 
 # Импорт стейтов
@@ -38,7 +38,6 @@ async def callback_inline_completes(call: CallbackQuery):
 @dp.callback_query_handler(certificate_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    # certificate_name = callback_data.get('certificate_name')
     certificate_id = callback_data.get('id')
     file_id = await db.find_certificate_id(certificate_id)
     await bot.send_document(call.message.chat.id, file_id)
@@ -62,15 +61,20 @@ async def process_name(message: types.Message, state: FSMContext):
     else:
         async with state.proxy() as data:
             data['type'] = message.text
-        await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_request())
+        # await bot.send_message(message.chat.id, 'Напишите ваше ФИО:', reply_markup=inline_keyboard_cancel_request())
         await CertificateRequest.names.set()
 
 
-@dp.message_handler(state=CertificateRequest.names)
+@dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.names)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['names'] = message.text
-    await message.reply("Напишите ваш Email")
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
+    except:
+        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
     await CertificateRequest.email.set()
 
 
@@ -81,7 +85,11 @@ async def process_name(message: types.Message, state: FSMContext):
         if is_valid_email(email):
             async with state.proxy() as data:
                 data['email'] = message.text
-            await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
+            except:
+                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
             await CertificateRequest.phone.set()
         else:
             await message.reply("Неверный формат электронной почты, напишите правильно почту!")
@@ -115,7 +123,7 @@ async def SendRequest(message: types.Message, state: FSMContext):
                              reply_markup=keyboard_feedback_send_phone())
 
 
-@dp.callback_query_handler(text='send_req_cancel')
+@dp.callback_query_handler(text='send_req_cancel', state=['*'])
 async def callback_inline_request_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил заявку - {call.data}')
     await state.reset_state()

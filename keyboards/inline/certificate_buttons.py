@@ -27,3 +27,10 @@ def inline_keyboard_send_req_data():
     callback_back = InlineKeyboardButton(text="❌ Отмена", callback_data='send_req_cancel')
     markup.add(callback_button, callback_back)
     return markup
+
+
+def inline_keyboard_cancel_request():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена запроса", callback_data="send_req_cancel")
+    markup.add(cancel_button)
+    return markup

@@ -43,37 +43,15 @@ def is_valid_email(s):
 async def library_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки БИБЛИОТЕКИ
-    if message.text == '🌐 Вебсайт':
-        text = (await json_data())['lib_answers']['library_site']
-        await bot.send_message(message.chat.id, text=text, parse_mode='HTML', disable_web_page_preview=True)
+    if message.text in ['🌐 Вебсайт', '☎ Контакты', '🕐 Время работы',
+                        '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила',
+                        '📰 Права читателя', '🚫 Что не разрешается', '⛔ Ответственность за нарушения']:
+        button_content = await db.select_library_menu_button_content(message.text)
+        await bot.send_message(chat_id=message.chat.id, text=button_content)
     elif message.text == '⚡ Электронные ресурсы':
         await bot.send_message(chat_id=message.chat.id,
                                text='Электронные ресурсы\n',
                                reply_markup=inline_keyboard_library_el_res())
-    elif message.text == '☎ Контакты':
-        text = (await json_data())['lib_answers']['lib_contacts']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '🕐 Время работы':
-        text = (await json_data())['lib_answers']['lib_work_time']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '🎓 Онлайн курсы':
-        text = (await json_data())['lib_answers']['lib_online_courses']
-        await bot.send_message(message.chat.id, text=text, disable_web_page_preview=True)
-    elif message.text == '💳 Потерял(a) ID-карту':
-        text = (await json_data())['lib_answers']['lib_lost_card']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '⚠ Правила':
-        text = (await json_data())['lib_answers']['lib_laws']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '📰 Права читателя':
-        text = (await json_data())['lib_answers']['lib_rights']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '🚫 Что не разрешается':
-        text = (await json_data())['lib_answers']['lib_not_allow']
-        await bot.send_message(message.chat.id, text=text)
-    elif message.text == '⛔ Ответственность за нарушения':
-        text = (await json_data())['lib_answers']['lib_responsible']
-        await bot.send_message(message.chat.id, text=text)
 
 
 @dp.callback_query_handler(text=['library_registration'])

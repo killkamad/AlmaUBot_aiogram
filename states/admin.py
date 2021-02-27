@@ -67,6 +67,11 @@ class EditButtonContentAlmauShop(StatesGroup):
     confirm = State()
 
 
+class EditButtonContentLibrary(StatesGroup):
+    button_content = State()
+    confirm = State()
+
+
 class SendContactCenter(StatesGroup):
     name = State()
     description = State()

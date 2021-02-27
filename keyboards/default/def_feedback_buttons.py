@@ -2,7 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
 def keyboard_feedback():
-    markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
     callback_button1 = KeyboardButton(text="✏ Написать письмо ректору")
     callback_button2 = KeyboardButton(text="⬅ В главное меню")
     markup.add(callback_button1, callback_button2)

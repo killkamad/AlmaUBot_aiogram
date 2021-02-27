@@ -108,3 +108,11 @@ def inline_keyboard_cancel_almaushop_faq_update():
     cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_almaushop_faq_update")
     markup.add(cancel_button)
     return markup
+
+
+# Almau Shop Отмена изменения контента для кнопок: Вебсайт и Контакты
+def inline_keyboard_cancel_almaushop_website_contacts():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_ed_but_con_shop")
+    markup.add(cancel_button)
+    return markup

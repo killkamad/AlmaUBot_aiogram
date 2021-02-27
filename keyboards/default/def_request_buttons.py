@@ -2,7 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
 def keyboard_certificate_type():
-    markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
     callback_button1 = KeyboardButton(text="Справка в военкомат")
     callback_button2 = KeyboardButton(text="Справка ГЦВП")
     callback_button3 = KeyboardButton(text="Справка по месту требования")

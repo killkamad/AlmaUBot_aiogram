@@ -19,6 +19,6 @@ def inline_keyboard_send_msg_data():
 
 def inline_keyboard_cancel_msg_send():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_back = InlineKeyboardButton(text="❌ Отмена отправки", callback_data="SendMsgCancel")
+    callback_back = InlineKeyboardButton(text="❌ Отмена", callback_data="SendMsgCancel")
     markup.add(callback_back)
     return markup

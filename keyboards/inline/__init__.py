@@ -3,7 +3,7 @@ from .admin_almaushop_buttons import inline_keyboard_almau_shop_admin, inline_ke
     inline_keyboard_edit_button_content_almaushop_or_cancel, inline_keyboard_delete_faq_almaushop, \
     inline_keyboard_edit_faq_almaushop, cancel_or_delete_faq_almau_shop, inline_keyboard_edit_faq_almaushop_choice, \
     inline_keyboard_edit_almaushop_faq_or_cancel, inline_keyboard_cancel_almaushop_faq_create, \
-    inline_keyboard_cancel_almaushop_faq_update
+    inline_keyboard_cancel_almaushop_faq_update, inline_keyboard_cancel_almaushop_website_contacts
 
 # Админ кнопки для Расписания
 from .admin_schedule_buttons import inline_keyboard_schedule_admin, cancel_or_send_schedule, cancel_or_update_schedule, \
@@ -47,7 +47,7 @@ from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel
     inline_keyboard_on_send_request_certificate
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
-                                   inline_keyboard_edit_button_content_library_or_cancel
+    inline_keyboard_edit_button_content_library_or_cancel
 
 # Кнопки для главного админ меню и админ меню для ролей
 from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin

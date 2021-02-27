@@ -38,51 +38,53 @@ def is_valid_email(s):
 async def feedback_text_buttons_handler(message: types.Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     if message.text == '✏ Написать письмо ректору':
+        # await message.answer('...', reply_markup=ReplyKeyboardRemove())
         await message.reply("Что вы хотели бы написать?", reply_markup=inline_keyboard_cancel_msg_send())
         await FeedbackMessage.content.set()
 
 
 @dp.message_handler(state=FeedbackMessage.content)
 async def process_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['content'] = fmt.quote_html(message.text)
     try:
         await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_msg_send())
     except:
-        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_msg_send())
+        pass
+    async with state.proxy() as data:
+        data['content'] = fmt.quote_html(message.text)
+    await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_msg_send())
     await FeedbackMessage.names.set()
 
 
 @dp.message_handler(state=FeedbackMessage.names)
 async def process_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['names'] = fmt.quote_html(message.text)
     try:
         await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_msg_send())
     except:
-        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_msg_send())
+        pass
+    async with state.proxy() as data:
+        data['names'] = fmt.quote_html(message.text)
+    await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_msg_send())
     await FeedbackMessage.email.set()
 
 
 @dp.message_handler(content_types=ContentType.TEXT, state=FeedbackMessage.email)
 async def process_name(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if "@" in message.text:
         email = message.text.strip()
         if is_valid_email(email):
             async with state.proxy() as data:
                 data['email'] = fmt.quote_html(message.text)
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
-            except:
-                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
+
+            await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
             await FeedbackMessage.phone.set()
         else:
-            await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+            await message.reply("Неверный формат электронной почты, напишите правильно почту!", reply_markup=inline_keyboard_cancel_msg_send())
     else:
-        await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+        await message.reply("Неверный формат электронной почты, напишите правильно почту!", reply_markup=inline_keyboard_cancel_msg_send())
 
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=FeedbackMessage.phone)

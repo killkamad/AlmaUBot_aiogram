@@ -9,9 +9,10 @@ from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback, inline_keyboard_cancel_request
+from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback, \
+    inline_keyboard_cancel_request
 from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
-                              keyboard_feedback_send_phone, always_stay_menu_keyboard
+    keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
 
 # Импорт стейтов
@@ -68,33 +69,35 @@ async def process_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.names)
 async def process_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['names'] = message.text
     try:
         await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
     except:
-        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
+        pass
+    async with state.proxy() as data:
+        data['names'] = message.text
+    await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
     await CertificateRequest.email.set()
 
 
 @dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.email)
 async def process_name(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if "@" in message.text:
         email = message.text.strip()
         if is_valid_email(email):
             async with state.proxy() as data:
                 data['email'] = fmt.quote_html(message.text)
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
-            except:
-                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
+            await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_request_send_phone())
             await CertificateRequest.phone.set()
         else:
-            await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+            await message.reply("Неверный формат электронной почты, напишите правильно почту!",
+                                reply_markup=inline_keyboard_cancel_request())
     else:
-        await message.reply("Неверный формат электронной почты, напишите правильно почту!")
+        await message.reply("Неверный формат электронной почты, напишите правильно почту!",
+                            reply_markup=inline_keyboard_cancel_request())
 
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=CertificateRequest.phone)

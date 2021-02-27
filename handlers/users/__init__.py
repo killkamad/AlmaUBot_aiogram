@@ -17,5 +17,6 @@ from .admin_navigation import dp
 from .admin_users import dp
 from .admin_certificate import dp
 from .certificate import dp
+from .admin_library import dp
 
 __all__ = ["dp"]

@@ -10,7 +10,7 @@ from utils.delete_messages import bot_delete_messages
 from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_calendar, \
     cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, \
     inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin, \
-    inline_keyboard_library_admin, inline_keyboard_marketing_admin
+    inline_keyboard_library_admin, inline_keyboard_marketing_admin, inline_keyboard_library_first_page_admin
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -111,6 +111,14 @@ async def almaushop_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню AlmaU Shop, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
+
+
+# Переход Админ меню для Библиотеки
+@dp.callback_query_handler(text='library_admin_menu')
+async def library_admin_menu(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) переход на первую страницу админ меню Библиотеки, call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
 
 
 # Переход Админ меню для Пользователей

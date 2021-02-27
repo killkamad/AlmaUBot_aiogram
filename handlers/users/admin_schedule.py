@@ -89,7 +89,7 @@ async def change_schedule_id(message: types.Message, state: FSMContext):
 async def callback_inline_send_schedule_bot(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кнопку для удаление:',
+                                text='Выберите кнопку для удаления:',
                                 reply_markup=await inline_keyboard_delete_schedule())
 
 

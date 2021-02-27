@@ -19,6 +19,25 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 #                callback_button11, callback_button12, callback_button13)
 #     return markup
 
+def inline_keyboard_library_choice_db():
+    markup = InlineKeyboardMarkup(row_width=2)
+    button1 = InlineKeyboardButton(text="IPR Books", callback_data="IPR Books")
+    button2 = InlineKeyboardButton(text="Scopus", callback_data="Scopus")
+    button3 = InlineKeyboardButton(text="Web of Science", callback_data="Web of Science")
+    button4 = InlineKeyboardButton(text="ЮРАЙТ", callback_data="ЮРАЙТ")
+    button5 = InlineKeyboardButton(text="Polpred", callback_data="Polpred")
+    button6 = InlineKeyboardButton(text="РМЭБ", callback_data="РМЭБ")
+    callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_lic_db_reg")
+    markup.add(button1, button2, button3, button4, button5, button6, callback_back)
+    return markup
+
+
+def inline_keyboard_cancel_lic_db_reg():
+    markup = InlineKeyboardMarkup(row_width=1)
+    cancel = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_lic_db_reg")
+    markup.add(cancel)
+    return markup
+
 
 def inline_keyboard_library_registration():
     markup = InlineKeyboardMarkup(row_width=1)

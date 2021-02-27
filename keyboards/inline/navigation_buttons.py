@@ -209,16 +209,17 @@ def inline_keyboard_old_building():
 #кнопки перехода
 def inline_keyboard_new_building_back():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="⬅ В новое здание", callback_data="new_building")
+    callback_button = InlineKeyboardButton(text="⬅ В главное меню карт", callback_data="map_nav")
     markup.add(callback_button)
     return markup
 
 
-def inline_keyboard_old_building_back():
+def inline_keyboard_old_building_back(building_callback, floor_callback):
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="⬅ В старое здание", callback_data="old_building")
-    callback_button1 = InlineKeyboardButton(text="⬅ В новое здание", callback_data="new_building")
-    markup.add(callback_button, callback_button1)
+    callback_button = InlineKeyboardButton(text="⬅ Назад", callback_data=building_callback+"building"+floor_callback)
+    callback_button1 = InlineKeyboardButton(text="⬅ В старое здание", callback_data="old_building")
+    callback_button2 = InlineKeyboardButton(text="⬅ В новое здание", callback_data="new_building")
+    markup.add(callback_button, callback_button1, callback_button2)
     return markup
 
 

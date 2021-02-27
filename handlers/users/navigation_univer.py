@@ -354,10 +354,63 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_sixth_new())
 
 
+#сделал очень тупую конструкцию для кнопки назад
 @dp.callback_query_handler(cabinet_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
     cabinet = callback_data.get('cabinet')
     description = await db.find_cabinet_description(cabinet)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back())
+    print(cabinet[0], cabinet[3])
+    if cabinet[0] == '1' and cabinet[3] != 'а':
+            building_callback = "old_"
+            floor_callback = "_first"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '2') and cabinet[3] != 'а':
+            building_callback = "old_"
+            floor_callback = "_second"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '3') and cabinet[3] != 'а':
+            building_callback = "old_"
+            floor_callback = "_third"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '4') and cabinet[3] != 'а':
+            building_callback = "old_"
+            floor_callback = "_fourth"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '1') and cabinet[3] == 'а':
+            building_callback = "new_"
+            floor_callback = "_first"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '2') and cabinet[3] == 'а':
+            building_callback = "new_"
+            floor_callback = "_second"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '3') and cabinet[3] == 'а':
+            building_callback = "new_"
+            floor_callback = "_third"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif (cabinet[0] == '4') and cabinet[3] == 'а':
+            building_callback = "new_"
+            floor_callback = "_fourth"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif cabinet[0] == '5':
+            building_callback = "new_"
+            floor_callback = "_fifth"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    elif cabinet[0] == '6':
+            building_callback = "new_"
+            floor_callback = "_sixth"
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+    else:
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                        text=description, reply_markup=inline_keyboard_new_building_back())

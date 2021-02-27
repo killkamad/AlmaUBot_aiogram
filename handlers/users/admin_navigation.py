@@ -17,7 +17,8 @@ from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_k
     map_nav_admin_choice_floor_new_delete, map_nav_admin_choice_floor_old, keyboard_map_nav_choice_building, \
     map_nav_admin_choice_floor_old_delete, keyboard_map_nav_choice_building_delete, \
     keyboard_map_nav_choice_building_update, \
-    map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new
+    map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
+    keyboard_pps_choice_position, keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool
 
 import asyncio
 
@@ -33,9 +34,10 @@ from keyboards.inline import cabinet_callback, cabinet_callback_update, nav_cent
     nav_center_callback_delete
 
 
-@dp.callback_query_handler(text_contains='nav_university_admin_menu')
-async def callback_inline_nav_university_admin_menu(call: CallbackQuery):
+@dp.callback_query_handler(text_contains='nav_university_admin_menu', state=['*'])
+async def callback_inline_nav_university_admin_menu(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Навигации, call.data - {call.data}')
+    await state.reset_state()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Навигации:', reply_markup=inline_keyboard_nav_university_admin_menu())
 
@@ -64,8 +66,10 @@ async def callback_inline_send_contact_center_admin(call: CallbackQuery):
 @dp.callback_query_handler(text='cancel_step_contact_center_admin', state=['*'])
 async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='<b><i>ОТМЕНЕНО</i></b>', parse_mode='HTML')
+    try:
+        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id) 
+    except:
+        pass
     await call.message.answer('Админ меню ключевых центров', reply_markup=inline_keyboard_contact_center_admin())
     await state.reset_state()
 
@@ -281,69 +285,69 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
 ###################################профессорско преподвательский состав изменение информации#################################
 @dp.callback_query_handler(text='tutors_university_admin', state=None)
 async def callback_tutors_university_admin_state(call: CallbackQuery):
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='выбор для изменений', reply_markup=inline_keyboard_cancel_contact_center_admin())
-    # await bot.send_message(chat_id=message.chat.id, text='ВЫБИРЕТЕ Школу', reply_markup=inline_keyboard_cancel_contact_center_admin())
-    await call.message.answer('Выберите школу для которой хотите ввести изменения\n'
-                              'Для отмены нажмите сверху кнопку отмены',
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    await call.message.answer('Выберите школу для которой хотите ввести изменения',
                               reply_markup=keyboard_pps_choice_shcool())
     await Pps_admin.shcool.set()
 
 
-def keyboard_pps_choice_shcool():
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("Школа менеджмента", "Школа политики и права")
-    markup.add("Школа Инженерного Менеджмента", "Школа предпринимательства и инноваций")
-    markup.add("Высшая Школа Бизнеса", "Школа Экономики и Финансов")
-    markup.add("Ректорат")
-    return markup
-
-
-@dp.message_handler(
-    lambda message: message.text in ['Школа менеджмента', 'Школа политики и права', 'Школа Инженерного Менеджмента',
-                                     'Школа предпринимательства и инноваций', 'Высшая Школа Бизнеса',
-                                     'Школа Экономики и Финансов'],
-    state=Pps_admin.shcool)
-async def tutors_university_admin_state_shcool(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['shcool'] = message.text
-    await bot.send_message(chat_id=message.chat.id, text='Выбор для изменений',
-                           reply_markup=inline_keyboard_cancel_contact_center_admin())
-    await message.reply("выбирете что хотите изменить", reply_markup=keyboard_pps_choice_position())
+@dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_shcool_admin'),
+                           state=Pps_admin.shcool)
+async def pps_admin_state_shcool(call: CallbackQuery, state: FSMContext):
+    shcoolnumber = call.data[-1]
+    if shcoolnumber == '1':
+        async with state.proxy() as data:
+            data['shcool'] = "Школа менеджмента"
+    if shcoolnumber == '2':
+        async with state.proxy() as data:
+            data['shcool'] = "Школа политики и права"
+    if shcoolnumber == '3':
+        async with state.proxy() as data:
+            data['shcool'] = "Школа Инженерного Менеджмента"
+    if shcoolnumber == '4':
+        async with state.proxy() as data:
+            data['shcool'] = "Школа предпринимательства и инноваций"
+    if shcoolnumber == '5':
+        async with state.proxy() as data:
+            data['shcool'] = "Высшая Школа Бизнеса"
+    if shcoolnumber == '6':
+        async with state.proxy() as data:
+            data['shcool'] = "Школа Экономики и Финансов"
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    await call.message.reply(
+        f"выбирете что хотите изменить",reply_markup=keyboard_pps_choice_position())
     await Pps_admin.position.set()
 
 
-@dp.message_handler(
-    lambda message: message.text in ['Ректорат'],
-    state=Pps_admin.shcool)
-async def tutors_university_admin_state_rectorat(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text='choice_rectorat_admin', state=Pps_admin.shcool)
+async def callback_tutors_university_admin_state(call: CallbackQuery, state: FSMContext): 
     async with state.proxy() as data:
-        data['shcool'] = message.text
-    await bot.send_message(chat_id=message.chat.id, text='Выбор для изменений',
-                           reply_markup=inline_keyboard_cancel_contact_center_admin())
-    await message.reply("выбирете что хотите изменить", reply_markup=keyboard_pps_choice_position_rector())
+        data['shcool'] = 'Ректорат'
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    await call.message.answer('выбирете что хотите изменить', reply_markup=keyboard_pps_choice_position_rector())
     await Pps_admin.position.set()
 
 
-def keyboard_pps_choice_position():
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("Декан", "Преподаватели")
-    return markup
-
-
-def keyboard_pps_choice_position_rector():
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("Ректор", "Проректоры")
-    return markup
-
-
-@dp.message_handler(lambda message: message.text in ['Декан', 'Преподаватели', "Ректор", "Проректоры"],
-                    state=Pps_admin.position)
-async def tutors_university_admin_state_position(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['position'] = message.text
-    await message.reply(f"Напишите описание которое хотите изменить для {data['position']} {data['shcool']}",
-                        reply_markup=ReplyKeyboardRemove())
+@dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_position_admin'),
+                           state=Pps_admin.position)
+async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
+    positionnum = call.data[-1]
+    if positionnum == '1':
+        async with state.proxy() as data:
+            data['position'] = "Декан"
+    if positionnum == '2':
+        async with state.proxy() as data:
+            data['position'] = "Преподаватели"
+    if positionnum == '3':
+        async with state.proxy() as data:
+            data['position'] = "Ректор"
+    if positionnum == '4':
+        async with state.proxy() as data:
+            data['position'] = "Проректоры"
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    await call.message.reply(
+        f"Напишите описание которое хотите изменить для {data['position']} {data['shcool']}",
+        reply_markup=inline_keyboard_cancel_map_nav_admin())
     await Pps_admin.description.set()
 
 
@@ -352,10 +356,18 @@ async def message_send_tutors_management(message: types.Message, state: FSMConte
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        except:
+            pass
         await bot.send_message(message.chat.id, text='Отправить это описание?',
                                reply_markup=cancel_or_send_tutors_management())
         await state.reset_state(with_data=False)
     else:
+        try:
+            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        except:
+            pass
         await message.answer('Ошибка - вы отправили не текст повторите')
 
 
@@ -363,15 +375,31 @@ async def message_send_tutors_management(message: types.Message, state: FSMConte
 async def callback_inline_send_tutors_management_final(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await bot_delete_messages(call.message, 9)
+        try:
+            await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+        except:
+            pass
         await db.add_pps_data(data['user_id'], data['shcool'], data['position'], data['description'])
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await call.message.answer(f'описание отправлено')
-        await call.message.answer('Админ меню навигации', reply_markup=inline_keyboard_nav_university_admin_menu())
+        await call.message.answer('описание отправлено\n'
+                                  'Админ меню навигации', 
+                                  reply_markup=inline_keyboard_nav_university_admin_menu())
         logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
+        try:
+            await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id - 1)
+        except:
+            pass
         print(e)
+
+
+@dp.callback_query_handler(text='cancel_step_tutors_admin', state=['*'])
+async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    await call.message.answer('Админ меню профессорско-преподовательского состава:', reply_markup=keyboard_pps_choice_shcool())
+    await state.reset_state()
+    await Pps_admin.shcool.set()
 
 
 #############админ меню карты навигации
@@ -743,7 +771,6 @@ async def map_nav_admin_state_delete_final(call: CallbackQuery, state: FSMContex
 @dp.callback_query_handler(text='cancel_step_map_nav_admin', state=['*'])
 async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='<b><i>ОТМЕНЕНО</i></b>', parse_mode='HTML')
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await call.message.answer('Админ меню карты-навигации:', reply_markup=inline_keyboard_map_nav_admin_menu())
     await state.reset_state()

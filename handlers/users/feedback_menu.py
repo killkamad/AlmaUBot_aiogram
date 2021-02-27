@@ -5,10 +5,10 @@ from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
 from keyboards.default import always_stay_keyboard, keyboard_feedback_send_phone, always_stay_menu_keyboard
-from keyboards.inline import inline_keyboard_menu
+from keyboards.inline import inline_keyboard_menu, inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 from states.feedback_state import FeedbackMessage
 from loader import dp, bot
-from keyboards.inline.feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
+# from keyboards.inline.feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -38,7 +38,7 @@ def is_valid_email(s):
 async def feedback_text_buttons_handler(message: types.Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     if message.text == '✏ Написать письмо ректору':
-        await message.reply("Что вы хотели бы написать?", reply_markup=ReplyKeyboardRemove())
+        await message.reply("Что вы хотели бы написать?", reply_markup=inline_keyboard_cancel_msg_send())
         await FeedbackMessage.content.set()
 
 
@@ -46,7 +46,11 @@ async def feedback_text_buttons_handler(message: types.Message, state: FSMContex
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['content'] = fmt.quote_html(message.text)
-    await message.reply("Напишите ваше ФИО", reply_markup=ReplyKeyboardRemove())
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_msg_send())
+    except:
+        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_msg_send())
     await FeedbackMessage.names.set()
 
 
@@ -54,7 +58,11 @@ async def process_name(message: types.Message, state: FSMContext):
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['names'] = fmt.quote_html(message.text)
-    await message.reply("Напишите ваш Email")
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_msg_send())
+    except:
+        await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_msg_send())
     await FeedbackMessage.email.set()
 
 
@@ -65,7 +73,11 @@ async def process_name(message: types.Message, state: FSMContext):
         if is_valid_email(email):
             async with state.proxy() as data:
                 data['email'] = fmt.quote_html(message.text)
-            await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
+            try:
+                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
+            except:
+                await message.reply("Отправьте свой номер телефона", reply_markup=keyboard_feedback_send_phone())
             await FeedbackMessage.phone.set()
         else:
             await message.reply("Неверный формат электронной почты, напишите правильно почту!")
@@ -99,7 +111,7 @@ async def SendToEmail(message: types.Message, state: FSMContext):
                              reply_markup=keyboard_feedback_send_phone())
 
 
-@dp.callback_query_handler(text='SendMsgCancel')
+@dp.callback_query_handler(text='SendMsgCancel', state=['*'])
 async def callback_inline_SendDataCancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил отправку письма - {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру

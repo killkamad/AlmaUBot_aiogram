@@ -49,7 +49,7 @@ def cancel_or_delete_certificate():
 
 async def inline_keyboard_upd_req_certificate():
     markup = InlineKeyboardMarkup(row_width=1)
-    request = await db.select_data_request_certificate()
+    request = await db.select_data_on_edit_request_certificate()
     markup.add(*[InlineKeyboardButton(text=item['full_name'],
                                       callback_data=request_update_callback.new(request_name=item["full_name"])) for item in request])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_update_step"))
@@ -67,7 +67,7 @@ async def inline_keyboard_update_certificate(user_id):
 
 async def inline_keyboard_del_req_certificate():
     markup = InlineKeyboardMarkup(row_width=1)
-    request = await db.select_data_request_certificate()
+    request = await db.select_data_on_edit_request_certificate()
     markup.add(*[InlineKeyboardButton(text=item['full_name'],
                                       callback_data=request_delete_callback.new(request_name=item["full_name"])) for item in request])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))

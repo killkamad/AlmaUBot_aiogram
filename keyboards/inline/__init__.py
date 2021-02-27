@@ -46,6 +46,9 @@ from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel
     inline_keyboard_get_request_certificate, inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
     inline_keyboard_on_send_request_certificate
 
+from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
+                                   inline_keyboard_edit_button_content_library_or_cancel
+
 # Кнопки для главного админ меню и админ меню для ролей
 from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin
 
@@ -61,12 +64,12 @@ from .library_buttons import inline_keyboard_library_registration, inline_keyboa
     inline_keyboard_back_to_library, inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, \
     inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib, inline_keyboard_cancel_lic_db_reg, \
     inline_keyboard_library_choice_db
-from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data
+from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back
 from .navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \
     inline_keyboard_contacts_center_back
 from .certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate, \
-    inline_keyboard_send_req_data
+    inline_keyboard_send_req_data, inline_keyboard_cancel_request
 from .schedule_buttons import inline_keyboard_schedule
 from .menu_buttons import inline_keyboard_menu
 from .faq_buttons import inline_keyboard_main_faq, inline_keyboard_main_faq_back

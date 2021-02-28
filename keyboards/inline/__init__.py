@@ -39,7 +39,7 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
     keyboard_map_nav_choice_building_update, \
     map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
     map_nav_admin_choice_floor_old, keyboard_map_nav_choice_building, keyboard_pps_choice_position, \
-    keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool
+    keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, inline_keyboard_cancel_tutors_admin
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \

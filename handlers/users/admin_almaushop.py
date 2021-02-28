@@ -104,8 +104,7 @@ async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentAlmauShop.button_content)
 async def edit_button_content_almaushop_first_step(message: types.Message, state: FSMContext):
     try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
     except:
         pass
     if message.content_type == 'text':
@@ -158,8 +157,7 @@ async def callback_inline_add_faq_almaushop_question_step(message: types.Message
     # await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
     # data = await state.get_data()
     try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
     except:
         pass
     if message.content_type == 'text':
@@ -173,7 +171,7 @@ async def callback_inline_add_faq_almaushop_question_step(message: types.Message
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
     else:
-        print(message.content_type)
+        # print(message.content_type)
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
 
@@ -183,8 +181,7 @@ async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, 
     # await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
     # data = await state.get_data()
     try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
     except:
         pass
     if message.content_type == 'text':
@@ -201,7 +198,7 @@ async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, 
                 f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML')
     else:
-        print(message.content_type)
+        # print(message.content_type)
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
 
@@ -253,7 +250,7 @@ async def callback_inline_cancel_faq_almaushop_update(call: CallbackQuery, state
                                      f'<u>Вопрос</u> - {data["question_text"]}\n'
                                      f'<u>Ответ</u> - {data["answer_text"]}',
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
-    await EditFaqAlmauShop.choice.set()
+    await state.reset_state(with_data=False)
 
 
 #### Удаление FAQ AlmaU Shop ####
@@ -335,10 +332,9 @@ async def callback_inline_edit_faq_almaushop_choice_step(call: CallbackQuery, st
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
     await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer),
                             user_id=call.message.chat.id, faq_id=id)
-    await EditFaqAlmauShop.choice.set()
 
 
-@dp.callback_query_handler(text='edit_faq_shop_q', state=EditFaqAlmauShop.choice)
+@dp.callback_query_handler(text='edit_faq_shop_q')
 async def edit_faq_almaushop_choice_step_question(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
@@ -348,7 +344,7 @@ async def edit_faq_almaushop_choice_step_question(call: CallbackQuery, state: FS
     await EditFaqAlmauShop.question_confirm.set()
 
 
-@dp.callback_query_handler(text='edit_faq_shop_a', state=EditFaqAlmauShop.choice)
+@dp.callback_query_handler(text='edit_faq_shop_a')
 async def edit_faq_almaushop_choice_step_answer(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
@@ -361,8 +357,7 @@ async def edit_faq_almaushop_choice_step_answer(call: CallbackQuery, state: FSMC
 @dp.message_handler(content_types=ContentType.ANY, state=EditFaqAlmauShop.question_confirm)
 async def edit_faq_almaushop_choice_step_question_final(message: types.Message, state: FSMContext):
     try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
     except:
         pass
     if message.content_type == 'text':
@@ -381,7 +376,7 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
                 parse_mode='HTML',
                 reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     else:
-        print(message.content_type)
+        # print(message.content_type)
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова', reply_markup=inline_keyboard_cancel_almaushop_faq_update())
 
@@ -389,8 +384,7 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
 @dp.message_handler(content_types=ContentType.ANY, state=EditFaqAlmauShop.answer_confirm)
 async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, state: FSMContext):
     try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
     except:
         pass
     if message.content_type == 'text':
@@ -409,7 +403,7 @@ async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, st
                 parse_mode='HTML',
                 reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     else:
-        print(message.content_type)
+        # print(message.content_type)
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
                             'Повторите снова',
                             reply_markup=inline_keyboard_cancel_almaushop_faq_update())
@@ -451,7 +445,6 @@ async def edit_faq_almaushop_choice_step_question_final_decline(call: CallbackQu
 async def callback_inline_cancel_faq_almaushop(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     data = await state.get_data()
-    print(data)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'❌ Отмена удаления F.A.Q ({data["question_text"]})\n'
                                      f'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())

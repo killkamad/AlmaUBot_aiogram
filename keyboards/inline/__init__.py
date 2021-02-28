@@ -13,7 +13,8 @@ from .admin_schedule_buttons import inline_keyboard_schedule_admin, cancel_or_se
 # Админ кнопки для F.A.Q главного меню
 from .admin_faq_buttons import inline_keyboard_faq_admin, inline_keyboard_add_main_faq_or_cancel, \
     inline_keyboard_delete_main_faq, inline_keyboard_edit_main_faq, cancel_or_delete_main_faq, \
-    inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel, inline_keyboard_cancel_faq
+    inline_keyboard_edit_main_faq_choice, inline_keyboard_edit_main_faq_or_cancel, inline_keyboard_cancel_faq, \
+    inline_keyboard_cancel_faq_edit
 
 # Админ кнопки для Пользователей
 from .admin_users_buttons import inline_keyboard_users_admin, inline_keyboard_users_admin_roles, \

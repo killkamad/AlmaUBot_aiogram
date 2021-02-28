@@ -97,29 +97,22 @@ async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMCo
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateCertificate.send_file)
 async def change_certificate_id(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     await UpdateCertificate.send_file.set()
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
         txt = f'Наименование справки: <b>{data["button_name"]}</b>'
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            await bot.send_document(message.chat.id, data["file_id"], caption=txt,
-                                    reply_markup=cancel_or_update_certificate())
-        except:
-            await bot.send_document(message.chat.id, data["file_id"], caption=txt,
-                                    reply_markup=cancel_or_update_certificate())
+        await bot.send_document(message.chat.id, data["file_id"], caption=txt,
+                                reply_markup=cancel_or_update_certificate())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
-                                   reply_markup=inline_keyboard_cancel_certificate())
-        except:
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
-                                   reply_markup=inline_keyboard_cancel_certificate())
+        await bot.send_message(message.chat.id,
+                               'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
+                               reply_markup=inline_keyboard_cancel_certificate())
 
 
 #### Удаление справки ####
@@ -179,36 +172,30 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 async def message_send_button_name(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
     await state.update_data(button_name=call.data[5:], user_id=call.message.chat.id)
-    await bot.send_message(chat_id=call.message.chat.id, text='Отправьте файл со справкой', reply_markup=inline_keyboard_cancel_certificate())
+    await bot.send_message(chat_id=call.message.chat.id, text='Отправьте файл со справкой',
+                           reply_markup=inline_keyboard_cancel_certificate())
     await SendCertificate.send_file.set()
 
 
 # Проверка если отправлен файл, то сохраняет айди файла в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendCertificate.send_file)
 async def message_certificate_send_file(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id, upload=True, request_state=True)
         data = await state.get_data()
         txt = f'Наименование справки будет: {data["button_name"]}\n' \
               f'Номер заявки: {data["request"]}'
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            await bot.send_document(message.chat.id, data["file_id"], caption=txt,
-                                    reply_markup=cancel_or_send_certificate())
-        except:
-            await bot.send_document(message.chat.id, data["file_id"], caption=txt,
-                                    reply_markup=cancel_or_send_certificate())
+        await bot.send_document(message.chat.id, data["file_id"], caption=txt,
+                                reply_markup=cancel_or_send_certificate())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
-                                   reply_markup=inline_keyboard_cancel_certificate())
-        except:
-            await bot.send_message(message.chat.id,
-                                   'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
-                                   reply_markup=inline_keyboard_cancel_certificate())
+        await bot.send_message(message.chat.id,
+                               'Ошибка - вы отправили не документ\nПовторите Отправление файла со справкой',
+                               reply_markup=inline_keyboard_cancel_certificate())
 
 
 # Отправление справки в базу данных
@@ -216,18 +203,19 @@ async def message_certificate_send_file(message: types.Message, state: FSMContex
 async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await db.add_certificate_data(data['user_id'], data['request'], data['file_id'], data['button_name'], data['upload'])
+        await db.add_certificate_data(data['user_id'], data['request'], data['file_id'], data['button_name'],
+                                      data['upload'])
         await db.mark_as_loaded_request(data['request'], data['request_state'])
         logging.info(f'User({call.message.chat.id}) отправил справку для {data["button_name"]}')
         try:
             await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             await bot.send_message(call.message.chat.id, f'Справка для <b>{data["button_name"]}</b> отправлена\n'
-                                   'Выберите студента запросившего справку:',
+                                                         'Выберите студента запросившего справку:',
                                    parse_mode='HTML',
                                    reply_markup=await inline_keyboard_on_send_request_certificate())
         except:
             await bot.send_message(call.message.chat.id, f'Справка для <b>{data["button_name"]}</b> отправлена\n'
-                                   'Выберите студента запросившего справку:',
+                                                         'Выберите студента запросившего справку:',
                                    parse_mode='HTML',
                                    reply_markup=await inline_keyboard_on_send_request_certificate())
     except Exception as e:
@@ -269,7 +257,7 @@ async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContex
         await db.delete_certificate_button(data["id_req"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=f'Справка для <b>{data["button_name"]}</b> успешно удалена из базы данных\n'
-                                    'Выберите справку для удаления',
+                                         'Выберите справку для удаления',
                                     parse_mode='HTML',
                                     reply_markup=await inline_keyboard_delete_certificate(data['id_student']))
         await state.reset_state()

@@ -67,6 +67,6 @@ def back_to_last_ten_users():
 # Изменение роли для пользователя Отмена
 def inline_keyboard_cancel_users_role_change():
     markup = InlineKeyboardMarkup()
-    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_users")
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="admin_role_edit_decline")
     markup.add(cancel_button)
     return markup

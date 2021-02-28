@@ -13,7 +13,7 @@ class SendScheduleToBot(StatesGroup):
 
 
 class UpdateSchedule(StatesGroup):
-    button_name = State()
+    # button_name = State()
     send_file = State()
 
 
@@ -31,7 +31,6 @@ class CreateFaqAlmauShop(StatesGroup):
 
 
 class EditFaqAlmauShop(StatesGroup):
-    choice = State()
     selected_item = State()
     question_confirm = State()
     answer_confirm = State()
@@ -47,12 +46,12 @@ class CreateMainFaq(StatesGroup):
 
 
 class DeleteMainFaq(StatesGroup):
-    question = State()
+    # question = State()
     confirm_delete = State()
 
 
 class EditMainFaq(StatesGroup):
-    button_name = State()
+    # button_name = State()
     choice = State()
     selected_item = State()
     question_confirm = State()
@@ -114,7 +113,6 @@ class DeleteCertificate(StatesGroup):
     request = State()
     button_name = State()
     confirm_delete = State()
-
 
 
 class Map_navigation(StatesGroup):

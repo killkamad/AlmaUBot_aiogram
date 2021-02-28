@@ -34,7 +34,7 @@ def inline_keyboard_library_choice_db():
 
 def inline_keyboard_cancel_lic_db_reg():
     markup = InlineKeyboardMarkup(row_width=1)
-    cancel = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_lic_db_reg")
+    cancel = InlineKeyboardButton(text="❌ Отмена регистрации", callback_data="SendDataCancel")
     markup.add(cancel)
     return markup
 

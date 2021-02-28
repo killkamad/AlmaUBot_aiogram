@@ -9,13 +9,15 @@ from utils.delete_messages import bot_delete_messages
 from utils import db_api as db
 
 from keyboards.inline import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
-                             inline_keyboard_edit_button_content_library_or_cancel
+    inline_keyboard_edit_button_content_library_or_cancel
 
 from states.admin import EditButtonContentLibrary
 
+
 @dp.callback_query_handler(text='lib_next_page')
 async def library_admin_menu(call: CallbackQuery):
-    logging.info(f'User({call.message.chat.id}) переход на вторую страницу админ меню Библиотеки, call.data - {call.data}')
+    logging.info(
+        f'User({call.message.chat.id}) переход на вторую страницу админ меню Библиотеки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_second_page_admin())
 
@@ -105,7 +107,8 @@ async def edit_button_content_library_cancel(call: CallbackQuery, state: FSMCont
     data = await state.get_data()
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-    await bot.send_message(call.message.chat.id, f'❌ Отмена изменения контента для кнопки - {data["button_name"]} для раздела Библиотека')
+    await bot.send_message(call.message.chat.id,
+                           f'❌ Отмена изменения контента для кнопки - {data["button_name"]} для раздела Библиотека')
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
     await state.reset_state()

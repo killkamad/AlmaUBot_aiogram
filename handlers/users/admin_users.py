@@ -26,15 +26,19 @@ from utils.misc import rate_limit
 @dp.callback_query_handler(text='edit_users_role', state=None)
 async def callback_inline_edit_users_role(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await call.message.answer(
-        '- Для успешного изменения роли, пользователь должен зарегистрировать свой номер командой /phone_reg .\n'
-        '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
-        reply_markup=inline_keyboard_cancel_users_role_change())
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='- Для успешного изменения роли, пользователь должен зарегистрировать свой номер командой /phone_reg .\n'
+                                     '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
+                                reply_markup=inline_keyboard_cancel_users_role_change())
     await UpdateUserRole.phone.set()
 
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=UpdateUserRole.phone)
 async def register_user_phone_next(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
+    except:
+        pass
     logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
     phone = message.contact.phone_number
     if phone.startswith("+"):
@@ -42,7 +46,6 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
     else:
         phone = f"+{phone}"
     if await db.check_phone_in_users(phone):
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
         role_at_the_moment = await db.check_role_for_admin(phone)
         await message.reply(f"✅ Номер телефона получен.\n"
                             f"В данный момент этот пользователь имеет роль - {role_at_the_moment}\n"
@@ -52,16 +55,20 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
         await UpdateUserRole.role.set()
     else:
         await message.reply('В базе данных нету пользователя с таким номером телефона.\n'
-                            'Пусть данный пользователь повторно пройдет регистрацию номера в боте с помощью команды - /phone_reg')
+                            'Пусть данный пользователь повторно пройдет регистрацию номера в боте с помощью команды - /phone_reg',
+                            reply_markup=inline_keyboard_cancel_users_role_change())
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateUserRole.phone)
 async def callback_inline_edit_users_role_phone(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
+    except:
+        pass
     logging.info(message.text)
     if message.content_type == 'text':
         if len(message.text) == 12:
             if await db.check_phone_in_users(message.text):
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
                 role_at_the_moment = await db.check_role_for_admin(message.text)
                 await message.reply(f"✅ Номер телефона получен.\n"
                                     f"В данный момент этот пользователь имеет роль - {role_at_the_moment}\n"
@@ -71,16 +78,19 @@ async def callback_inline_edit_users_role_phone(message: types.Message, state: F
                 await UpdateUserRole.role.set()
             else:
                 await message.reply('В базе данных нету пользователя с таким номером телефона.\n'
-                                    'Пусть данный пользователь повторно пройдет регистрацию номера в боте с помощью команды - /phone_reg')
+                                    'Пусть данный пользователь повторно пройдет регистрацию номера в боте с помощью команды - /phone_reg',
+                                    reply_markup=inline_keyboard_cancel_users_role_change())
         else:
             await message.reply(
                 f'Вы отправили не правильный номер, номер должен иметь 12 символов включая знак "+", отправленный номер содержит = <b>{len(message.text)}</b> символов.\n'
                 f'Попробуйте снова отправить номер',
-                parse_mode='HTML')
+                parse_mode='HTML',
+                reply_markup=inline_keyboard_cancel_users_role_change())
     else:
         await message.reply(f'Ошибка ваше тип сообщения = {message.content_type}\n'
                             f'Ваше сообщение должно содержать только текст\n'
-                            'Повторите снова')
+                            'Повторите снова',
+                            reply_markup=inline_keyboard_cancel_users_role_change())
 
 
 # Хендлер для ролей
@@ -127,10 +137,9 @@ async def callback_inline_edit_users_role_cancel(call: CallbackQuery, state: FSM
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Обновление роли отменено, возвращение в Админ меню пользователи')
+                                text='Обновление роли отменено, возвращение в Админ меню пользователи\n'
+                                     'Админ меню Пользователи:', reply_markup=inline_keyboard_users_admin())
     await state.reset_state()
-    await bot.send_message(chat_id=call.message.chat.id, text='Админ меню Пользователи:',
-                           reply_markup=inline_keyboard_users_admin())
 
 
 @dp.callback_query_handler(text='back_to_users_admin', state=None)

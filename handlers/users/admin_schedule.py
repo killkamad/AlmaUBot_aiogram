@@ -40,11 +40,11 @@ async def callback_inline_update_schedule_bot(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_update_schedule())
-    await UpdateSchedule.button_name.set()
+    # await UpdateSchedule.button_name.set()
 
 
 #### ОТМЕНА Обновление расписания
-@dp.callback_query_handler(text='cancel_update_step', state=UpdateSchedule.button_name)
+@dp.callback_query_handler(text='cancel_update_step')
 async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await schedule_admin_menu(call)
@@ -52,7 +52,7 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 
 
 # Нажатие на одну из кнопок с названием расписания, для обновления
-@dp.callback_query_handler(schedule_update_callback.filter(), state=UpdateSchedule.button_name)
+@dp.callback_query_handler(schedule_update_callback.filter())
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     schedule_button_name = callback_data.get('schedule_name')
@@ -127,15 +127,14 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 # Проверка сообщения на текст, если текст, то сохраняет это сообщение и айди в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendScheduleToBot.button_name)
 async def message_send_button_name(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
+    except:
+        pass
     if message.content_type == 'text':
         if len(message.text) <= 28:
             await state.update_data(button_name=fmt.quote_html(message.text.lower()),
                                     user_id=message.chat.id)
-            try:
-                await bot.edit_message_reply_markup(message.chat.id,
-                                                    message.message_id - 1)  # Убирает инлайн клавиатуру
-            except:
-                pass
             await message.reply('Отправьте файл с расписанием', reply_markup=inline_keyboard_cancel_schedule(),
                                 reply=False)
             await SendScheduleToBot.send_file.set()

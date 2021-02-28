@@ -69,7 +69,7 @@ async def callback_library_registration(call: CallbackQuery):
 
 
 # Отмена регистрации на лицензионные БД
-@dp.message_handler(text='/cancel', state=[EmailReg.bookbase, EmailReg.names, EmailReg.email, EmailReg.phone])
+@dp.message_handler(text='/cancel', state=[EmailReg.names, EmailReg.email, EmailReg.phone])
 async def callback_cancel_lib_reg(message: types.Message, state: FSMContext):
     logging.info(f'User({message.chat.id}) отменил регистрацию на лицензионные БД')
     await bot.send_message(chat_id=message.chat.id, text='Регистрация на лицензионные базы данных была отменена',
@@ -90,14 +90,14 @@ async def callback_library_registration_button(call: CallbackQuery):
                                 reply_markup=inline_keyboard_library_choice_db())
     # await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться\n',
     #                           reply_markup=keyboard_library_choice_db())
-    await EmailReg.bookbase.set()
+    # await EmailReg.bookbase.set()
 
 
 # Сохранение выбранной базы данных и запрос ФИО
 # @dp.message_handler(
 #     lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
 #     state=EmailReg.bookbase)
-@dp.callback_query_handler(state=EmailReg.bookbase)
+@dp.callback_query_handler(text=['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'])
 async def callback_process_name(call: CallbackQuery, state: FSMContext):
     try:
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
@@ -105,7 +105,11 @@ async def callback_process_name(call: CallbackQuery, state: FSMContext):
         pass
     async with state.proxy() as data:
         data['book_database'] = call.data
-    await call.message.answer("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_lic_db_reg())
+    await bot.edit_message_text(chat_id=call.message.chat.id,
+                                message_id=call.message.message_id,
+                                text=f"Вы выбрали '{call.data}'.\n"
+                                     f"Напишите ваше ФИО",
+                                reply_markup=inline_keyboard_cancel_lic_db_reg())
     await EmailReg.names.set()
 
 
@@ -172,7 +176,7 @@ async def send_license_db_reg_data_to_email(message: types.Message, state: FSMCo
 
 
 # Если пользователь нажал кнопку Отмена происходит отмена и возвращение в меню библиотеки
-@dp.callback_query_handler(text='SendDataCancel')
+@dp.callback_query_handler(text='SendDataCancel', state=['*'])
 async def send_license_db_reg_data_to_email_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил регистрацию в БД библиотеки - {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
@@ -235,7 +239,8 @@ async def send_email_to_library_and_notification(call: CallbackQuery, state: FSM
         f"<html>"
         f"<body>"
         f"<h1>"
-        f"Пришли регистрационные данные: <br/>"
+        f"Запрос на регистрацию на лицензионные базы <br/> <br/>"
+        f"Регистрационные данные: <br/>"
         f"ФИО - {data['names']} <br/> "
         f"Email - {data['email']} <br/> "
         f"Телефон - {data['phone']}  <br/> "

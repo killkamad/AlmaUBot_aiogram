@@ -59,7 +59,7 @@ def inline_keyboard_edit_main_faq_choice():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="❓ Вопрос", callback_data="edit_main_faq_q")
     callback_button2 = InlineKeyboardButton(text="❗ Ответ", callback_data="edit_main_faq_a")
-    callback_button3 = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_admin_faq")
+    callback_button3 = InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_admin_edit_faq")
     markup.add(callback_button, callback_button2)
     markup.row(callback_button3)
     return markup
@@ -77,5 +77,13 @@ def inline_keyboard_edit_main_faq_or_cancel():
 def inline_keyboard_cancel_faq():
     markup = InlineKeyboardMarkup()
     cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_faq")
+    markup.add(cancel_button)
+    return markup
+
+
+# F.A.Q Отмена Изменения
+def inline_keyboard_cancel_faq_edit():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_faq_edit")
     markup.add(cancel_button)
     return markup

@@ -33,12 +33,12 @@ async def callback_inline_send_all(call: CallbackQuery):
 
 @dp.message_handler(content_types=ContentType.ANY, state=MassMailSending.message_text)
 async def message_send_text(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text':
         if len(message.text) <= 4000:
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            except:
-                pass
             await state.update_data(message_text_all=fmt.quote_html(message.text))
             message_txt = f'Ваше сообщение:\n' \
                           f'{fmt.quote_html(message.text)}' \
@@ -48,18 +48,10 @@ async def message_send_text(message: types.Message, state: FSMContext):
                                    reply_markup=inline_keyboard_mass_mailing_send_or_attach())
             await state.reset_state(with_data=False)
         else:
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            except:
-                pass
             await bot.send_message(message.chat.id,
                                    f'Ваше сообщение содержит <b>{len(message.text)}</b> символов. Бот может обработать максимум 4000 символов. Сократите количество и попробуйте снова',
                                    parse_mode='HTML', reply_markup=inline_keyboard_cancel_mass_mailing())
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await bot.send_message(message.chat.id,
                                'Ошибка - ваше сообщение должно содержать только текст\nНапишите текст сообщения для массовой рассылки:',
                                reply_markup=inline_keyboard_cancel_mass_mailing())

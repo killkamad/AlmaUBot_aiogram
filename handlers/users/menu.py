@@ -63,7 +63,7 @@ async def menu_handler(message):
 
 
 ################# Регистрация номера в таблицу Users ###########################
-@rate_limit(6, 'phone_reg')
+@rate_limit(3, 'phone_reg')
 @dp.message_handler(commands=['phone_reg'])
 async def register_user_phone(message):
     logging.info(f"User({message.chat.id}) начал регистрацию номера телефона")
@@ -71,24 +71,34 @@ async def register_user_phone(message):
     await RegisterUserPhone.phone.set()
 
 
-@dp.message_handler(content_types=ContentType.CONTACT, state=RegisterUserPhone.phone)
+@dp.message_handler(content_types=ContentType.ANY, state=RegisterUserPhone.phone)
 async def register_user_phone_next(message: types.Message, state: FSMContext):
-    if message.chat.id == message.contact.user_id:
-        logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
-        await message.reply("✅ Номер телефона получен, и успешно зарегистрирован",
-                            reply_markup=always_stay_menu_keyboard())
-        phone = message.contact.phone_number
-        if phone.startswith("+"):
-            phone = phone
+    if message.content_type == 'contact':
+        if message.chat.id == message.contact.user_id:
+            logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
+            await message.reply("✅ Номер телефона получен, и успешно зарегистрирован",
+                                reply_markup=always_stay_menu_keyboard())
+            phone = message.contact.phone_number
+            if phone.startswith("+"):
+                phone = phone
+            else:
+                phone = f"+{phone}"
+            await db.register_user_phone(message.chat.id, phone)
+            await state.reset_state()
         else:
-            phone = f"+{phone}"
-        await db.register_user_phone(message.chat.id, phone)
-        await state.reset_state()
+            logging.info(f"User({message.chat.id}) ввел не правильный номер")
+            await message.answer("Вы отправили не свой номер", reply_markup=ReplyKeyboardRemove())
+            await message.answer("Повторите отправку номера с помощью кнопки ниже",
+                                 reply_markup=keyboard_send_phone_to_register_in_db())
     else:
-        logging.info(f"User({message.chat.id}) ввел не правильный номер")
-        await message.answer("Вы отправили не свой номер", reply_markup=ReplyKeyboardRemove())
-        await message.answer("Повторите отправку номера с помощью кнопки ниже",
-                             reply_markup=keyboard_send_phone_to_register_in_db())
+        if message.text == '❌ Отмена регистрации':
+            logging.info(f"User({message.chat.id}) отменил регистрацию номера телефона")
+            await message.answer('Отмена регистрации номера телефона.\n'
+                                 'Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
+            await state.reset_state()
+        else:
+            await message.answer("Используйте кнопки внизу экрана, для отправки номера или отмены",
+                                 reply_markup=keyboard_send_phone_to_register_in_db())
 
 
 ################# КОНЕЦ Регистрация номера в таблицу Users КОНЕЦ ###########################

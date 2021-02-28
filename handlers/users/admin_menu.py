@@ -116,7 +116,8 @@ async def almaushop_admin_menu(call: CallbackQuery):
 # Переход Админ меню для Библиотеки
 @dp.callback_query_handler(text='library_admin_menu')
 async def library_admin_menu(call: CallbackQuery):
-    logging.info(f'User({call.message.chat.id}) переход на первую страницу админ меню Библиотеки, call.data - {call.data}')
+    logging.info(
+        f'User({call.message.chat.id}) переход на первую страницу админ меню Библиотеки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
 

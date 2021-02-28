@@ -32,7 +32,7 @@ def inline_keyboard_contact_center_admin():
 def cancel_or_send_contact_center_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_contact_center")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_contact_center_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -50,7 +50,7 @@ async def inline_keyboard_contacts_center_update():
 def cancel_or_update_contact_center_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Изменить", callback_data="update_info_contact_center_admin")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_contact_center_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -75,7 +75,7 @@ def cancel_or_delete_contact_center_admin():
 
 def inline_keyboard_cancel_contact_center_admin():
     markup = InlineKeyboardMarkup()
-    cancel_button = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_contact_center_admin")
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_contact_center_admin")
     markup.add(cancel_button)
     return markup
 
@@ -83,7 +83,7 @@ def inline_keyboard_cancel_contact_center_admin():
 def cancel_or_send_tutors_management():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_tutors_management")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_tutors_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -104,7 +104,7 @@ def inline_keyboard_map_nav_admin_menu():
 def cancel_or_send_map_nav_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_map_navigation_admin")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_map_nav_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -122,7 +122,7 @@ async def inline_keyboard_cabinets_admin(building, floor):
 def cancel_or_update_map_nav_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Изменить", callback_data="update_map_navigation_admin")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_map_nav_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -130,14 +130,14 @@ def cancel_or_update_map_nav_admin():
 def cancel_or_delete_map_nav_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text="✅ Удалить", callback_data="delete_map_navigation_admin")
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_map_nav_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
 
 def inline_keyboard_cancel_map_nav_admin():
     markup = InlineKeyboardMarkup()
-    cancel_button = InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_map_nav_admin")
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(cancel_button)
     return markup
 
@@ -271,4 +271,11 @@ def keyboard_pps_choice_shcool():
     callback_button7 = InlineKeyboardButton(text="Ректорат", callback_data="choice_rectorat_admin")
     callback_button8 = InlineKeyboardButton(text="⬅ Назад", callback_data="nav_university_admin_menu")
     markup.add(callback_button1, callback_button2, callback_button3, callback_button4, callback_button5, callback_button6, callback_button7, callback_button8)
+    return markup
+
+
+def inline_keyboard_cancel_tutors_admin():
+    markup = InlineKeyboardMarkup()
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
+    markup.add(cancel_button)
     return markup

@@ -89,8 +89,8 @@ class UpdateUserRole(StatesGroup):
     confirm = State()
 
 
-class Pps_admin(StatesGroup):
-    shcool = State()
+class PpsAdmin(StatesGroup):
+    school = State()
     position = State()
     description = State()
 
@@ -115,21 +115,21 @@ class DeleteCertificate(StatesGroup):
     confirm_delete = State()
 
 
-class Map_navigation(StatesGroup):
+class MapNavigation(StatesGroup):
     building = State()
     floor = State()
     cabinet = State()
     description = State()
 
 
-class Map_navigation_update(StatesGroup):
+class MapNavigationUpdate(StatesGroup):
     building = State()
     floor = State()
     cabinet = State()
     description = State()
 
 
-class Map_navigation_delete(StatesGroup):
+class MapNavigationDelete(StatesGroup):
     building = State()
     floor = State()
     cabinet = State()

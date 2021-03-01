@@ -45,6 +45,7 @@ async def callback_inline_update_almaushop_merch(call: CallbackQuery):
     except Exception as err:
         logging.exception(err)
         await bot.send_message(call.message.chat.id, '❗ Произошла ошибка')
+    await call.answer(text='✅ Данные в таблице almau shop успешно обновлены', show_alert=False)
 
 
 # Парсинг сайта almaushop.kz/books книг и загрузка данных в таблицу в БД
@@ -64,13 +65,16 @@ async def callback_inline_update_almaushop_books(call: CallbackQuery):
     except Exception as err:
         logging.exception(err)
         await bot.send_message(call.message.chat.id, '❗ Произошла ошибка')
+    await call.answer(text='✅ Данные в таблице almau_shop_books успешно обновлены', show_alert=False)
 
 
 @dp.callback_query_handler(text='add_faq_almaushop', state=None)
 async def callback_inline_add_faq_almaushop(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await call.message.answer('Напишите вопрос', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Напишите вопрос', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
     await CreateFaqAlmauShop.question.set()
+    await call.answer()
 
 
 # Изменение контента кнопок вебсайта и контактов в меню almaushop
@@ -78,14 +82,17 @@ async def callback_inline_add_faq_almaushop(call: CallbackQuery, state: FSMConte
 async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     if call.data == 'edit_website_b_almaushop':
-        await call.message.answer('Напишите новый текст для кнопки "🌐  Вебсайт"',
-                                  reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки "🌐  Вебсайт"',
+                                    reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
         await state.update_data(button_name='🌐  Вебсайт')
     elif call.data == 'edit_contacts_b_almaushop':
-        await call.message.answer('Напишите новый текст для кнопки "☎  Контакты":',
-                                  reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки "☎  Контакты":',
+                                    reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
         await state.update_data(button_name='☎  Контакты')
     await EditButtonContentAlmauShop.button_content.set()
+    await call.answer()
 
 
 # @dp.callback_query_handler(text='cancel_almaushop_web_con', state=['*'])
@@ -136,6 +143,7 @@ async def edit_button_content_almaushop_last_step(call: CallbackQuery, state: FS
                                text=f'✅ Успешно изменен контент для кнопки - "{data["button_name"]}" для раздела AlmaU Shop\n'
                                     f'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
         await state.reset_state()
+        await call.answer(text=f'✅ Успешно изменен контент для кнопки - "{data["button_name"]}"')
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
@@ -150,6 +158,7 @@ async def edit_button_content_almaushop_last_step_cancel(call: CallbackQuery, st
                                 text=f'❌ Отмена изменения контента для кнопки - "{data["button_name"]}" для раздела AlmaU Shop\n'
                                      f'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer(text=f'❌ Отмена изменения контента для кнопки - "{data["button_name"]}"')
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=CreateFaqAlmauShop.question)
@@ -217,6 +226,7 @@ async def callback_inline_add_faq_almaushop(call: CallbackQuery, state: FSMConte
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
+    await call.answer(text='✅ Успешно сохранено')
 
 
 @dp.callback_query_handler(text='cancel_almaushop_faq', state=None)
@@ -227,6 +237,7 @@ async def callback_inline_cancel_faq_almaushop(call: CallbackQuery, state: FSMCo
                            text='❌ Отмена создания вопроса и ответа для раздела F.A.Q AlmaU Shop\n'
                                 'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer(text='❌ Отмена создания')
 
 
 @dp.callback_query_handler(text='cancel_step_almaushop_faq', state=['*'])
@@ -238,6 +249,7 @@ async def callback_inline_cancel_faq_almaushop(call: CallbackQuery, state: FSMCo
                                 parse_mode='HTML',
                                 reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer(text='❌ успешно отменено')
 
 
 # Отмена изменения в AlmaU Shop FAQ и возврат к выбору изменения вопроса или ответа
@@ -251,6 +263,7 @@ async def callback_inline_cancel_faq_almaushop_update(call: CallbackQuery, state
                                      f'<u>Ответ</u> - {data["answer_text"]}',
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
     await state.reset_state(with_data=False)
+    await call.answer()
 
 
 #### Удаление FAQ AlmaU Shop ####
@@ -260,6 +273,7 @@ async def callback_inline_delete_faq_almaushop(call: CallbackQuery, state: FSMCo
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для удаление:',
                                 reply_markup=await inline_keyboard_delete_faq_almaushop())
+    await call.answer()
     # await DeleteFaqAlmauShop.question.set()
 
 
@@ -270,6 +284,7 @@ async def callback_inline_delete_faq_almaushop_back(call: CallbackQuery, state: 
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer()
 
 
 #### Возвращение в меню изменения FAQ Almau Shop
@@ -277,6 +292,7 @@ async def callback_inline_delete_faq_almaushop_back(call: CallbackQuery, state: 
 async def callback_inline_delete_faq_almaushop_back(call: CallbackQuery, state: FSMContext):
     await state.reset_state()
     await callback_inline_edit_faq_almaushop(call)
+    await call.answer()
 
 
 @dp.callback_query_handler(almau_shop_faq_delete_callback.filter(), state=None)
@@ -290,6 +306,7 @@ async def callback_inline_delete_faq_almaushop_final(call: CallbackQuery, state:
                                 reply_markup=cancel_or_delete_faq_almau_shop())
     await state.update_data(question_text=fmt.quote_html(question), user_id=call.message.chat.id)
     await DeleteFaqAlmauShop.confirm_delete.set()
+    await call.answer()
 
 
 # Удаление FAQ AlmaU Shop из базы данных
@@ -305,9 +322,11 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
                                     reply_markup=inline_keyboard_almau_shop_admin())
         await state.reset_state()
         logging.info(f'User({call.message.chat.id}) удалил FAQ Almau Shop для {data["question_text"]}')
+        await call.answer(text='✅ успешно удалено')
     except Exception as e:
-        await call.message.answer(f'Ошибка FAQ ALmau Shop не удалено, (Ошибка - {e})')
+        await call.message.answer(f'Ошибка FAQ Almau Shop не удалено, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')
+        await call.answer()
 
 
 @dp.callback_query_handler(text='edit_faq_almaushop', state=None)
@@ -316,6 +335,7 @@ async def callback_inline_edit_faq_almaushop(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_edit_faq_almaushop())
+    await call.answer()
 
 
 @dp.callback_query_handler(almau_shop_faq_edit_callback.filter(), state=None)
@@ -332,6 +352,7 @@ async def callback_inline_edit_faq_almaushop_choice_step(call: CallbackQuery, st
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
     await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer),
                             user_id=call.message.chat.id, faq_id=id)
+    await call.answer()
 
 
 @dp.callback_query_handler(text='edit_faq_shop_q')
@@ -342,6 +363,7 @@ async def edit_faq_almaushop_choice_step_question(call: CallbackQuery, state: FS
                            text='Напишите на какой текст изменить вопрос',
                            reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     await EditFaqAlmauShop.question_confirm.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='edit_faq_shop_a')
@@ -352,6 +374,7 @@ async def edit_faq_almaushop_choice_step_answer(call: CallbackQuery, state: FSMC
                            text='Напишите на какой текст изменить ответ',
                            reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     await EditFaqAlmauShop.answer_confirm.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditFaqAlmauShop.question_confirm)
@@ -423,9 +446,11 @@ async def edit_faq_almaushop_choice_step_question_final_save(call: CallbackQuery
                                text='✅ Ваши изменения для раздела F.A.Q AlmaU Shop успешно сохранены\n'
                                     'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
         await state.reset_state()
+        await call.answer(text='✅ успешно изменено')
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
+        await call.answer()
 
 
 @dp.callback_query_handler(text='edit_faq_shop_dec', state=None)
@@ -439,6 +464,7 @@ async def edit_faq_almaushop_choice_step_question_final_decline(call: CallbackQu
                            text='❌ Отмена изменения вопроса для раздела F.A.Q AlmaU Shop\n'
                                 'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer(text='❌ Отменено')
 
 
 @dp.callback_query_handler(text='cancel_del_faq_almaushop', state=DeleteFaqAlmauShop.confirm_delete)
@@ -449,4 +475,5 @@ async def callback_inline_cancel_faq_almaushop(call: CallbackQuery, state: FSMCo
                                 text=f'❌ Отмена удаления F.A.Q ({data["question_text"]})\n'
                                      f'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
     await state.reset_state()
+    await call.answer(text='❌ Отменено')
 ############### Админ меню для AlmaU Shop конец ####################

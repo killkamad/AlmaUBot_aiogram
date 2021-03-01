@@ -66,6 +66,7 @@ async def callback_library_registration(call: CallbackQuery):
                                      '- Электронно-Библиотечная Система Polpred polpred.com\n'
                                      '- Республиканская Межвузовская Электронная Библиотека rmebrk.kz',
                                 reply_markup=inline_keyboard_library_registration())
+    await call.answer()
 
 
 # Отмена регистрации на лицензионные БД
@@ -88,9 +89,7 @@ async def callback_library_registration_button(call: CallbackQuery):
                                      'Выберите базу данных на которую хотите зарегистрироваться',
                                 disable_web_page_preview=True,
                                 reply_markup=inline_keyboard_library_choice_db())
-    # await call.message.answer('Выберите базу данных на которую хотите зарегистрироваться\n',
-    #                           reply_markup=keyboard_library_choice_db())
-    # await EmailReg.bookbase.set()
+    await call.answer()
 
 
 # Сохранение выбранной базы данных и запрос ФИО
@@ -111,6 +110,7 @@ async def callback_process_name(call: CallbackQuery, state: FSMContext):
                                      f"Напишите ваше ФИО",
                                 reply_markup=inline_keyboard_cancel_lic_db_reg())
     await EmailReg.names.set()
+    await call.answer()
 
 
 # Сохранение ФИО и запрос Email
@@ -186,6 +186,7 @@ async def send_license_db_reg_data_to_email_cancel(call: CallbackQuery, state: F
                            text='Регистрация Отменена\n'
                                 'Возвращение в меню библиотеки', reply_markup=keyboard_library())
     await state.reset_state()
+    await call.answer()
 
 
 # Handler для кнопки возврат в ЭЛЕКТРОННЫЕ РЕСУРСЫ
@@ -194,6 +195,7 @@ async def callback_el_res(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Электронные ресурсы\n',
                                 reply_markup=inline_keyboard_library_el_res())
+    await call.answer()
 
 
 # Handler для кнопки возврат в 📕 Лицензионные Базы Данных
@@ -201,6 +203,7 @@ async def callback_el_res(call: CallbackQuery):
 async def callback_license_db_inline_menu(call: CallbackQuery, state: FSMContext):
     await state.reset_state()
     await callback_library_registration(call)
+    await call.answer()
 
 
 # Handler для остальных кнопок баз данных
@@ -222,6 +225,7 @@ async def callback_el_res_choice(call: CallbackQuery):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=text,
                                     reply_markup=inline_keyboard_library_online_bib())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='SendEmailToLibrary')

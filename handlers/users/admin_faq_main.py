@@ -27,6 +27,7 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await call.message.answer('Напишите вопрос:\n', reply_markup=inline_keyboard_cancel_faq())
     await CreateMainFaq.question.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=CreateMainFaq.question)
@@ -85,6 +86,7 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
                                text='✅ Успешно сохранен вопрос и ответ для раздела F.A.Q в главном меню\n'
                                     'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
         await state.reset_state()
+        await call.answer()
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
@@ -98,6 +100,7 @@ async def callback_inline_cancel_creation_main_faq(call: CallbackQuery, state: F
                            text='❌ Отмена создания вопроса и ответа для F.A.Q в главном меню\n'
                                 'Админ меню AlmaU Shop:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
+    await call.answer()
 
 
 ######################### КОНЕЦ Добавление нового FAQ в главном меню КОНЕЦ ############################################
@@ -109,7 +112,7 @@ async def callback_inline_edit_main_faq(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_edit_main_faq())
-    # await EditMainFaq.button_name.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(main_faq_edit_callback.filter())
@@ -126,7 +129,7 @@ async def callback_inline_edit_main_faq_choice_step(call: CallbackQuery, state: 
                                 reply_markup=inline_keyboard_edit_main_faq_choice(), parse_mode='HTML')
     await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer),
                             user_id=call.message.chat.id, faq_id=id)
-    # await EditMainFaq.choice.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='edit_main_faq_q')
@@ -137,6 +140,7 @@ async def edit_main_faq_choice_step_question(call: CallbackQuery, state: FSMCont
                            text='Напишите на какой текст изменить вопрос',
                            reply_markup=inline_keyboard_cancel_faq_edit())
     await EditMainFaq.question_confirm.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditMainFaq.question_confirm)
@@ -172,6 +176,7 @@ async def edit_main_faq_choice_step_answer(call: CallbackQuery, state: FSMContex
                            text='Напишите на какой текст изменить ответ',
                            reply_markup=inline_keyboard_cancel_faq_edit())
     await EditMainFaq.answer_confirm.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditMainFaq.answer_confirm)
@@ -214,6 +219,7 @@ async def edit_main_faq_choice_step_question_final_save(call: CallbackQuery, sta
         await bot.send_message(chat_id=call.message.chat.id,
                                text='✅ Ваши изменения для раздела F.A.Q главного меню успешно изменены\n'
                                     'Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+        await call.answer()
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
@@ -227,6 +233,7 @@ async def edit_main_faq_choice_step_question_final_decline(call: CallbackQuery, 
                            text='❌ Отмена изменения вопроса для раздела F.A.Q главного меню\n'
                                 'Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
+    await call.answer()
 
 
 ######################### КОНЕЦ Изменение FAQ в главном меню КОНЕЦ #############################################
@@ -238,7 +245,7 @@ async def callback_inline_delete_main_faq(call: CallbackQuery, state: FSMContext
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для удаление:',
                                 reply_markup=await inline_keyboard_delete_main_faq())
-    # await DeleteMainFaq.question.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(main_faq_delete_callback.filter())
@@ -251,6 +258,7 @@ async def callback_inline_delete_main_faq_final(call: CallbackQuery, state: FSMC
                                 reply_markup=cancel_or_delete_main_faq())
     await state.update_data(question_text=fmt.quote_html(question), user_id=call.message.chat.id)
     await DeleteMainFaq.confirm_delete.set()
+    await call.answer()
 
 
 # Удаление FAQ AlmaU Shop из базы данных
@@ -266,6 +274,7 @@ async def callback_inline_delete_main_faq_delete_step(call: CallbackQuery, state
                                text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
         await state.reset_state()
         logging.info(f'User({call.message.chat.id}) удалил FAQ главного меню для {data["question_text"]}')
+        await call.answer()
     except Exception as e:
         await call.message.answer(f'Ошибка FAQ главного меню не удален, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')
@@ -280,6 +289,7 @@ async def callback_inline_cancel_delete_main_faq(call: CallbackQuery, state: FSM
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
+    await call.answer()
 
 
 ######################### КОНЕЦ Удаления FAQ в главном меню КОНЕЦ #############################################
@@ -292,6 +302,7 @@ async def callback_inline_back_to_admin_faq(call: CallbackQuery, state: FSMConte
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
+    await call.answer()
 
 
 #### Возвращение к кнопкам изменить в админ меню FAQ
@@ -301,6 +312,7 @@ async def callback_inline_back_to_admin_edit_faq(call: CallbackQuery, state: FSM
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_edit_main_faq())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='cancel_step_faq', state=['*'])
@@ -312,6 +324,7 @@ async def callback_inline_cancel_step_faq(call: CallbackQuery, state: FSMContext
                                 parse_mode='HTML',
                                 reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='cancel_step_faq_edit', state=['*'])
@@ -324,3 +337,4 @@ async def callback_inline_cancel_step_faq_edit(call: CallbackQuery, state: FSMCo
                                      f'<u>Ответ</u> - {data["answer_text"]}',
                                 reply_markup=inline_keyboard_edit_main_faq_choice(), parse_mode='HTML')
     await state.reset_state(with_data=False)
+    await call.answer()

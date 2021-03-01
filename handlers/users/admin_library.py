@@ -20,6 +20,7 @@ async def library_admin_menu(call: CallbackQuery):
         f'User({call.message.chat.id}) переход на вторую страницу админ меню Библиотеки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_second_page_admin())
+    await call.answer()
 
 
 @dp.callback_query_handler(text=['edit_lib_website', 'edit_lib_contacts', 'edit_lib_work_hours',
@@ -65,6 +66,7 @@ async def edit_button_content_library(call: CallbackQuery, state: FSMContext):
                                   'Для отмены - /cancel')
         await state.update_data(button_name='⛔ Ответственность за нарушения')
     await EditButtonContentLibrary.button_content.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentLibrary.button_content)
@@ -97,6 +99,7 @@ async def edit_button_content_library_confirm(call: CallbackQuery, state: FSMCon
         await bot.send_message(chat_id=call.message.chat.id,
                                text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
         await state.reset_state()
+        await call.answer()
     except Exception as error:
         logging.info(f'Error - {error}')
         await bot.send_message(call.message.chat.id, f'Произошла ошибка - {error}')
@@ -112,3 +115,4 @@ async def edit_button_content_library_cancel(call: CallbackQuery, state: FSMCont
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
     await state.reset_state()
+    await call.answer()

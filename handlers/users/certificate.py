@@ -34,6 +34,7 @@ async def callback_inline_completes(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Готовые справки:',
                                 reply_markup=await inline_keyboard_get_certificate(call.message.chat.id))
+    await call.answer()
 
 
 @dp.callback_query_handler(certificate_callback.filter())
@@ -42,6 +43,7 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     certificate_id = callback_data.get('id')
     file_id = await db.find_certificate_id(certificate_id)
     await bot.send_document(call.message.chat.id, file_id)
+    await call.answer()
 
 
 # Запрос на получение справки
@@ -52,6 +54,7 @@ async def callback_inline_request(call: CallbackQuery):
                            text='Укажите вид справки',
                            reply_markup=keyboard_certificate_type())
     await CertificateRequest.type.set()
+    await call.answer()
 
 
 @dp.message_handler(state=CertificateRequest.type)

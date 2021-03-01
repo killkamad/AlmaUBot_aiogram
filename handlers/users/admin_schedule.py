@@ -31,6 +31,7 @@ async def callback_inline_send_schedule_bot(call: CallbackQuery):
                                 text='Напишите название для кнопки, например (3 Курс):',
                                 reply_markup=inline_keyboard_cancel_schedule())
     await SendScheduleToBot.button_name.set()
+    await call.answer()
 
 
 #### Обновление расписания ####
@@ -40,7 +41,7 @@ async def callback_inline_update_schedule_bot(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
                                 reply_markup=await inline_keyboard_update_schedule())
-    # await UpdateSchedule.button_name.set()
+    await call.answer()
 
 
 #### ОТМЕНА Обновление расписания
@@ -49,6 +50,7 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await schedule_admin_menu(call)
     await state.reset_state()
+    await call.answer()
 
 
 # Нажатие на одну из кнопок с названием расписания, для обновления
@@ -62,6 +64,7 @@ async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext
                                 parse_mode='HTML',
                                 reply_markup=inline_keyboard_cancel_schedule())
     await UpdateSchedule.send_file.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateSchedule.send_file)
@@ -91,6 +94,7 @@ async def callback_inline_send_schedule_bot(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для удаления:',
                                 reply_markup=await inline_keyboard_delete_schedule())
+    await call.answer()
 
 
 #### ОТМЕНА Удаления расписания
@@ -99,6 +103,7 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await schedule_admin_menu(call)
     await state.reset_state()
+    await call.answer()
 
 
 # Нажатие на одну из кнопок с названием расписания, для удаления
@@ -111,6 +116,7 @@ async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext
                                 text=f'Вы точно уверены, что хотите удалить кнопку расписания для <b>{schedule_button_name}</b>',
                                 parse_mode='HTML', reply_markup=cancel_or_delete_schedule())
     await DeleteSchedule.confirm_delete.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='cancel_step_schedule', state=['*'])
@@ -122,6 +128,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
                                 parse_mode='HTML',
                                 reply_markup=inline_keyboard_schedule_admin())
     await state.reset_state()
+    await call.answer()
 
 
 # Проверка сообщения на текст, если текст, то сохраняет это сообщение и айди в state
@@ -186,6 +193,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
                                   parse_mode='HTML',
                                   reply_markup=inline_keyboard_schedule_admin())
         logging.info(f'User({call.message.chat.id}) отправил расписание для {data["button_name"]}')
+        await call.answer()
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не отправлено, (Ошибка - {e})')
 
@@ -222,6 +230,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не обновлено, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')
+    await call.answer()
 
 
 # Удаление расписания из базы данных
@@ -235,6 +244,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
                                 reply_markup=await inline_keyboard_delete_schedule())
     await state.reset_state()
     logging.info(f'User({call.message.chat.id}) удалил расписание для {data["button_name"]}')
+    await call.answer()
 
 
 @dp.callback_query_handler(text_contains='cancel_schedule')
@@ -247,6 +257,7 @@ async def callback_inline_cancel_schedule(call: CallbackQuery, state: FSMContext
                            parse_mode='HTML',
                            reply_markup=inline_keyboard_schedule_admin())
     await state.reset_state()
+    await call.answer()
 
 
 @dp.callback_query_handler(text_contains='cancel_update_schedule')
@@ -259,6 +270,7 @@ async def callback_inline_cancel_update_schedule(call: CallbackQuery, state: FSM
                            parse_mode='HTML',
                            reply_markup=inline_keyboard_schedule_admin())
     await state.reset_state()
+    await call.answer()
 
 
 @dp.callback_query_handler(text_contains='cancel_delete_schedule', state=DeleteSchedule.confirm_delete)
@@ -272,3 +284,4 @@ async def callback_inline_cancel_delete_schedule(call: CallbackQuery, state: FSM
     # await call.message.answer('<b>Удаление отмененено</b>', parse_mode='HTML')
     # await admin_menu(call.message)
     await state.reset_state()
+    await call.answer()

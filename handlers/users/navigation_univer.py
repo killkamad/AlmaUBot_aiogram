@@ -53,7 +53,6 @@ async def callback_inline_contacts_center_call(call: CallbackQuery, callback_dat
     #     description = await db.contact_center_description(valueFromCallBack)
     #     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
     #                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
-    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_university')

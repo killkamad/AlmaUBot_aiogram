@@ -18,7 +18,8 @@ from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_k
     map_nav_admin_choice_floor_old_delete, keyboard_map_nav_choice_building_delete, \
     keyboard_map_nav_choice_building_update, \
     map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
-    keyboard_pps_choice_position, keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, inline_keyboard_cancel_tutors_admin
+    keyboard_pps_choice_position, keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, \
+    inline_keyboard_cancel_tutors_admin
 
 import asyncio
 
@@ -27,8 +28,8 @@ from .admin_menu import admin_menu
 
 from utils.delete_messages import bot_delete_messages
 from aiogram.dispatcher import FSMContext
-from states.admin import SendContactCenter, UpdateContactCenter, DeleteContactCenter, Pps_admin, Map_navigation, \
-    Map_navigation_update, Map_navigation_delete
+from states.admin import SendContactCenter, UpdateContactCenter, DeleteContactCenter, PpsAdmin, MapNavigation, \
+    MapNavigationUpdate, MapNavigationDelete
 
 from keyboards.inline import cabinet_callback, cabinet_callback_update, nav_center_callback_update, \
     nav_center_callback_delete
@@ -72,21 +73,17 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 # Проверка центра на текст
 @dp.message_handler(content_types=ContentType.ANY, state=SendContactCenter.name)
 async def message_send_contact_center_name(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text' and len(message.text) <= 29:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await state.update_data(name=message.text.lower(),
                                 user_id=message.chat.id)
         await bot.send_message(message.chat.id, 'Отправьте описание контакт центра',
                                reply_markup=inline_keyboard_cancel_contact_center_admin())
         await SendContactCenter.description.set()
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         print(message.content_type)
         await bot.send_message(message.chat.id,
                                'Ошибка - ваше сообщение должно содержать только текст и не превышать 29 символов.\nПовторите название для кнопки, например (бухгалтерия):',
@@ -96,22 +93,19 @@ async def message_send_contact_center_name(message: types.Message, state: FSMCon
 # Проверка описания центра на текст
 @dp.message_handler(content_types=ContentType.ANY, state=SendContactCenter.description)
 async def message_send_contact_center_description(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text':
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await state.update_data(description=message.text.lower())
         data = await state.get_data()
         txt = f'Название кнопки будет: {data["name"]}'
         await bot.send_message(message.chat.id, txt, reply_markup=cancel_or_send_contact_center_admin())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
-        await message.answer('Ошибка - вы отправили не текст повторите')
+        await message.answer('Ошибка - вы отправили не текст повторите',
+                             reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 # создание контакт центра в базе данных
@@ -122,9 +116,9 @@ async def callback_inline_send_contact_center_final(call: CallbackQuery, state: 
         await db.add_contact_center_data(data['user_id'], data['description'], data["name"])
         logging.info(f'User({call.message.chat.id}) отправил контакты для {data["name"]}')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'описание <b>{data["name"]}</b> отправлено \n'
-                                      'Админ меню ключевых центров:',
-                                reply_markup=inline_keyboard_contact_center_admin())
+                                    text=f'описание <b>{data["name"]}</b> отправлено \n'
+                                         'Админ меню ключевых центров:',
+                                    reply_markup=inline_keyboard_contact_center_admin())
     except Exception as e:
         await call.message.answer(f'Ошибка контакт центр не отправлен, (Ошибка - {e})')
         print(e)
@@ -146,19 +140,19 @@ async def callback_inline_updade_contact_center(call: CallbackQuery, state: FSMC
     callback_name = callback_data.get('name')
     await state.update_data(name=callback_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'Напишете заново новую информацию для <b>{callback_name}</b>:',
-                           parse_mode='HTML', reply_markup=inline_keyboard_cancel_contact_center_admin())
+                                text=f'Напишете заново новую информацию для <b>{callback_name}</b>:',
+                                parse_mode='HTML', reply_markup=inline_keyboard_cancel_contact_center_admin())
     await UpdateContactCenter.description.set()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateContactCenter.description)
 async def updade_contact_center_step(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     await UpdateContactCenter.description.set()
     if message.content_type == 'text':
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await state.update_data(description=message.text.lower())
         data = await state.get_data()
         await bot.send_message(message.chat.id, text=f'Название кнопки: <b>{data["name"]}</b> \n'
@@ -166,11 +160,8 @@ async def updade_contact_center_step(message: types.Message, state: FSMContext):
                                reply_markup=cancel_or_update_contact_center_admin())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
-        await message.answer('Ошибка - вы отправили не текст повторите', reply_markup=inline_keyboard_cancel_contact_center_admin())
+        await message.answer('Ошибка - вы отправили не текст повторите',
+                             reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='update_info_contact_center_admin', state=None)
@@ -183,9 +174,9 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
             pass
         await db.update_contact_center_data(data['user_id'], data['description'], data["name"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'описание <b>{data["name"]}</b> успешно обновлено \n'
-                           'Админ меню ключевых центров:',
-                           parse_mode='HTML', reply_markup=inline_keyboard_contact_center_admin())
+                                    text=f'описание <b>{data["name"]}</b> успешно обновлено \n'
+                                         'Админ меню ключевых центров:',
+                                    parse_mode='HTML', reply_markup=inline_keyboard_contact_center_admin())
         logging.info(f'User({call.message.chat.id}) обновил описание для {data["name"]}')
     except Exception as e:
         try:
@@ -201,8 +192,8 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
 async def callback_inline_delete_contact_center_admin(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'Выберите кнопку для удаление:',
-                           reply_markup=await inline_keyboard_contacts_center_delete())
+                                text=f'Выберите кнопку для удаление:',
+                                reply_markup=await inline_keyboard_contacts_center_delete())
     await DeleteContactCenter.name.set()
 
 
@@ -212,8 +203,8 @@ async def callback_inline_updade_contact_center(call: CallbackQuery, state: FSMC
     callback_name = callback_data.get('name')
     await state.update_data(name=callback_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'Вы точно уверены, что хотите удалить информацию  <b>{callback_name}</b>:',
-                           reply_markup=cancel_or_delete_contact_center_admin())
+                                text=f'Вы точно уверены, что хотите удалить информацию  <b>{callback_name}</b>:',
+                                reply_markup=cancel_or_delete_contact_center_admin())
     await DeleteContactCenter.confirm_delete.set()
 
 
@@ -223,9 +214,9 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         data = await state.get_data()
         await db.delete_contact_center_button(data["name"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'ключевой центр <b>{data["name"]}</b> успешно удален из базы данных \n'
-                                f'Админ меню ключевых центров:',
-                           reply_markup=inline_keyboard_contact_center_admin())
+                                    text=f'ключевой центр <b>{data["name"]}</b> успешно удален из базы данных \n'
+                                         f'Админ меню ключевых центров:',
+                                    reply_markup=inline_keyboard_contact_center_admin())
         await state.reset_state()
         logging.info(f'User({call.message.chat.id}) удалил ключевой центр для {data["name"]}')
     except Exception as e:
@@ -241,13 +232,13 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text='tutors_university_admin', state=None)
 async def callback_tutors_university_admin_state(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'Выберите школу для которой хотите ввести изменения',
-                           reply_markup=keyboard_pps_choice_shcool())
-    await Pps_admin.shcool.set()
+                                text=f'Выберите школу для которой хотите ввести изменения',
+                                reply_markup=keyboard_pps_choice_shcool())
+    await PpsAdmin.school.set()
 
 
 @dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_shcool_admin'),
-                           state=Pps_admin.shcool)
+                           state=PpsAdmin.school)
 async def pps_admin_state_shcool(call: CallbackQuery, state: FSMContext):
     shcoolnumber = call.data[-1]
     if shcoolnumber == '1':
@@ -269,23 +260,23 @@ async def pps_admin_state_shcool(call: CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             data['shcool'] = "Школа Экономики и Финансов"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'выбирете что хотите изменить',
-                           reply_markup=keyboard_pps_choice_position())
-    await Pps_admin.position.set()
+                                text=f'выбирете что хотите изменить',
+                                reply_markup=keyboard_pps_choice_position())
+    await PpsAdmin.position.set()
 
 
-@dp.callback_query_handler(text='choice_rectorat_admin', state=Pps_admin.shcool)
-async def callback_tutors_university_admin_state(call: CallbackQuery, state: FSMContext): 
+@dp.callback_query_handler(text='choice_rectorat_admin', state=PpsAdmin.school)
+async def callback_tutors_university_admin_state(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['shcool'] = 'Ректорат'
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'выбирете что хотите изменить',
-                           reply_markup=keyboard_pps_choice_position_rector())
-    await Pps_admin.position.set()
+                                text=f'выбирете что хотите изменить',
+                                reply_markup=keyboard_pps_choice_position_rector())
+    await PpsAdmin.position.set()
 
 
 @dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_position_admin'),
-                           state=Pps_admin.position)
+                           state=PpsAdmin.position)
 async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
     positionnum = call.data[-1]
     if positionnum == '1':
@@ -301,29 +292,25 @@ async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             data['position'] = "Проректоры"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-            text=f"Напишите описание которое хотите изменить для {data['position']} {data['shcool']}",
-            reply_markup=inline_keyboard_cancel_tutors_admin())
-    await Pps_admin.description.set()
+                                text=f"Напишите описание которое хотите изменить для {data['position']} {data['shcool']}",
+                                reply_markup=inline_keyboard_cancel_tutors_admin())
+    await PpsAdmin.description.set()
 
 
-@dp.message_handler(content_types=ContentType.ANY, state=Pps_admin.description)
+@dp.message_handler(content_types=ContentType.ANY, state=PpsAdmin.description)
 async def message_send_tutors_management(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
-        data = await state.get_data()
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await bot.send_message(message.chat.id, text='Отправить это описание?',
                                reply_markup=cancel_or_send_tutors_management())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
-        await message.answer('Ошибка - вы отправили не текст повторите')
+        await message.answer('Ошибка - вы отправили не текст повторите',
+                             reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='send_tutors_management', state=None)
@@ -332,9 +319,9 @@ async def callback_inline_send_tutors_management_final(call: CallbackQuery, stat
         data = await state.get_data()
         await db.add_pps_data(data['user_id'], data['shcool'], data['position'], data['description'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text= f'Описание отправлено'
-                           'Админ меню навигации',
-                           reply_markup=inline_keyboard_nav_university_admin_menu())
+                                    text=f'Описание отправлено'
+                                         'Админ меню навигации',
+                                    reply_markup=inline_keyboard_nav_university_admin_menu())
         logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
@@ -350,13 +337,13 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                           text=f'Выберите школу для которой хотите ввести изменения',
-                           reply_markup=keyboard_pps_choice_shcool())
+                                text=f'Выберите школу для которой хотите ввести изменения',
+                                reply_markup=keyboard_pps_choice_shcool())
     await state.reset_state()
-    await Pps_admin.shcool.set()
+    await PpsAdmin.school.set()
 
 
-#############админ меню карты навигации
+#############  админ меню карты навигации
 @dp.callback_query_handler(text_contains='map_nav_admin')
 async def callback_inline_contacts_center_admin(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ карты-навигации, call.data - {call.data}')
@@ -367,32 +354,35 @@ async def callback_inline_contacts_center_admin(call: CallbackQuery):
 @dp.callback_query_handler(text='send_cabinet_admin', state=None)
 async def callback_map_nav_admin_state(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='выберите здание где хотите добавить кабинет', reply_markup=keyboard_map_nav_choice_building())
-    await Map_navigation.building.set()
+                                text='выберите здание где хотите добавить кабинет',
+                                reply_markup=keyboard_map_nav_choice_building())
+    await MapNavigation.building.set()
 
 
-@dp.callback_query_handler(text='new_building_choice_admin', state=Map_navigation.building)
+@dp.callback_query_handler(text='new_building_choice_admin', state=MapNavigation.building)
 async def map_nav_admin_state_building1(call: CallbackQuery, state: FSMContext):
     databuilding = 'Новое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите добавить кабинет', reply_markup=map_nav_admin_choice_floor_new())
-    await Map_navigation.floor.set()
+                                text='Выберите этаж в каком хотите добавить кабинет',
+                                reply_markup=map_nav_admin_choice_floor_new())
+    await MapNavigation.floor.set()
 
 
-@dp.callback_query_handler(text='old_building_choice_admin', state=Map_navigation.building)
+@dp.callback_query_handler(text='old_building_choice_admin', state=MapNavigation.building)
 async def map_nav_admin_state_building2(call: CallbackQuery, state: FSMContext):
     databuilding = 'Старое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите добавить кабинет', reply_markup=map_nav_admin_choice_floor_old())
-    await Map_navigation.floor.set()
+                                text='Выберите этаж в каком хотите добавить кабинет',
+                                reply_markup=map_nav_admin_choice_floor_old())
+    await MapNavigation.floor.set()
 
 
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin'),
-                           state=Map_navigation.floor)
+                           state=MapNavigation.floor)
 async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
     floornumber = call.data[-1]
     if floornumber == '1':
@@ -413,15 +403,19 @@ async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
     if floornumber == '6':
         async with state.proxy() as data:
             data['floor'] = "6 этаж"
-    print(data['floor'])
+    # print(data['floor'])
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f"Напишите название(например:101 кабинет) которое хотите добавить для {data['building']} {data['floor']}",
                                 reply_markup=inline_keyboard_cancel_map_nav_admin())
-    await Map_navigation.cabinet.set()
+    await MapNavigation.cabinet.set()
 
 
-@dp.message_handler(content_types=ContentType.ANY, state=Map_navigation.cabinet)
+@dp.message_handler(content_types=ContentType.ANY, state=MapNavigation.cabinet)
 async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     try:
         data = await state.get_data()
         cabinets = await db.select_cabinet_admin_check()
@@ -434,18 +428,10 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
         if message.content_type == 'text' and checkcabinet == True:
             async with state.proxy() as data:
                 data['cabinet'] = message.text
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            except:
-                pass
             await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
                                 reply_markup=inline_keyboard_cancel_map_nav_admin())
-            await Map_navigation.description.set()
+            await MapNavigation.description.set()
         else:
-            try:
-                await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-            except:
-                pass
             await message.answer('Ошибка - вы отправили не текст или название кабинета уже существует повторите',
                                  reply_markup=inline_keyboard_cancel_map_nav_admin())
     except Exception as e:
@@ -453,15 +439,15 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
         print(e)
 
 
-@dp.message_handler(content_types=ContentType.ANY, state=Map_navigation.description)
+@dp.message_handler(content_types=ContentType.ANY, state=MapNavigation.description)
 async def map_nav_admin_state_description(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await bot.send_message(message.chat.id, text=f"Отправить описание?:\n"
                                                      f"{data['building']}\n"
                                                      f"{data['floor']}\n"
@@ -470,10 +456,6 @@ async def map_nav_admin_state_description(message: types.Message, state: FSMCont
                                reply_markup=cancel_or_send_map_nav_admin())
         await state.reset_state(with_data=False)
     else:
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-        except:
-            pass
         await message.answer('Ошибка - вы отправили не текст повторите',
                              reply_markup=inline_keyboard_cancel_map_nav_admin())
 
@@ -485,51 +467,52 @@ async def map_nav_admin_state_send_final(call: CallbackQuery, state: FSMContext)
         await db.add_map_navigation_data(data['user_id'], data['building'], data['floor'], data['cabinet'],
                                          data['description'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f"{data['cabinet']} для {data['building']} {data['floor']} отправлен\n"
-                                "Админ меню карт-навигации",
-                                reply_markup=inline_keyboard_map_nav_admin_menu())
-        
+                                    text=f"{data['cabinet']} для {data['building']} {data['floor']} отправлен\n"
+                                         "Админ меню карт-навигации",
+                                    reply_markup=inline_keyboard_map_nav_admin_menu())
+
         logging.info(f'User({call.message.chat.id}) отправил информацию для кабинета')
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
         print(e)
 
 
-########################################Обновление Кабинетов###############################################
+########################################  Обновление Кабинетов   ###############################################
 
 
 @dp.callback_query_handler(text='update_cabinet_admin', state=None)
 async def callback_map_nav_admin_state_update(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='выберите здание где хотите обновить кабинет', reply_markup=keyboard_map_nav_choice_building_update())
-    await Map_navigation_update.building.set()
+                                text='выберите здание где хотите обновить кабинет',
+                                reply_markup=keyboard_map_nav_choice_building_update())
+    await MapNavigationUpdate.building.set()
 
 
-@dp.callback_query_handler(text='new_building_choice_admin_update', state=Map_navigation_update.building)
+@dp.callback_query_handler(text='new_building_choice_admin_update', state=MapNavigationUpdate.building)
 async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMContext):
     databuilding = 'Новое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите изменить описание кабинет', 
+                                text='Выберите этаж в каком хотите изменить описание кабинет',
                                 reply_markup=map_nav_admin_choice_floor_new_update())
-    await Map_navigation_update.floor.set()
+    await MapNavigationUpdate.floor.set()
 
 
-@dp.callback_query_handler(text='old_building_choice_admin_update', state=Map_navigation_update.building)
+@dp.callback_query_handler(text='old_building_choice_admin_update', state=MapNavigationUpdate.building)
 async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMContext):
     databuilding = 'Старое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
-    print(data['building'])
+    # print(data['building'])
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите изменить описание кабинет', 
+                                text='Выберите этаж в каком хотите изменить описание кабинет',
                                 reply_markup=map_nav_admin_choice_floor_old_update())
-    await Map_navigation_update.floor.set()
+    await MapNavigationUpdate.floor.set()
 
 
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin_update'),
-                           state=Map_navigation_update.floor)
+                           state=MapNavigationUpdate.floor)
 async def map_nav_admin_state_floor_update(call: CallbackQuery, state: FSMContext):
     floornumber = call.data[-1]
     if floornumber == '1':
@@ -553,12 +536,12 @@ async def map_nav_admin_state_floor_update(call: CallbackQuery, state: FSMContex
     floor = data['floor']
     building = data['building']
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет для изменения:', 
+                                text='Выберите кабинет для изменения:',
                                 reply_markup=await inline_keyboard_cabinets_admin(building, floor))
-    await Map_navigation_update.cabinet.set()
+    await MapNavigationUpdate.cabinet.set()
 
 
-@dp.callback_query_handler(cabinet_callback_update.filter(), state=Map_navigation_update.cabinet)
+@dp.callback_query_handler(cabinet_callback_update.filter(), state=MapNavigationUpdate.cabinet)
 async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     cabinet_name = callback_data.get('cabinet')
@@ -567,15 +550,18 @@ async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMCont
                                 text=f'Напишите изменения для <b>{cabinet_name}</b>:',
                                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_map_nav_admin())
 
-    await Map_navigation_update.description.set()
+    await MapNavigationUpdate.description.set()
 
 
-@dp.message_handler(content_types=ContentType.ANY, state=Map_navigation_update.description)
+@dp.message_handler(content_types=ContentType.ANY, state=MapNavigationUpdate.description)
 async def map_nav_admin_state_description_update(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
         await bot.send_message(message.chat.id, text=f"Изменить описание?:\n"
                                                      f"{data['building']}\n"
                                                      f"{data['floor']}\n"
@@ -584,7 +570,8 @@ async def map_nav_admin_state_description_update(message: types.Message, state: 
                                reply_markup=cancel_or_update_map_nav_admin())
         await state.reset_state(with_data=False)
     else:
-        await message.answer('Ошибка - вы отправили не текст повторите')
+        await message.answer('Ошибка - вы отправили не текст повторите',
+                             reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='update_map_navigation_admin', state=None)
@@ -594,9 +581,9 @@ async def map_nav_admin_state_update_final(call: CallbackQuery, state: FSMContex
         await db.update_map_nav_description_data(data['user_id'], data['building'], data['floor'], data['cabinet'],
                                                  data['description'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
-                                "Админ меню карт-навигации",
-                                reply_markup=inline_keyboard_map_nav_admin_menu())
+                                    text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
+                                         "Админ меню карт-навигации",
+                                    reply_markup=inline_keyboard_map_nav_admin_menu())
         logging.info(f'User({call.message.chat.id}) изменил информацию для кабинета')
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
@@ -609,32 +596,35 @@ async def map_nav_admin_state_update_final(call: CallbackQuery, state: FSMContex
 @dp.callback_query_handler(text='delete_cabinet_admin', state=None)
 async def callback_map_nav_admin_state_delete(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите здание где хотите удалить кабинет', reply_markup=keyboard_map_nav_choice_building_delete())
-    await Map_navigation_delete.building.set()
+                                text='Выберите здание где хотите удалить кабинет',
+                                reply_markup=keyboard_map_nav_choice_building_delete())
+    await MapNavigationDelete.building.set()
 
 
-@dp.callback_query_handler(text='new_building_choice_admin_delete', state=Map_navigation_delete.building)
+@dp.callback_query_handler(text='new_building_choice_admin_delete', state=MapNavigationDelete.building)
 async def map_nav_admin_state_building1_delete(call: CallbackQuery, state: FSMContext):
     databuilding = 'Новое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите удалить кабинет', reply_markup=map_nav_admin_choice_floor_new_delete())
-    await Map_navigation_delete.floor.set()
+                                text='Выберите этаж в каком хотите удалить кабинет',
+                                reply_markup=map_nav_admin_choice_floor_new_delete())
+    await MapNavigationDelete.floor.set()
 
 
-@dp.callback_query_handler(text='old_building_choice_admin_delete', state=Map_navigation_delete.building)
+@dp.callback_query_handler(text='old_building_choice_admin_delete', state=MapNavigationDelete.building)
 async def map_nav_admin_state_building2_delete(call: CallbackQuery, state: FSMContext):
     databuilding = 'Старое здание'
     async with state.proxy() as data:
         data['building'] = databuilding
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите этаж в каком хотите удалить кабинет', reply_markup=map_nav_admin_choice_floor_old_delete())
-    await Map_navigation_delete.floor.set()
+                                text='Выберите этаж в каком хотите удалить кабинет',
+                                reply_markup=map_nav_admin_choice_floor_old_delete())
+    await MapNavigationDelete.floor.set()
 
 
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin_delete'),
-                           state=Map_navigation_delete.floor)
+                           state=MapNavigationDelete.floor)
 async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
     floornumber = call.data[-1]
     if floornumber == '1':
@@ -660,10 +650,10 @@ async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите какой кабинет хотите удалить',
                                 reply_markup=await inline_keyboard_cabinets_admin(building, floor))
-    await Map_navigation_delete.cabinet.set()
+    await MapNavigationDelete.cabinet.set()
 
 
-@dp.callback_query_handler(cabinet_callback_update.filter(), state=Map_navigation_delete.cabinet)
+@dp.callback_query_handler(cabinet_callback_update.filter(), state=MapNavigationDelete.cabinet)
 async def map_nav_admin_state_cabinet_delete(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     cabinet_name = callback_data.get('cabinet')
@@ -680,9 +670,9 @@ async def map_nav_admin_state_delete_final(call: CallbackQuery, state: FSMContex
         data = await state.get_data()
         await db.delete_map_nav_description_data(data['building'], data['floor'], data['cabinet'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f"{data['cabinet']} для {data['building']} {data['floor']} удален\n"
-                                "Админ меню карт-навигации",
-                                reply_markup=inline_keyboard_map_nav_admin_menu())
+                                    text=f"{data['cabinet']} для {data['building']} {data['floor']} удален\n"
+                                         "Админ меню карт-навигации",
+                                    reply_markup=inline_keyboard_map_nav_admin_menu())
         logging.info(f'User({call.message.chat.id}) удалил информацию кабинета')
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')

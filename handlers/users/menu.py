@@ -146,6 +146,7 @@ async def callback_inline_schedule(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Расписание")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/faq')
@@ -153,6 +154,7 @@ async def callback_inline_faq(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в F.A.Q")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='F.A.Q ↘', reply_markup=await inline_keyboard_main_faq())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/library')
@@ -160,6 +162,7 @@ async def callback_inline_library(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Библиотеку")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Библиотека ↘', reply_markup=keyboard_library())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/feedback')
@@ -171,6 +174,7 @@ async def callback_inline_feedback(call: CallbackQuery):
                            text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
                                 'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.',
                            reply_markup=keyboard_feedback())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/almaushop')
@@ -178,6 +182,7 @@ async def callback_inline_almaushop(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в AlmaU Shop")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='AlmaU Shop ↘', reply_markup=keyboard_almaushop())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/certificate')
@@ -187,12 +192,14 @@ async def callback_inline_certificate(call: CallbackQuery):
                                 text='Получение справки с места учебы ↘ \n' \
                                      'Вы можете получить справку или оставить заявку на получение справки с места учебы по месту требования (военкомат и тд.)',
                                 reply_markup=await inline_keyboard_certificate())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/academ_calendar')
 async def callback_academ_calendar(call: CallbackQuery):
     file_id = await db.find_id_academic_calendar()
     await bot.send_document(call.message.chat.id, file_id)
+    await call.answer()
 
 
 @dp.callback_query_handler(text='go_back')
@@ -201,6 +208,7 @@ async def callback_inline(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=_main_menu_text,
                                 reply_markup=inline_keyboard_menu())
+    await call.answer()
 
 
 ######################  Динамические кнопки Расписания ##################################################
@@ -212,6 +220,7 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
     file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
     await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
+    await call.answer()
 
 
 ###################### КОНЕЦ Динамические кнопки Расписания КОНЕЦ #################################################
@@ -222,6 +231,7 @@ async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
     answer = (await db.main_faq_select_question_and_answer(id))['answer']
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=answer, reply_markup=inline_keyboard_main_faq_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='back_to_main_faq')
@@ -230,5 +240,6 @@ async def callback_inline_faq_menu_back(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text="F.A.Q ↘",
                                 reply_markup=await inline_keyboard_main_faq())
+    await call.answer()
 
 ############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################

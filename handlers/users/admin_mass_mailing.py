@@ -26,9 +26,11 @@ import aiogram.utils.markdown as fmt
 @dp.callback_query_handler(text='send_all', state=None)
 async def callback_inline_send_all(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку 📣 Рассылка - {call.data}')
-    await call.message.answer('Напишите текст сообщения для массовой рассылки:',
-                              reply_markup=inline_keyboard_cancel_mass_mailing())
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Напишите текст сообщения для массовой рассылки:',
+                                reply_markup=inline_keyboard_cancel_mass_mailing())
     await MassMailSending.message_text.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=MassMailSending.message_text)
@@ -64,6 +66,7 @@ async def callback_inline_attach_pic_or_doc(call: CallbackQuery):
     await bot.send_message(call.message.chat.id, 'Прикрепите фото или файл к рассылке:',
                            reply_markup=inline_keyboard_cancel_mass_mailing())
     await MassMailSending.message_attached.set()
+    await call.answer()
 
 
 # Получение медиа файлы от пользователя для массовой рассылки
@@ -152,6 +155,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
                                '<b>✅ Массовая рассылка закончила отправку сообщений.</b>',
                                parse_mode='HTML')
         await state.reset_state()
+        await call.answer()
     else:
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
         await bot.send_message(call.message.chat.id,
@@ -174,6 +178,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
                                '<b>✅ Массовая рассылка закончила отправку сообщений.</b>',
                                parse_mode='HTML')
         await state.reset_state()
+        await call.answer()
 
 
 @dp.callback_query_handler(text=['cancel_massive_sending', 'cancel_mass_mailing'], state=['*'])
@@ -183,3 +188,5 @@ async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
                                 text='✅ Массовая рассылка успешно отменена')
     await admin_menu(call.message)
     await state.reset_state()
+    await call.answer()
+

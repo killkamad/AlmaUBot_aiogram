@@ -20,11 +20,6 @@ async def bot_echo(message: types.Message):
     if message.text == '🏠 Меню':
         await message.answer(_main_menu_text,
                              reply_markup=inline_keyboard_menu())
-    # elif message.text == '❓ Помощь':
-    #     await message.answer('Главное меню:\n'
-    #                          '- Расписание - здесь можно посмотреть расписание\n'
-    #                          '- FAQ - часто задаваемые вопросы и ответы на них',
-    #                          reply_markup=inline_keyboard_menu())
     elif message.text == '💻 О боте':
         await message.answer('<b>О боте:</b>\n\n'
                              '- Для загрузки расписания, войти в меню админа - /admin '
@@ -47,7 +42,3 @@ async def bot_echo(message: types.Message):
                              '- Для просмотра мерча AlmaU и получении информации о AlmaU Shop в меню '
                              'нажать на кнопку <b>"🌀 AlmaU Shop"</b>.',
                              parse_mode='HTML')
-    # elif message.text == '⬅ В главное меню':
-    #     await message.answer('Возвращение в главное меню', reply_markup=always_stay_keyboard())
-    #     await message.answer(text=_main_menu_text,
-    #                          reply_markup=inline_keyboard_menu())

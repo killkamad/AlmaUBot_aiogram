@@ -77,6 +77,7 @@ async def callback_inline_back_to_admin_menu(call: CallbackQuery):
         else:
             await bot.send_message(call.message.chat.id, 'Недостаточный уровень доступа')
             logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')
+        await call.answer()
     except Exception as e:
         logging.info(f'Ошибка - {e}')
 
@@ -95,6 +96,7 @@ async def schedule_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Расписания, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Расписания:', reply_markup=inline_keyboard_schedule_admin())
+    await call.answer()
 
 
 # Переход Админ меню для FAQ главного меню
@@ -103,6 +105,7 @@ async def almaushop_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню FAQ главного меню, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+    await call.answer()
 
 
 # Переход Админ меню для Almau shop
@@ -111,6 +114,7 @@ async def almaushop_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню AlmaU Shop, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню AlmaU Shop:', reply_markup=inline_keyboard_almau_shop_admin())
+    await call.answer()
 
 
 # Переход Админ меню для Библиотеки
@@ -120,6 +124,7 @@ async def library_admin_menu(call: CallbackQuery):
         f'User({call.message.chat.id}) переход на первую страницу админ меню Библиотеки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Библиотека:', reply_markup=inline_keyboard_library_first_page_admin())
+    await call.answer()
 
 
 # Переход Админ меню для Пользователей
@@ -128,6 +133,7 @@ async def users_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Пользователей, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Пользователи:', reply_markup=inline_keyboard_users_admin())
+    await call.answer()
 
 
 ############## Академ календарь ####################################################################################
@@ -135,13 +141,19 @@ async def users_admin_menu(call: CallbackQuery):
 @dp.callback_query_handler(text='send_academic_calendar', state=None)
 async def callback_send_academic_calendar(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await call.message.answer('Отправьте файл академического календаря', reply_markup=cancel_academic_calendar())
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Отправьте файл академического календаря', reply_markup=cancel_academic_calendar())
     await SendAcademCalendar.send_file.set()
+    await call.answer()
 
 
 # Проверка академ календаря на то что он файл
 @dp.message_handler(content_types=ContentType.ANY, state=SendAcademCalendar.send_file)
 async def message_academic_calendar_send_file(message: types.Message, state: FSMContext):
+    try:
+        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
+    except:
+        pass
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
         data = await state.get_data()
@@ -149,7 +161,8 @@ async def message_academic_calendar_send_file(message: types.Message, state: FSM
                                 reply_markup=cancel_or_send_academic_calendar())
         await state.reset_state(with_data=False)
     else:
-        await message.answer('Ошибка - вы отправили не документ\nПовторите Отправление файла')
+        await message.answer('Ошибка - вы отправили не документ\nПовторите Отправление файла',
+                             reply_markup=cancel_academic_calendar())
 
 
 # Отправка академ календаря в базу данных
@@ -157,12 +170,12 @@ async def message_academic_calendar_send_file(message: types.Message, state: FSM
 async def callback_inline_send_academic_calendar(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        # await bot_delete_messages(call.message, 2)
         await db.add_academic_calendar_data(data['user_id'], data['file_id'])
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-        # await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await call.message.answer('<b>Академический календарь</b> отправлен', parse_mode='HTML')
+        await call.message.answer('✅ <b>Академический календарь</b> отправлен', parse_mode='HTML')
+        await admin_menu(call.message)
         logging.info(f'User({call.message.chat.id}) отправил академ календарь')
+        await call.answer()
     except Exception as e:
         await call.message.answer(f'Ошибка Академический календарь не отправлен, (Ошибка - {e})')
         print(e)
@@ -173,18 +186,24 @@ async def callback_inline_send_academic_calendar(call: CallbackQuery, state: FSM
 async def callback_inline_cancel_step_academic_calendar(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='<b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
+                                text='❌ <b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
+    await admin_menu(call.message)
     await state.reset_state()
+    await call.answer()
 
 
 # Отмена отправки календаря
 @dp.callback_query_handler(text='cancel_academic_calendar')
 async def callback_inline_cancel_acdemic_calendar(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил отправку Академического календаря call.data - {call.data}')
-    await bot_delete_messages(call.message, 4)
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await call.message.answer('<b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
+    try:
+        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    except:
+        pass
+    await call.message.answer('❌ <b>Отправка Академического календаря отменена</b>', parse_mode='HTML')
+    await admin_menu(call.message)
     await state.reset_state()
+    await call.answer()
 
 
 ############## КОНЕЦ Академ календарь КОНЕЦ ###########################################################################
@@ -196,3 +215,4 @@ async def certificate_admin_menu(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ меню Справки, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Справки:', reply_markup=inline_keyboard_certificate_admin())
+    await call.answer()

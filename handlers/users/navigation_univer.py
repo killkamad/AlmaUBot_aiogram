@@ -26,6 +26,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Навигацию")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Навигация по университету', reply_markup=inline_keyboard_nav_unifi())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='contacts_center')
@@ -33,7 +34,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Контакты ключевых центров")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Контакты ключевых центров', reply_markup=await inline_keyboard_contacts_center())
-
+    await call.answer()
 
 
 @dp.callback_query_handler(nav_center_callback.filter())
@@ -43,15 +44,16 @@ async def callback_inline_contacts_center_call(call: CallbackQuery, callback_dat
     description = await db.contact_center_description(callback_center)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
+    await call.answer()
 
-
-# @dp.callback_query_handler(text_contains="['contacts_center_call'")
-# async def callback_inline_contacts_center_call(call: CallbackQuery):
-#     logging.info(f'call = {call.data}')
-#     valueFromCallBack = ast.literal_eval(call.data)[1]
-#     description = await db.contact_center_description(valueFromCallBack)
-#     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-#                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
+    # @dp.callback_query_handler(text_contains="['contacts_center_call'")
+    # async def callback_inline_contacts_center_call(call: CallbackQuery):
+    #     logging.info(f'call = {call.data}')
+    #     valueFromCallBack = ast.literal_eval(call.data)[1]
+    #     description = await db.contact_center_description(valueFromCallBack)
+    #     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+    #                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_university')
@@ -60,6 +62,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Профессорско-преподавательский состав, выберите школу',
                                 reply_markup=inline_keyboard_pps())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_management')
@@ -67,6 +70,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Школа менеджмента', reply_markup=inline_keyboard_pps_shcool_management())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_law')
@@ -74,6 +78,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Школа политики и права', reply_markup=inline_keyboard_pps_shcool_law())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_inovation')
@@ -82,6 +87,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Школа предпринимательства и инноваций',
                                 reply_markup=inline_keyboard_pps_shcool_inovation())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_economic')
@@ -89,6 +95,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Школа Экономики и Финансов', reply_markup=inline_keyboard_pps_shcool_economic())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_engineer')
@@ -97,6 +104,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Школа Инженерного Менеджмента',
                                 reply_markup=inline_keyboard_pps_shcool_engineer())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_bussines')
@@ -104,6 +112,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Высшая Школа Бизнеса', reply_markup=inline_keyboard_pps_shcool_bussines())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat')
@@ -111,6 +120,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Ректорат")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Ректорат', reply_markup=inline_keyboard_pps_rectorat())
+    await call.answer()
 
 
 #######
@@ -122,6 +132,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_management_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='dekan_shcool_law')
@@ -132,6 +143,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_law_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='dekan_shcool_inovation')
@@ -142,6 +154,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_inovation_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='dekan_shcool_economic')
@@ -152,6 +165,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_economic_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='dekan_shcool_engineer')
@@ -162,6 +176,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_engineer_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='dekan_shcool_bussines')
@@ -172,6 +187,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_bussines_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat_rector')
@@ -182,6 +198,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_rectorat_back())
+    await call.answer()
 
 
 ########################
@@ -193,6 +210,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_management_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_shcool_law')
@@ -203,6 +221,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_law_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_shcool_inovation')
@@ -213,6 +232,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_inovation_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_shcool_economic')
@@ -223,6 +243,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_economic_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_shcool_engineer')
@@ -233,6 +254,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_engineer_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='tutors_shcool_bussines')
@@ -243,6 +265,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_shcool_bussines_back())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat_humans')
@@ -253,6 +276,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
     description = await db.pps_center_description(shcool, position)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_pps_rectorat_back())
+    await call.answer()
 
 
 ########
@@ -262,6 +286,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Карта-навигация по университету, выбирете здание:',
                                 reply_markup=inline_keyboard_map_nav())
+    await call.answer()
 
 
 ########
@@ -271,6 +296,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Старое здание университета, выберите этаж:',
                                 reply_markup=inline_keyboard_old_building())
+    await call.answer()
 
 
 #######
@@ -280,6 +306,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Новое здание университета, выберите этаж:',
                                 reply_markup=inline_keyboard_new_building())
+    await call.answer()
 
 
 ######### хэндлеры старое здание
@@ -288,6 +315,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_old())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_second')
@@ -295,6 +323,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 2 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_old())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_third')
@@ -302,6 +331,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 3 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_old())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_fourth')
@@ -309,6 +339,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 4 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_old())
+    await call.answer()
 
 
 ############## хэндлеры новое здание
@@ -317,6 +348,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_new())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_second')
@@ -324,6 +356,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 2 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_new())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_third')
@@ -331,6 +364,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 3 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_new())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_fourth')
@@ -338,6 +372,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 4 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_new())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_fifth')
@@ -345,6 +380,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 5 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fifth_new())
+    await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_sixth')
@@ -352,9 +388,10 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 6 этаж")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_sixth_new())
+    await call.answer()
 
 
-#сделал очень тупую конструкцию для кнопки назад
+# сделал очень тупую конструкцию для кнопки назад
 @dp.callback_query_handler(cabinet_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
@@ -362,55 +399,66 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     description = await db.find_cabinet_description(cabinet)
     print(cabinet[0], cabinet[3])
     if cabinet[0] == '1' and cabinet[3] != 'а':
-            building_callback = "old_"
-            floor_callback = "_first"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "old_"
+        floor_callback = "_first"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '2') and cabinet[3] != 'а':
-            building_callback = "old_"
-            floor_callback = "_second"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "old_"
+        floor_callback = "_second"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '3') and cabinet[3] != 'а':
-            building_callback = "old_"
-            floor_callback = "_third"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "old_"
+        floor_callback = "_third"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '4') and cabinet[3] != 'а':
-            building_callback = "old_"
-            floor_callback = "_fourth"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "old_"
+        floor_callback = "_fourth"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '1') and cabinet[3] == 'а':
-            building_callback = "new_"
-            floor_callback = "_first"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_first"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '2') and cabinet[3] == 'а':
-            building_callback = "new_"
-            floor_callback = "_second"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_second"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '3') and cabinet[3] == 'а':
-            building_callback = "new_"
-            floor_callback = "_third"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_third"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '4') and cabinet[3] == 'а':
-            building_callback = "new_"
-            floor_callback = "_fourth"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_fourth"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif cabinet[0] == '5':
-            building_callback = "new_"
-            floor_callback = "_fifth"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_fifth"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif cabinet[0] == '6':
-            building_callback = "new_"
-            floor_callback = "_sixth"
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        building_callback = "new_"
+        floor_callback = "_sixth"
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     else:
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                        text=description, reply_markup=inline_keyboard_new_building_back())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description, reply_markup=inline_keyboard_new_building_back())
+    await call.answer()

@@ -61,8 +61,7 @@ async def almaushop_faq_menu(call: CallbackQuery, callback_data: dict):
     answer = await db.almaushop_faq_find_answer(id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=answer, reply_markup=inline_keyboard_faq_almaushop_back())
-    # logging.info(f'User({call.message.chat.id}) нажал на кнопку {id}')
-    # logging.info(f'User({call.message.chat.id}) нажал на кнопку {callback_data}')
+    await call.answer()
 
 
 @dp.callback_query_handler(text='back_to_almau_shop_faq')
@@ -71,3 +70,4 @@ async def almaushop_faq_menu_back(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text="F.A.Q ↘",
                                 reply_markup=await inline_keyboard_faq_almaushop())
+    await call.answer()

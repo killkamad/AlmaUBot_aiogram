@@ -31,6 +31,7 @@ async def callback_inline_edit_users_role(call: CallbackQuery):
                                      '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
                                 reply_markup=inline_keyboard_cancel_users_role_change())
     await UpdateUserRole.phone.set()
+    await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=UpdateUserRole.phone)
@@ -117,6 +118,7 @@ async def callback_inline_edit_users_role_giving(call: CallbackQuery, state: FSM
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=message_text, reply_markup=inline_keyboard_users_admin_roles_accept_decline())
     await UpdateUserRole.confirm.set()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='admin_role_edit_accept', state=UpdateUserRole.confirm)
@@ -129,6 +131,7 @@ async def callback_inline_edit_users_role_giving_accept(call: CallbackQuery, sta
     await bot.send_message(chat_id=call.message.chat.id, text='Админ меню Пользователи:',
                            reply_markup=inline_keyboard_users_admin())
     await state.reset_state()
+    await call.answer()
 
 
 # Хендлер для отмены выдачи роли
@@ -140,6 +143,7 @@ async def callback_inline_edit_users_role_cancel(call: CallbackQuery, state: FSM
                                 text='Обновление роли отменено, возвращение в Админ меню пользователи\n'
                                      'Админ меню Пользователи:', reply_markup=inline_keyboard_users_admin())
     await state.reset_state()
+    await call.answer()
 
 
 @dp.callback_query_handler(text='back_to_users_admin', state=None)
@@ -147,6 +151,7 @@ async def callback_inline_last_ten_users_db(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню Пользователи:', reply_markup=inline_keyboard_users_admin())
+    await call.answer()
 
 
 #################################### ВЫВОД 10 последний человек ####################################
@@ -157,6 +162,7 @@ async def callback_inline_last_ten_users_db(call: CallbackQuery):
                                 message_id=call.message.message_id,
                                 text='10 Последний пользователей',
                                 reply_markup=await inline_keyboard_select_last_ten_users())
+    await call.answer()
 
 
 @dp.callback_query_handler(last_ten_users_callback.filter(), state=None)
@@ -175,3 +181,4 @@ async def callback_inline_edit_main_faq_choice_step(call: CallbackQuery, callbac
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=text,
                                 reply_markup=back_to_last_ten_users(), parse_mode='HTML')
+    await call.answer()

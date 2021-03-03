@@ -19,6 +19,7 @@ from utils import db_api as db
 from states.admin import SendAcademCalendar
 
 from utils.misc import rate_limit
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 # Вход в главное админ меню
@@ -150,10 +151,7 @@ async def callback_send_academic_calendar(call: CallbackQuery):
 # Проверка академ календаря на то что он файл
 @dp.message_handler(content_types=ContentType.ANY, state=SendAcademCalendar.send_file)
 async def message_academic_calendar_send_file(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
         data = await state.get_data()

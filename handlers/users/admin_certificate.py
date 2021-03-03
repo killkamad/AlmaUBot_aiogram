@@ -22,6 +22,7 @@ from utils import db_api as db
 from states.admin import SendCertificate, UpdateCertificate, DeleteCertificate
 
 from utils.misc import rate_limit
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 @dp.callback_query_handler(request_callback.filter())
@@ -102,10 +103,7 @@ async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMCo
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateCertificate.send_file)
 async def change_certificate_id(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     await UpdateCertificate.send_file.set()
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
@@ -190,10 +188,7 @@ async def message_send_button_name(call: CallbackQuery, callback_data: dict, sta
 # Проверка если отправлен файл, то сохраняет айди файла в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendCertificate.send_file)
 async def message_certificate_send_file(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id, upload=True, request_state=True)
         data = await state.get_data()

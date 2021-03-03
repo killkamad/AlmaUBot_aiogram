@@ -21,6 +21,7 @@ from utils import db_api as db
 from states.admin import UpdateUserRole
 import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 @dp.callback_query_handler(text='edit_users_role', state=None)
@@ -36,10 +37,7 @@ async def callback_inline_edit_users_role(call: CallbackQuery):
 
 @dp.message_handler(content_types=ContentType.CONTACT, state=UpdateUserRole.phone)
 async def register_user_phone_next(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
     phone = message.contact.phone_number
     if phone.startswith("+"):
@@ -62,10 +60,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateUserRole.phone)
 async def callback_inline_edit_users_role_phone(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     logging.info(message.text)
     if message.content_type == 'text':
         if len(message.text) == 12:
@@ -138,7 +133,6 @@ async def callback_inline_edit_users_role_giving_accept(call: CallbackQuery, sta
 @dp.callback_query_handler(text=['cancel_role_choice', 'admin_role_edit_decline'], state=['*'])
 async def callback_inline_edit_users_role_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Обновление роли отменено, возвращение в Админ меню пользователи\n'
                                      'Админ меню Пользователи:', reply_markup=inline_keyboard_users_admin())

@@ -19,6 +19,7 @@ from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauSho
     CreateMainFaq, EditMainFaq, DeleteMainFaq
 import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 ######################### Добавление нового FAQ в главном меню #############################################
@@ -32,10 +33,7 @@ async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.ANY, state=CreateMainFaq.question)
 async def callback_inline_add_main_faq_question_step(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 300:
             await state.update_data(question=fmt.quote_html(message.text))
@@ -53,10 +51,7 @@ async def callback_inline_add_main_faq_question_step(message: types.Message, sta
 
 @dp.message_handler(content_types=ContentType.ANY, state=CreateMainFaq.answer)
 async def callback_inline_add_main_faq_answer_step(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(answer=fmt.quote_html(message.text))
@@ -145,10 +140,7 @@ async def edit_main_faq_choice_step_question(call: CallbackQuery, state: FSMCont
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditMainFaq.question_confirm)
 async def edit_main_faq_choice_step_question_final(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 300:
             await state.update_data(selected_item=fmt.quote_html(message.text),
@@ -181,10 +173,7 @@ async def edit_main_faq_choice_step_answer(call: CallbackQuery, state: FSMContex
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditMainFaq.answer_confirm)
 async def edit_main_faq_choice_step_answer_final(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(selected_item=fmt.quote_html(message.text),

@@ -25,7 +25,7 @@ import asyncio
 
 from utils import db_api as db
 from .admin_menu import admin_menu
-
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 from utils.delete_messages import bot_delete_messages
 from aiogram.dispatcher import FSMContext
 from states.admin import SendContactCenter, UpdateContactCenter, DeleteContactCenter, PpsAdmin, MapNavigation, \
@@ -77,10 +77,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 # Проверка центра на текст
 @dp.message_handler(content_types=ContentType.ANY, state=SendContactCenter.name)
 async def message_send_contact_center_name(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text' and len(message.text) <= 29:
         await state.update_data(name=message.text.lower(),
                                 user_id=message.chat.id)
@@ -97,10 +94,7 @@ async def message_send_contact_center_name(message: types.Message, state: FSMCon
 # Проверка описания центра на текст
 @dp.message_handler(content_types=ContentType.ANY, state=SendContactCenter.description)
 async def message_send_contact_center_description(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower())
         data = await state.get_data()
@@ -154,10 +148,7 @@ async def callback_inline_updade_contact_center(call: CallbackQuery, state: FSMC
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateContactCenter.description)
 async def updade_contact_center_step(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     await UpdateContactCenter.description.set()
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower())
@@ -239,7 +230,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
         logging.info(f'Ошибка - {e}')
 
 
-###################################профессорско преподвательский состав изменение информации#################################
+###################################  профессорско преподвательский состав изменение информации#################################
 @dp.callback_query_handler(text='tutors_university_admin', state=None)
 async def callback_tutors_university_admin_state(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -314,10 +305,7 @@ async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.ANY, state=PpsAdmin.description)
 async def message_send_tutors_management(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         await bot.send_message(message.chat.id, text='Отправить это описание?',
@@ -334,17 +322,13 @@ async def callback_inline_send_tutors_management_final(call: CallbackQuery, stat
         data = await state.get_data()
         await db.add_pps_data(data['user_id'], data['shcool'], data['position'], data['description'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=f'Описание отправлено'
+                                    text=f'Описание отправлено\n'
                                          'Админ меню навигации',
                                     reply_markup=inline_keyboard_nav_university_admin_menu())
         logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
         await call.answer()
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
-        try:
-            await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id - 1)
-        except:
-            pass
         print(e)
 
 
@@ -434,20 +418,17 @@ async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.ANY, state=MapNavigation.cabinet)
 async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     try:
         data = await state.get_data()
         cabinets = await db.select_cabinet_admin_check()
-        checkcabinet = True
+        check_cabinet = True
         for item in cabinets:
             if item['cabinet'] == message.text:
-                checkcabinet = False
+                check_cabinet = False
             else:
                 continue
-        if message.content_type == 'text' and checkcabinet == True:
+        if message.content_type == 'text' and check_cabinet is True:
             async with state.proxy() as data:
                 data['cabinet'] = message.text
             await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
@@ -463,10 +444,7 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
 
 @dp.message_handler(content_types=ContentType.ANY, state=MapNavigation.description)
 async def map_nav_admin_state_description(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()
@@ -514,9 +492,9 @@ async def callback_map_nav_admin_state_update(call: CallbackQuery):
 
 @dp.callback_query_handler(text='new_building_choice_admin_update', state=MapNavigationUpdate.building)
 async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Новое здание'
+    data_building = 'Новое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = data_building
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите изменить описание кабинет',
                                 reply_markup=map_nav_admin_choice_floor_new_update())
@@ -526,9 +504,9 @@ async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMCon
 
 @dp.callback_query_handler(text='old_building_choice_admin_update', state=MapNavigationUpdate.building)
 async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Старое здание'
+    data_building = 'Старое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = data_building
     # print(data['building'])
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите изменить описание кабинет',
@@ -583,10 +561,7 @@ async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMCont
 
 @dp.message_handler(content_types=ContentType.ANY, state=MapNavigationUpdate.description)
 async def map_nav_admin_state_description_update(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()

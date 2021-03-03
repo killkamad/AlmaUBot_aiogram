@@ -14,7 +14,7 @@ from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_se
 from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
     keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
-
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 # Импорт стейтов
 from states.request_state import CertificateRequest
 
@@ -72,10 +72,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.names)
 async def process_name(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     async with state.proxy() as data:
         data['names'] = message.text
     await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_request())
@@ -84,10 +81,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.email)
 async def process_name(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if "@" in message.text:
         email = message.text.strip()
         if is_valid_email(email):

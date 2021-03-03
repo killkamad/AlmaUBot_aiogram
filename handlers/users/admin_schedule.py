@@ -21,6 +21,7 @@ from states.admin import SendScheduleToBot, UpdateSchedule, DeleteSchedule
 
 import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 #### Отправка расписания ####
@@ -69,11 +70,7 @@ async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateSchedule.send_file)
 async def change_schedule_id(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id,
-                                            message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
@@ -134,10 +131,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 # Проверка сообщения на текст, если текст, то сохраняет это сообщение и айди в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendScheduleToBot.button_name)
 async def message_send_button_name(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 28:
             await state.update_data(button_name=fmt.quote_html(message.text.lower()),
@@ -159,14 +153,11 @@ async def message_send_button_name(message: types.Message, state: FSMContext):
 # Проверка если отправлен файл, то сохраняет айди файла в state
 @dp.message_handler(content_types=ContentType.ANY, state=SendScheduleToBot.send_file)
 async def message_schedule_send_file(message: types.Message, state: FSMContext):
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
         txt = f'Название кнопки будет: {data["button_name"]}'
-        try:
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-        except:
-            pass
         await bot.send_document(message.chat.id, data["file_id"], caption=txt,
                                 reply_markup=cancel_or_send_schedule())
         await state.reset_state(with_data=False)

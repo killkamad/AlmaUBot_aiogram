@@ -21,7 +21,7 @@ from aiogram.types import ReplyKeyboardRemove
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import aiosmtplib
-
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 from aiogram.dispatcher import FSMContext
 # Библиотека регулярных выражений
 import re
@@ -116,10 +116,7 @@ async def callback_process_name(call: CallbackQuery, state: FSMContext):
 # Сохранение ФИО и запрос Email
 @dp.message_handler(state=EmailReg.names)
 async def callback_process_email(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     async with state.proxy() as data:
         data['names'] = fmt.quote_html(message.text)
     await message.reply("Напишите ваш Email", reply_markup=inline_keyboard_cancel_lic_db_reg())
@@ -129,10 +126,7 @@ async def callback_process_email(message: types.Message, state: FSMContext):
 # Сохранение Email и запрос номера телефона
 @dp.message_handler(content_types=ContentType.TEXT, state=EmailReg.email)
 async def callback_process_phone(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if "@" in message.text:
         email = message.text.strip()
         if is_valid_email(email):

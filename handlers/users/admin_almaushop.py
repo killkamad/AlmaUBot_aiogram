@@ -25,7 +25,7 @@ from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauSho
 
 import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
-
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 ############### Админ меню для AlmaU Shop ####################
 # Парсинг сайта almaushop.kz мерча и загрузка данных в таблицу в БД
@@ -110,10 +110,7 @@ async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentAlmauShop.button_content)
 async def edit_button_content_almaushop_first_step(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(button_content=message.text)
@@ -165,10 +162,7 @@ async def edit_button_content_almaushop_last_step_cancel(call: CallbackQuery, st
 async def callback_inline_add_faq_almaushop_question_step(message: types.Message, state: FSMContext):
     # await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
     # data = await state.get_data()
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 300:
             await state.update_data(question=fmt.quote_html(message.text))
@@ -189,10 +183,7 @@ async def callback_inline_add_faq_almaushop_question_step(message: types.Message
 async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, state: FSMContext):
     # await state.update_data(file_id=message.document.file_id, user_id=message.chat.id)
     # data = await state.get_data()
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(answer=fmt.quote_html(message.text))
@@ -379,10 +370,7 @@ async def edit_faq_almaushop_choice_step_answer(call: CallbackQuery, state: FSMC
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditFaqAlmauShop.question_confirm)
 async def edit_faq_almaushop_choice_step_question_final(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 300:
             await state.update_data(selected_item=fmt.quote_html(message.text),
@@ -406,10 +394,7 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
 
 @dp.message_handler(content_types=ContentType.ANY, state=EditFaqAlmauShop.answer_confirm)
 async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(selected_item=fmt.quote_html(message.text),

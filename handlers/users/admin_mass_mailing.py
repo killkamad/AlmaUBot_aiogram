@@ -21,6 +21,7 @@ from states.admin import MassMailSending
 
 from utils.misc import rate_limit
 import aiogram.utils.markdown as fmt
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
 @dp.callback_query_handler(text='send_all', state=None)
@@ -35,10 +36,7 @@ async def callback_inline_send_all(call: CallbackQuery):
 
 @dp.message_handler(content_types=ContentType.ANY, state=MassMailSending.message_text)
 async def message_send_text(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(message_text_all=fmt.quote_html(message.text))
@@ -72,10 +70,7 @@ async def callback_inline_attach_pic_or_doc(call: CallbackQuery):
 # Получение медиа файлы от пользователя для массовой рассылки
 @dp.message_handler(content_types=ContentType.ANY, state=MassMailSending.message_attached)
 async def message_send_photo(message: types.Message, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)
-    except:
-        pass
+    await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'photo':
         await state.update_data(content_type="photo", file_id=message.photo[-1].file_id)
         # logging.info(message.photo[-1].file_id)
@@ -189,4 +184,3 @@ async def callback_inline_cancel(call: CallbackQuery, state: FSMContext):
     await admin_menu(call.message)
     await state.reset_state()
     await call.answer()
-

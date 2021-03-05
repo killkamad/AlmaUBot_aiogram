@@ -33,18 +33,18 @@ _main_menu_text = 'Главное меню:\n' \
 @dp.message_handler(commands="set_commands", state="*")
 async def cmd_set_commands(message: types.Message):
     logging.info(f"User({message.chat.id}) использовал команду 'set_commands'")
-    for admin in admins:
-        try:
-            if message.from_user.id == admin:
-                commands = [types.BotCommand(command="/menu", description="главное меню"),
-                            types.BotCommand(command="/help", description="помощь"),
-                            types.BotCommand(command="/admin", description="админ меню"),
-                            types.BotCommand(command="/set_commands", description="установка команд бота")
-                            ]
-                await bot.set_my_commands(commands)
-                await message.answer("Команды настроены.")
-        except Exception as err:
-            logging.exception(err)
+    role = await db.check_role_by_id(message.chat.id)
+    if role == 'admin':
+        commands = [types.BotCommand(command="/menu", description="главное меню"),
+                    types.BotCommand(command="/help", description="помощь"),
+                    types.BotCommand(command="/admin", description="админ меню"),
+                    types.BotCommand(command="/set_commands", description="установка команд бота")
+                    ]
+        await bot.set_my_commands(commands)
+        await message.answer("Команды настроены.")
+    else:
+        await bot.send_message(message.chat.id, 'Недостаточный уровень доступа')
+        logging.info(f'User({message.chat.id}) попытался использовать команду set_commands')
 
 
 @rate_limit(3, 'menu_old')

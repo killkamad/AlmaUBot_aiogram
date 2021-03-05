@@ -15,24 +15,37 @@ async def main_faq_select_question_and_answer(id):
         logging.info(error)
 
 
-# Главное менб FAQ получение вопроса и ответа
-async def main_faq_select_data():
+# Главное меню FAQ получение айди, вопроса и ответа
+async def main_faq_select_data(page):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT id, question, answer FROM main_faq ORDER BY id;"
+            sql_select = "SELECT id, question, answer FROM main_faq ORDER BY id LIMIT 10 OFFSET $1*10;"
+            record: Record = await connection.fetch(sql_select, int(page))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Главное меню FAQ получение айди, вопроса и ответа ЕЩЕ 10 штук
+async def main_faq_select_data_next_ten_rows():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT id, question, answer FROM main_faq ORDER BY id LIMIT 10 OFFSET 0;"
             record: Record = await connection.fetch(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def main_faq_select_question_and_answer(id):
+# Подсчет строк
+async def main_faq_count():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT question, answer FROM main_faq WHERE id = $1;"
-            record: Record = await connection.fetchrow(sql_select, int(id))
+            sql_select = "SELECT count(*) FROM main_faq;"
+            record: Record = await connection.fetchval(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -89,7 +102,12 @@ async def edit_main_faq_answer(id_telegram, answer, id):
 
 
 async def main():
-    print(await main_faq_select_question_and_answer(1))
+    # print(await main_faq_count())
+    # for i, j in enumerate(await main_faq_select_data_next_ten_rows(), 1):
+    #     print(i, j)
+    # print(await main_faq_select_data_next_ten_rows())
+    for i in range(15):
+        await add_data_main_faq(124342141, f"question{i}?", f'answer{i}')
 
 
 if __name__ == '__main__':

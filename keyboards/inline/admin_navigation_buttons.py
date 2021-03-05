@@ -101,11 +101,20 @@ def inline_keyboard_map_nav_admin_menu():
     return markup
 
 
+def cancel_or_send_or_image_map_nav_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button1 = InlineKeyboardButton(text="➕ Прикрепить фото", callback_data="send_image_navigation_admin")
+    callback_button2 = InlineKeyboardButton(text="✅ Отправить без фото", callback_data="send_map_navigation_admin")
+    callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
+    markup.add(callback_button1, callback_button2, callback_button3)
+    return markup
+
+
 def cancel_or_send_map_nav_admin():
-    markup = InlineKeyboardMarkup()
-    callback_button = InlineKeyboardButton(text="✅ Отправить", callback_data="send_map_navigation_admin")
-    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
-    markup.add(callback_button, callback_button2)
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button2 = InlineKeyboardButton(text="✅ Отправить", callback_data="send_map_navigation_admin")
+    callback_button3 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
+    markup.add(callback_button2, callback_button3)
     return markup
 
 
@@ -124,6 +133,15 @@ def cancel_or_update_map_nav_admin():
     callback_button = InlineKeyboardButton(text="✅ Изменить", callback_data="update_map_navigation_admin")
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(callback_button, callback_button2)
+    return markup
+
+
+def cancel_or_update_or_image_map_nav_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button = InlineKeyboardButton(text="➕ Прикрепить или изменить фото", callback_data="update_image_navigation_admin")
+    callback_button1 = InlineKeyboardButton(text="✅ Изменить", callback_data="update_map_navigation_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
+    markup.add(callback_button, callback_button1, callback_button2)
     return markup
 
 

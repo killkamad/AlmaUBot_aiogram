@@ -120,6 +120,7 @@ class MapNavigation(StatesGroup):
     floor = State()
     cabinet = State()
     description = State()
+    image = State()
 
 
 class MapNavigationUpdate(StatesGroup):
@@ -127,6 +128,7 @@ class MapNavigationUpdate(StatesGroup):
     floor = State()
     cabinet = State()
     description = State()
+    image = State()
 
 
 class MapNavigationDelete(StatesGroup):

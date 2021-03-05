@@ -1,4 +1,5 @@
 import logging
+from math import ceil
 from loader import dp, bot
 
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove, Message
@@ -46,7 +47,7 @@ async def cmd_set_commands(message: types.Message):
             logging.exception(err)
 
 
-@rate_limit(6, 'menu_old')
+@rate_limit(3, 'menu_old')
 @dp.message_handler(commands=['menu_old'])
 async def menu_handler(message):
     logging.info(f"User({message.chat.id}) вошел в меню")
@@ -108,12 +109,15 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 @dp.message_handler(lambda message: message.text in ["📅 Расписание", "⁉ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
                                                      "🗒 Академический календарь", "🏢 Получить справку",
                                                      "📝 Связь с ректором", "🗺️ Навигация по университету"])
-async def main_menu_handler(message: Message):
+async def main_menu_handler(message: Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == "📅 Расписание":
         await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
     elif message.text == "⁉ FAQ":
-        await message.answer(text='F.A.Q ↘', reply_markup=await inline_keyboard_main_faq())
+        await state.update_data(page=0)
+        data = await state.get_data()
+        await message.answer(text=f'F.A.Q Страница {data["page"] + 1}',
+                             reply_markup=await inline_keyboard_main_faq(data["page"]))
     elif message.text == "📚 Библиотека":
         await message.answer(text='Библиотека ↘', reply_markup=keyboard_library())
     elif message.text == "🌀 AlmaU Shop":
@@ -139,6 +143,29 @@ async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == "⬅ В главное меню":
         await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
+
+
+# FAQ кнопки вперед и назад
+@dp.callback_query_handler(text=["main_faq_previous", "main_faq_next"])
+async def main_menu_faq_next_prev(call: CallbackQuery, state: FSMContext):
+    logging.info(f"User({call.message.chat.id}) enter {call.data}")
+    data = await state.get_data()
+    max_pages = (ceil(await db.main_faq_count() / 10))
+    if call.data == "main_faq_next" and (data['page'] + 1 < max_pages):
+        await state.update_data(page=(data['page'] + 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}',
+                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
+    elif call.data == "main_faq_previous" and (data['page'] != 0):
+        await state.update_data(page=(data['page'] - 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}',
+                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
+    # await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
 
 
 @dp.callback_query_handler(text='/schedule')
@@ -235,11 +262,13 @@ async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(text='back_to_main_faq')
-async def callback_inline_faq_menu_back(call: CallbackQuery):
+async def callback_inline_faq_menu_back(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text="F.A.Q ↘",
-                                reply_markup=await inline_keyboard_main_faq())
+    data = await state.get_data()
+    await bot.edit_message_text(chat_id=call.message.chat.id,
+                                message_id=call.message.message_id,
+                                text=f'F.A.Q Страница {data["page"] + 1}',
+                                reply_markup=await inline_keyboard_main_faq(data['page']))
     await call.answer()
 
 ############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################

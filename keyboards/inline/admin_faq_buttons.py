@@ -1,3 +1,5 @@
+from math import ceil
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.inline.callback_datas import main_faq_edit_callback, main_faq_delete_callback
 from utils import db_api as db
@@ -24,25 +26,49 @@ def inline_keyboard_add_main_faq_or_cancel():
 
 
 # FAQ главного меню удаление
-async def inline_keyboard_delete_main_faq():
+async def inline_keyboard_delete_main_faq(page):
+    max_pages = (ceil(await db.main_faq_count() / 10))
+    count_rows = await db.main_faq_count()
     markup = InlineKeyboardMarkup(row_width=1)
-    faq_questions = await db.main_faq_select_data()
+    faq_questions = await db.main_faq_select_data(page)
     markup.add(
         *[InlineKeyboardButton(text=item["question"],
                                callback_data=main_faq_delete_callback.new(callback_id=item["id"]))
           for item in faq_questions])
+    if (page < max_pages) and (count_rows > 10):
+        if page != 0:
+            previous_page = InlineKeyboardButton(text=f"⏪ Страница {page}", callback_data="main_faq_prev_delete")
+        else:
+            previous_page = InlineKeyboardButton(text=f"⏪", callback_data="main_faq_prev_delete")
+        if page + 1 >= max_pages:
+            next_page = InlineKeyboardButton(text=f"⏩", callback_data="main_faq_next_delete")
+        else:
+            next_page = InlineKeyboardButton(text=f"⏩ Страница {page + 2}", callback_data="main_faq_next_delete")
+        markup.row(previous_page, next_page)
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_admin_faq"))
     return markup
 
 
 # FAQ главного меню изменение
-async def inline_keyboard_edit_main_faq():
+async def inline_keyboard_edit_main_faq(page):
+    max_pages = (ceil(await db.main_faq_count() / 10))
+    count_rows = await db.main_faq_count()
     markup = InlineKeyboardMarkup(row_width=1)
-    faq_questions = await db.main_faq_select_data()
+    faq_questions = await db.main_faq_select_data(page)
     markup.add(
         *[InlineKeyboardButton(text=item["question"],
                                callback_data=main_faq_edit_callback.new(callback_id=item["id"]))
           for item in faq_questions])
+    if (page < max_pages) and (count_rows > 10):
+        if page != 0:
+            previous_page = InlineKeyboardButton(text=f"⏪ Страница {page}", callback_data="main_faq_prev_edit")
+        else:
+            previous_page = InlineKeyboardButton(text=f"⏪", callback_data="main_faq_prev_edit")
+        if page + 1 >= max_pages:
+            next_page = InlineKeyboardButton(text=f"⏩", callback_data="main_faq_next_edit")
+        else:
+            next_page = InlineKeyboardButton(text=f"⏩ Страница {page + 2}", callback_data="main_faq_next_edit")
+        markup.row(previous_page, next_page)
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_admin_faq"))
     return markup
 

@@ -1,4 +1,6 @@
 import logging
+from math import ceil
+
 from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
@@ -102,11 +104,14 @@ async def callback_inline_cancel_creation_main_faq(call: CallbackQuery, state: F
 
 ######################### Изменение FAQ в главном меню #############################################
 @dp.callback_query_handler(text='edit_main_faq', state=None)
-async def callback_inline_edit_main_faq(call: CallbackQuery):
+async def callback_inline_edit_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await state.update_data(page=0)
+    data = await state.get_data()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кнопку для изменения:',
-                                reply_markup=await inline_keyboard_edit_main_faq())
+                                text=f'Страница {data["page"] + 1}\n'
+                                     'Выберите кнопку для изменения:',
+                                reply_markup=await inline_keyboard_edit_main_faq(data["page"]))
     await call.answer()
 
 
@@ -206,7 +211,7 @@ async def edit_main_faq_choice_step_question_final_save(call: CallbackQuery, sta
             await state.reset_state()
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
         await bot.send_message(chat_id=call.message.chat.id,
-                               text='✅ Ваши изменения для раздела F.A.Q главного меню успешно изменены\n'
+                               text='✅ Ваши изменения для раздела F.A.Q главного меню успешно сохранены\n'
                                     'Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
         await call.answer()
     except Exception as error:
@@ -225,15 +230,42 @@ async def edit_main_faq_choice_step_question_final_decline(call: CallbackQuery, 
     await call.answer()
 
 
+# FAQ кнопки вперед и назад для EDIT
+@dp.callback_query_handler(text=["main_faq_prev_edit", "main_faq_next_edit"])
+async def edit_main_menu_faq_next_prev(call: CallbackQuery, state: FSMContext):
+    logging.info(f"User({call.message.chat.id}) enter {call.data}")
+    data = await state.get_data()
+    max_pages = (ceil(await db.main_faq_count() / 10))
+    if call.data == "main_faq_next_edit" and (data['page'] + 1 < max_pages):
+        await state.update_data(page=(data['page'] + 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}\n'
+                                         f'Выберите кнопку для изменения:',
+                                    reply_markup=await inline_keyboard_edit_main_faq(data["page"]))
+    elif call.data == "main_faq_prev_edit" and (data['page'] != 0):
+        await state.update_data(page=(data['page'] - 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}\n'
+                                         f'Выберите кнопку для изменения:',
+                                    reply_markup=await inline_keyboard_edit_main_faq(data["page"]))
+
+
 ######################### КОНЕЦ Изменение FAQ в главном меню КОНЕЦ #############################################
 
 ######################### Удаление FAQ в главном меню #############################################
 @dp.callback_query_handler(text='delete_main_faq', state=None)
 async def callback_inline_delete_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await state.update_data(page=0)
+    data = await state.get_data()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кнопку для удаление:',
-                                reply_markup=await inline_keyboard_delete_main_faq())
+                                text=f'Страница {data["page"] + 1}\n'
+                                     f'Выберите кнопку для удаление:',
+                                reply_markup=await inline_keyboard_delete_main_faq(data['page']))
     await call.answer()
 
 
@@ -257,10 +289,10 @@ async def callback_inline_delete_main_faq_delete_step(call: CallbackQuery, state
         data = await state.get_data()
         await db.delete_main_faq_button(data["question_text"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=f'✅ Указанный F.A.Q - "<b>{data["question_text"]}</b>" был успешно удален',
+                                    text=f'✅ Указанный F.A.Q - "<b>{data["question_text"]}</b>" был успешно удален.\n'
+                                         f'Возвращение в Админ меню F.A.Q:',
+                                    reply_markup=inline_keyboard_faq_admin(),
                                     parse_mode='HTML')
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
         await state.reset_state()
         logging.info(f'User({call.message.chat.id}) удалил FAQ главного меню для {data["question_text"]}')
         await call.answer()
@@ -274,11 +306,34 @@ async def callback_inline_delete_main_faq_delete_step(call: CallbackQuery, state
 async def callback_inline_cancel_delete_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='❌ Отмена удаления вопроса F.A.Q главного меню, возвращение в')
-    await bot.send_message(chat_id=call.message.chat.id,
-                           text='Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
+                                text='❌ Отмена удаления вопроса F.A.Q главного меню.\n'
+                                     'Возвращение в Админ меню F.A.Q:', reply_markup=inline_keyboard_faq_admin())
     await state.reset_state()
     await call.answer()
+
+
+# FAQ кнопки вперед и назад для DELETE
+@dp.callback_query_handler(text=["main_faq_prev_delete", "main_faq_next_delete"])
+async def delete_main_menu_faq_next_prev(call: CallbackQuery, state: FSMContext):
+    logging.info(f"User({call.message.chat.id}) enter {call.data}")
+    data = await state.get_data()
+    max_pages = (ceil(await db.main_faq_count() / 10))
+    if call.data == "main_faq_next_delete" and (data['page'] + 1 < max_pages):
+        await state.update_data(page=(data['page'] + 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}\n'
+                                         f'Выберите кнопку для удаление:',
+                                    reply_markup=await inline_keyboard_delete_main_faq(data['page']))
+    elif call.data == "main_faq_prev_delete" and (data['page'] != 0):
+        await state.update_data(page=(data['page'] - 1))
+        data = await state.get_data()
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=f'F.A.Q Страница {data["page"] + 1}\n'
+                                         f'Выберите кнопку для удаление:',
+                                    reply_markup=await inline_keyboard_delete_main_faq(data['page']))
 
 
 ######################### КОНЕЦ Удаления FAQ в главном меню КОНЕЦ #############################################
@@ -298,9 +353,10 @@ async def callback_inline_back_to_admin_faq(call: CallbackQuery, state: FSMConte
 @dp.callback_query_handler(text='back_to_admin_edit_faq', state=['*'])
 async def callback_inline_back_to_admin_edit_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    data = await state.get_data()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите кнопку для изменения:',
-                                reply_markup=await inline_keyboard_edit_main_faq())
+                                reply_markup=await inline_keyboard_edit_main_faq(data['page']))
     await call.answer()
 
 

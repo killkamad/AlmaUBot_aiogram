@@ -282,7 +282,8 @@ async def callback_inline_contacts_center(call: CallbackQuery):
 @dp.callback_query_handler(text='map_nav')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
                                 text='Карта-навигация по университету, выбирете здание:',
                                 reply_markup=inline_keyboard_map_nav())
     await call.answer()
@@ -292,7 +293,8 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 @dp.callback_query_handler(text='old_building')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
                                 text='Старое здание университета, выберите этаж:',
                                 reply_markup=inline_keyboard_old_building())
     await call.answer()
@@ -302,7 +304,8 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 @dp.callback_query_handler(text='new_building')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
                                 text='Новое здание университета, выберите этаж:',
                                 reply_markup=inline_keyboard_new_building())
     await call.answer()
@@ -311,33 +314,41 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 ######### хэндлеры старое здание
 @dp.callback_query_handler(text='old_building_first')
 async def callback_inline_nav_unifi(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_old())
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 1 этаж")
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_first_old())
     await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_second')
 async def callback_inline_nav_unifi(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 2 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_old())
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 2 этаж")
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_second_old())
     await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_third')
 async def callback_inline_nav_unifi(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 3 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_old())
+    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 3 этаж")
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_third_old())
     await call.answer()
 
 
 @dp.callback_query_handler(text='old_building_fourth')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 4 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_old())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_fourth_old())
     await call.answer()
 
 
@@ -345,48 +356,60 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 @dp.callback_query_handler(text='new_building_first')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_first_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_first_new())
     await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_second')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 2 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_second_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_second_new())
     await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_third')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 3 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_third_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_third_new())
     await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_fourth')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 4 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fourth_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_fourth_new())
     await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_fifth')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 5 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_fifth_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_fifth_new())
     await call.answer()
 
 
 @dp.callback_query_handler(text='new_building_sixth')
 async def callback_inline_nav_unifi(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 6 этаж")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кабинет:', reply_markup=await inline_keyboard_cabinets_sixth_new())
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.send_message(chat_id=call.message.chat.id,
+                                text='Выберите кабинет:', 
+                                reply_markup=await inline_keyboard_cabinets_sixth_new())
     await call.answer()
 
 
@@ -396,68 +419,125 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
     cabinet = callback_data.get('cabinet')
     description = await db.find_cabinet_description(cabinet)
+    photo_id = await db.find_photoid_description(cabinet)
     print(cabinet[0], cabinet[3])
     if cabinet[0] == '1' and cabinet[3] != 'а':
         building_callback = "old_"
         floor_callback = "_first"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '2') and cabinet[3] != 'а':
         building_callback = "old_"
         floor_callback = "_second"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '3') and cabinet[3] != 'а':
         building_callback = "old_"
         floor_callback = "_third"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '4') and cabinet[3] != 'а':
         building_callback = "old_"
         floor_callback = "_fourth"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '1') and cabinet[3] == 'а':
         building_callback = "new_"
         floor_callback = "_first"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '2') and cabinet[3] == 'а':
         building_callback = "new_"
         floor_callback = "_second"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '3') and cabinet[3] == 'а':
         building_callback = "new_"
         floor_callback = "_third"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif (cabinet[0] == '4') and cabinet[3] == 'а':
         building_callback = "new_"
         floor_callback = "_fourth"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif cabinet[0] == '5':
         building_callback = "new_"
         floor_callback = "_fifth"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     elif cabinet[0] == '6':
         building_callback = "new_"
         floor_callback = "_sixth"
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
     else:
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description, reply_markup=inline_keyboard_new_building_back())
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_new_building_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description, 
+                                 reply_markup=inline_keyboard_new_building_back())
     await call.answer()

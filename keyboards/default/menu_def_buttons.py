@@ -13,7 +13,7 @@ def always_stay_keyboard():
 def always_stay_menu_keyboard():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     schedule_button = KeyboardButton(text="📅 Расписание", callback_data="/schedule")
-    faq_button = KeyboardButton(text="⁉ FAQ", callback_data="/faq")
+    faq_button = KeyboardButton(text="❓ FAQ", callback_data="/faq")
     library_button = KeyboardButton(text="📚 Библиотека", callback_data="/library")
     shop_button = KeyboardButton(text="🌀 AlmaU Shop", callback_data="/almaushop")
     calendar_button = KeyboardButton(text="🗒 Академический календарь", callback_data="/academ_calendar")

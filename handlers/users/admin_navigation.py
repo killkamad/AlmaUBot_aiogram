@@ -428,12 +428,16 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
                 check_cabinet = False
             else:
                 continue
-        if message.content_type == 'text' and check_cabinet is True:
-            async with state.proxy() as data:
-                data['cabinet'] = message.text
-            await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
-                                reply_markup=inline_keyboard_cancel_map_nav_admin())
-            await MapNavigation.description.set()
+        if (message.content_type == 'text') and (check_cabinet is True):
+            if len(message.text) <= 28:
+                async with state.proxy() as data:
+                    data['cabinet'] = message.text
+                await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
+                                    reply_markup=inline_keyboard_cancel_map_nav_admin())
+                await MapNavigation.description.set()
+            else:
+                await message.answer(f'Ваше сообщение содержит {len(message.text)}, максимально допустимое значание 28',
+                                     reply_markup=inline_keyboard_cancel_map_nav_admin())
         else:
             await message.answer('Ошибка - вы отправили не текст или название кабинета уже существует повторите',
                                  reply_markup=inline_keyboard_cancel_map_nav_admin())
@@ -652,15 +656,16 @@ async def map_nav_admin_state_send_final(call: CallbackQuery, state: FSMContext)
         data = await state.get_data()
         if len(data) > 5:
             await db.update_map_nav_description_data(data['user_id'], data['building'], data['floor'], data['cabinet'],
-                                             data['description'], data['image'])
+                                                     data['description'], data['image'])
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
                                              "Админ меню карт-навигации",
                                         reply_markup=inline_keyboard_map_nav_admin_menu())
             await state.reset_state()
         else:
-            await db.update_map_nav_description_data_noimage(data['user_id'], data['building'], data['floor'], data['cabinet'],
-                                             data['description'])
+            await db.update_map_nav_description_data_noimage(data['user_id'], data['building'], data['floor'],
+                                                             data['cabinet'],
+                                                             data['description'])
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
                                              "Админ меню карт-навигации",

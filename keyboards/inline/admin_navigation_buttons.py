@@ -139,11 +139,30 @@ def cancel_or_update_map_nav_admin():
     return markup
 
 
+def cancel_or_description_or_image_map_nav_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button = InlineKeyboardButton(text="➕ Прикрепить или изменить фото",
+                                           callback_data="update_image_navigation_admin")
+    callback_button1 = InlineKeyboardButton(text="✅ Изменить описание", callback_data="update_description_state")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
+    markup.add(callback_button, callback_button1, callback_button2)
+    return markup
+
+
+def cancel_or_description_or_send_map_nav_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button = InlineKeyboardButton(text="♻ Изменить описание", callback_data="update_description_state")
+    callback_button1 = InlineKeyboardButton(text="✅ Отправить фото", callback_data="update_photo_map_navigation_admin")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
+    markup.add(callback_button, callback_button1, callback_button2)
+    return markup
+
+
 def cancel_or_update_or_image_map_nav_admin():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text="➕ Прикрепить или изменить фото",
                                            callback_data="update_image_navigation_admin")
-    callback_button1 = InlineKeyboardButton(text="✅ Изменить", callback_data="update_map_navigation_admin")
+    callback_button1 = InlineKeyboardButton(text="✅ Отправить изменения описания", callback_data="update_map_navigation_admin")
     callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_map_nav_admin")
     markup.add(callback_button, callback_button1, callback_button2)
     return markup

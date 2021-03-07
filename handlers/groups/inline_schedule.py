@@ -2,30 +2,39 @@ import logging
 from loader import dp, bot
 # Импортирование функций из БД контроллера
 from utils import db_api as db
-
 from aiogram.types import InlineQuery, \
     InputTextMessageContent, InlineQueryResultArticle, InlineQueryResultCachedDocument, InlineQueryResultCachedPhoto
-import hashlib
 
 
 @dp.inline_handler(lambda inline_query: True)
 async def inline_schedule(inline_query: InlineQuery):
+    query = inline_query.query.strip().lower()
     schedule_list = await db.aws_select_data_schedule()
-    # text = inline_query.query or [i['name_sched'] for i in schedule]
-    # print(text)
-    # input_content = InputTextMessageContent(text)
-    # result_id: str = hashlib.md5(text.encode()).hexdigest()
-    # print(result_id)
+    search_result = []
     results = []
+    for item in schedule_list:
+        if query in item['name_sched']:
+            search_result.append([item['name_sched'], item['id_sched']])
+    # result_id: str = hashlib.md5(text.encode()).hexdigest()
     try:
-        for i, schedule in enumerate(schedule_list):
+        for i, schedule in enumerate(search_result):
             results.append(InlineQueryResultCachedDocument(
-                id=i + 1,
-                title=f'{schedule["name_sched"]} Расписание',
-                document_file_id=schedule["id_sched"],
-                # document_file_id="BQACAgIAAxkBAAJwsGBEzD4EXwFiDyQyFft1NB1dddL9AAJTCwACPSMoStz_dcjkQIcgHgQ"
+                id=f'{i + 1}',
+                title=f'{schedule[0]}',
+                document_file_id=schedule[1],
             ))
     except Exception as e:
-        print(e)
+        logging.info(f'{e}')
+
+    if query and not results:
+        results.append(
+            InlineQueryResultArticle(
+                id='999999',
+                title='Расписания с таким названием не найдено',
+                input_message_content=InputTextMessageContent(
+                    message_text=f'Ничего не нашлось по запросу "{query}"',
+                ),
+            )
+        )
     # don't forget to set cache_time=1 for testing (default is 300s or 5m)
     await bot.answer_inline_query(inline_query.id, results=results, cache_time=1)

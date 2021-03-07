@@ -498,8 +498,9 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     cabinet = callback_data.get('cabinet')
     description = await db.find_cabinet_description(cabinet)
     photo_id = await db.find_photoid_description(cabinet)
-    floor = await db.find_floor_cabinet(description)
-    building = await db.find_building_cabinet(description)
+    id_cab = await db.find_id_cabinet(cabinet)
+    floor = await db.find_floor_cabinet(id_cab)
+    building = await db.find_building_cabinet(id_cab)
     if floor == '1 этаж' and building == 'Старое здание':
         building_callback = "old_"
         floor_callback = "_first"

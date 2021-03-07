@@ -51,23 +51,34 @@ async def find_photoid_description(cabinet):
         logging.info(error)
 
 
-async def find_floor_cabinet(description):
+async def find_id_cabinet(cabinet):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT floor FROM map_navigation WHERE cabinet_description = $1;"
-            record: Record = await connection.fetchval(sql_select, str(description))
+            sql_select = "SELECT id FROM map_navigation WHERE cabinet = $1;"
+            record: Record = await connection.fetchval(sql_select, str(cabinet))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def find_building_cabinet(description):
+async def find_floor_cabinet(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT building FROM map_navigation WHERE cabinet_description = $1;"
-            record: Record = await connection.fetchval(sql_select, str(description))
+            sql_select = "SELECT floor FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def find_building_cabinet(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT building FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)

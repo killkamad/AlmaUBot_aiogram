@@ -15,3 +15,4 @@ from .tutors_and_employees_table import *
 from .users_table import *
 from .map_navigation_table import *
 from .library_menu_buttons_table import *
+from .library_resources_table import *

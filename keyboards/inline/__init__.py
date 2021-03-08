@@ -50,7 +50,9 @@ from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel
     inline_keyboard_on_send_request_certificate
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
-    inline_keyboard_edit_button_content_library_or_cancel
+    inline_keyboard_edit_button_content_library_or_cancel, inline_keyboard_cancel_edit_library_button, \
+    inline_keyboard_library_res_admin, inline_keyboard_library_res_edit_admin, cancel_or_add_lib_resource, \
+    inline_keyboard_del_lib_res, cancel_or_delete_lib_resource, cancel_edit_lib_res
 
 # Кнопки для главного админ меню и админ меню для ролей
 from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin
@@ -61,7 +63,7 @@ from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callbac
     schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
     request_callback, request_type_callback, request_update_callback, request_delete_callback, \
     cabinet_callback, cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete, \
-    nav_center_callback
+    nav_center_callback, lib_res_callback, lib_res_delete_callback
 
 from .library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
     inline_keyboard_back_to_library, inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, \

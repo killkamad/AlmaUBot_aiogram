@@ -106,14 +106,14 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 
 
 @rate_limit(1, 'Меню')
-@dp.message_handler(lambda message: message.text in ["📅 Расписание", "⁉ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
+@dp.message_handler(lambda message: message.text in ["📅 Расписание", "❓ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
                                                      "🗒 Академический календарь", "🏢 Получить справку",
                                                      "📝 Связь с ректором", "🗺️ Навигация по университету"])
 async def main_menu_handler(message: Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == "📅 Расписание":
         await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
-    elif message.text == "⁉ FAQ":
+    elif message.text == "❓ FAQ":
         await state.update_data(page=0)
         data = await state.get_data()
         await message.answer(text=f'F.A.Q Страница {data["page"] + 1}',

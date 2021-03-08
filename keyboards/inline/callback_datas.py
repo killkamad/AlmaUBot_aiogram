@@ -34,9 +34,9 @@ request_update_callback = CallbackData('requ', 'request_name')
 request_delete_callback = CallbackData('reqd', 'request_name')
 
 # map-navigation
-cabinet_callback = CallbackData('cabinet_call', 'cabinet')
-cabinet_callback_update = CallbackData('cabinet_upd_call', 'cabinet')
-cabinet_callback_delete = CallbackData('cabinet_del_call', 'cabinet')
+cabinet_callback = CallbackData('cab', 'cabinet')
+cabinet_callback_update = CallbackData('cabu', 'cabinet')
+cabinet_callback_delete = CallbackData('cabd', 'cabinet')
 
 # centers univer
 nav_center_callback = CallbackData('cntr', 'name')

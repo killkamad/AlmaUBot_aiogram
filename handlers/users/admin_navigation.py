@@ -19,7 +19,8 @@ from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_k
     keyboard_map_nav_choice_building_update, \
     map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
     keyboard_pps_choice_position, keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, \
-    inline_keyboard_cancel_tutors_admin, cancel_or_send_or_image_map_nav_admin, cancel_or_update_or_image_map_nav_admin
+    inline_keyboard_cancel_tutors_admin, cancel_or_send_or_image_map_nav_admin, cancel_or_update_or_image_map_nav_admin, \
+    cancel_or_description_or_image_map_nav_admin, cancel_or_description_or_send_map_nav_admin
 
 import asyncio
 
@@ -428,12 +429,16 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
                 check_cabinet = False
             else:
                 continue
-        if message.content_type == 'text' and check_cabinet is True:
-            async with state.proxy() as data:
-                data['cabinet'] = message.text
-            await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
-                                reply_markup=inline_keyboard_cancel_map_nav_admin())
-            await MapNavigation.description.set()
+        if (message.content_type == 'text') and (check_cabinet is True):
+            if len(message.text) <= 28:
+                async with state.proxy() as data:
+                    data['cabinet'] = message.text
+                await message.reply(f"Напишите описание для {data['cabinet']} {data['building']} {data['floor']} ",
+                                    reply_markup=inline_keyboard_cancel_map_nav_admin())
+                await MapNavigation.description.set()
+            else:
+                await message.answer(f'Ваше сообщение содержит {len(message.text)}, максимально допустимое значание 28',
+                                     reply_markup=inline_keyboard_cancel_map_nav_admin())
         else:
             await message.answer('Ошибка - вы отправили не текст или название кабинета уже существует повторите',
                                  reply_markup=inline_keyboard_cancel_map_nav_admin())
@@ -592,9 +597,18 @@ async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMCont
     cabinet_name = callback_data.get('cabinet')
     await state.update_data(cabinet=cabinet_name)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Напишите изменения для <b>{cabinet_name}</b>:',
-                                parse_mode='HTML', reply_markup=inline_keyboard_cancel_map_nav_admin())
+                                text=f'Выберите что хотите изменить <b>{cabinet_name}</b>:',
+                                parse_mode='HTML', reply_markup=cancel_or_description_or_image_map_nav_admin())
+    await state.reset_state(with_data=False)
+    print(callback_data)
+    await call.answer()
 
+
+@dp.callback_query_handler(text='update_description_state', state=None)
+async def map_nav_admin_state_cabinet_update_description(call: CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=f'Напишите изменение для кабинета',
+                                reply_markup=inline_keyboard_cancel_map_nav_admin())
     await MapNavigationUpdate.description.set()
     await call.answer()
 
@@ -603,23 +617,36 @@ async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMCont
 async def map_nav_admin_state_description_update(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
-        await state.update_data(description=message.text.lower(), user_id=message.chat.id)
         data = await state.get_data()
-        await bot.send_message(message.chat.id, text=f"Изменить описание?:\n"
-                                                     f"{data['building']}\n"
-                                                     f"{data['floor']}\n"
-                                                     f"Название кабинета(кнопки) - {data['cabinet']}\n"
-                                                     f"описание - {data['description']}\n"
-                                                     f"Добавить или изменить фото?",
-                               reply_markup=cancel_or_update_or_image_map_nav_admin())
-        await state.reset_state(with_data=False)
+        await state.update_data(user_id=message.chat.id)
+        async with state.proxy() as data:
+            data['description'] = message.text.lower()
+        if len(data) > 5:
+            await bot.send_message(message.chat.id, text=f"описание добавлено:\n"
+                                                         f"{data['building']}\n"
+                                                         f"{data['floor']}\n"
+                                                         f"Название кабинета(кнопки) - {data['cabinet']}\n"
+                                                         f"описание - {data['description']}\n"
+                                                         f"Отправить данные?",
+                                   reply_markup=cancel_or_update_map_nav_admin())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id, text=f"описание добавлено:\n"
+                                                         f"{data['building']}\n"
+                                                         f"{data['floor']}\n"
+                                                         f"Название кабинета(кнопки) - {data['cabinet']}\n"
+                                                         f"описание - {data['description']}\n"
+                                                         f"Добавить или изменить фото?",
+                                   reply_markup=cancel_or_update_or_image_map_nav_admin())
+            await state.reset_state(with_data=False)
+
     else:
         await message.answer('Ошибка - вы отправили не текст повторите',
                              reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='update_image_navigation_admin', state=None)
-async def map_nav_admin_image_send(call: CallbackQuery, state: FSMContext):
+async def map_nav_admin_image_send_message(call: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Отправьте фото',
                                 reply_markup=inline_keyboard_cancel_map_nav_admin())
@@ -632,15 +659,26 @@ async def map_nav_admin_state_image(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'photo':
         data = await state.get_data()
-        await state.update_data(image=message.photo[-1].file_id)
-        await bot.send_message(message.chat.id, text=f"Фото изменено!\n"
-                                                     f"Изменить описание?:\n"
-                                                     f"{data['building']}\n"
-                                                     f"{data['floor']}\n"
-                                                     f"Название кабинета(кнопки) - {data['cabinet']}\n"
-                                                     f"описание - {data['description']}\n",
-                               reply_markup=cancel_or_update_map_nav_admin())
-        await state.reset_state(with_data=False)
+        await state.update_data(user_id=message.chat.id)
+        async with state.proxy() as data:
+            data['image'] = message.photo[-1].file_id
+        if len(data) > 5:
+            await bot.send_message(message.chat.id, text=f"Фото добавлено!\n"
+                                                         f"Изменить описание?:\n"
+                                                         f"{data['building']}\n"
+                                                         f"{data['floor']}\n"
+                                                         f"Название кабинета(кнопки) - {data['cabinet']}\n"
+                                                         f"описание - {data['description']}\n",
+                                   reply_markup=cancel_or_update_map_nav_admin())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id, text=f"Фото изменено!\n"
+                                                         f"Изменить описание?:\n"
+                                                         f"{data['building']}\n"
+                                                         f"{data['floor']}\n"
+                                                         f"Название кабинета(кнопки) - {data['cabinet']}\n",
+                                   reply_markup=cancel_or_description_or_send_map_nav_admin())
+            await state.reset_state(with_data=False)
     else:
         await message.answer('Ошибка - вы отправили не фото повторите',
                              reply_markup=inline_keyboard_cancel_map_nav_admin())
@@ -652,15 +690,16 @@ async def map_nav_admin_state_send_final(call: CallbackQuery, state: FSMContext)
         data = await state.get_data()
         if len(data) > 5:
             await db.update_map_nav_description_data(data['user_id'], data['building'], data['floor'], data['cabinet'],
-                                             data['description'], data['image'])
+                                                     data['description'], data['image'])
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
                                              "Админ меню карт-навигации",
                                         reply_markup=inline_keyboard_map_nav_admin_menu())
             await state.reset_state()
         else:
-            await db.update_map_nav_description_data_noimage(data['user_id'], data['building'], data['floor'], data['cabinet'],
-                                             data['description'])
+            await db.update_map_nav_description_data_noimage(data['user_id'], data['building'], data['floor'],
+                                                             data['cabinet'],
+                                                             data['description'])
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
                                              "Админ меню карт-навигации",
@@ -672,6 +711,24 @@ async def map_nav_admin_state_send_final(call: CallbackQuery, state: FSMContext)
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
         print(e)
 
+
+@dp.callback_query_handler(text='update_photo_map_navigation_admin', state=None)
+async def map_nav_admin_state_send_final_photo(call: CallbackQuery, state: FSMContext):
+    try:
+        data = await state.get_data()
+        await db.update_map_nav_description_data_nodescription(data['user_id'], data['building'], data['floor'],
+                                                         data['cabinet'],
+                                                         data['image'])
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
+                                         "Админ меню карт-навигации",
+                                    reply_markup=inline_keyboard_map_nav_admin_menu())
+        await state.reset_state()
+        logging.info(f'User({call.message.chat.id}) отправил фото для кабинета')
+        await call.answer()
+    except Exception as e:
+        await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
+        print(e)
 
 #######################################  Удаление Кабинетов   ##########################################
 

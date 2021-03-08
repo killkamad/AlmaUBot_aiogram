@@ -51,6 +51,39 @@ async def find_photoid_description(cabinet):
         logging.info(error)
 
 
+async def find_id_cabinet(cabinet):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT id FROM map_navigation WHERE cabinet = $1;"
+            record: Record = await connection.fetchval(sql_select, str(cabinet))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def find_floor_cabinet(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT floor FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def find_building_cabinet(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT building FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def select_cabinet_admin(id):
     pool: Connection = db
     try:
@@ -81,7 +114,7 @@ async def update_map_nav_description_data(id_Telegram, building, floor, cabinet,
             sql_ex = "Update map_navigation set id_Telegram = $1, cabinet_description = $5, photo_id = $6 Where building = $2 and floor = $3 and cabinet = $4"
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(building),
                                                        str(floor), str(cabinet), str(cabinet_description), str(photo_id))
-            logging.info(f"UPDATED cabinet ({cabinet})")
+            logging.info(f"UPDATED cabinet description and photo ({cabinet})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -95,7 +128,21 @@ async def update_map_nav_description_data_noimage(id_Telegram, building, floor, 
             sql_ex = "Update map_navigation set id_Telegram = $1, cabinet_description = $5 Where building = $2 and floor = $3 and cabinet = $4"
             record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(building),
                                                        str(floor), str(cabinet), str(cabinet_description))
-            logging.info(f"UPDATED cabinet ({cabinet})")
+            logging.info(f"UPDATED cabinet description({cabinet})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def update_map_nav_description_data_nodescription(id_Telegram, building, floor, cabinet, photo_id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "Update map_navigation set id_Telegram = $1, photo_id = $5 Where building = $2 and floor = $3 and cabinet = $4"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(building),
+                                                       str(floor), str(cabinet), str(photo_id))
+            logging.info(f"UPDATED cabinet photo({cabinet})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)

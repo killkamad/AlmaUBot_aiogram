@@ -68,6 +68,18 @@ class EditButtonContentLibrary(StatesGroup):
     confirm = State()
 
 
+class AddLibraryResource(StatesGroup):
+    button_name = State()
+    lib_url = State()
+    lib_type = State()
+    confirm_add = State()
+
+
+class DeleteLibraryResource(StatesGroup):
+    button_name = State()
+    confirm_delete = State()
+
+
 class SendContactCenter(StatesGroup):
     name = State()
     description = State()

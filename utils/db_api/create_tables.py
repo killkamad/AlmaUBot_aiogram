@@ -238,6 +238,26 @@ async def create_table_library_menu_buttons():
         print(error)
 
 
+async def create_table_library_resources():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                CREATE TABLE if not exists library_resources(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                button_name VARCHAR (300),
+                lib_url VARCHAR (2000),
+                lib_type VARCHAR (300),
+                date_time TIMESTAMP)
+                """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table library_resources successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # Создание таблицы для FAQ в главном меню
 async def create_table_main_faq():
     pool: Connection = db
@@ -382,6 +402,8 @@ async def set_up_tables():
         await create_table_certificate()
         await create_table_request_certificate()
         await create_table_map_navigation()
+        await create_table_library_menu_buttons()
+        await create_table_library_resources()
     except Exception as error:
         print(f'Error - {error}')
 
@@ -391,8 +413,7 @@ async def main():
     # print(count_user)
     # for i in count_user:
     #     print(i)
-    # await set_up_tables()
-    await create_table_library_menu_buttons()
+    await set_up_tables()
     # await create_table_test()
 
 

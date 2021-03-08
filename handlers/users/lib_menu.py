@@ -208,17 +208,17 @@ async def callback_el_res_choice(call: CallbackQuery):
         text = "Базы данных свободного доступа(Казахстанские)"
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=text,
-                                    reply_markup=inline_keyboard_library_base_kaz())
+                                    reply_markup=await inline_keyboard_library_base_kaz())
     elif call.data == "library_free_zarub":
         text = "Базы данных свободного доступа(Зарубежные)"
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=text,
-                                    reply_markup=inline_keyboard_library_base_zarub())
+                                    reply_markup=await inline_keyboard_library_base_zarub())
     elif call.data == "library_online_librares":
         text = "Онлайн Библиотеки"
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=text,
-                                    reply_markup=inline_keyboard_library_online_bib())
+                                    reply_markup=await inline_keyboard_library_online_bib())
     await call.answer()
 
 

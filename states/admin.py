@@ -105,6 +105,7 @@ class PpsAdmin(StatesGroup):
     school = State()
     position = State()
     description = State()
+    image = State()
 
 
 class SendCertificate(StatesGroup):

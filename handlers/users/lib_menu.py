@@ -59,18 +59,15 @@ async def callback_library_registration(call: CallbackQuery):
     resource = await db.select_data_lib_resource_reg()
     libs = []
     for res in resource:
-        libs.append(['- ' + res['button_name'] + ' ' + res['lib_url']])
-    def text_libs():
-        for i in range(len(libs)):
-            for j in range(len(libs[i])):
-                info = str(libs[i][j]) + '\n'
-                return(info)
+        libs.append('- ' + res['button_name'] + ' ' + res['lib_url'] + ' ' + '\n')
+    lib_text = "".join(map(str, libs))
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Регистрация на лицензионные базы данных\n'
-                                     'Такие как:\n'
-                                     f'{text_libs()}',
+                                text=f'Регистрация на лицензионные базы данных\n'
+                                     f'Такие как:\n'
+                                     f'{lib_text}',
                                 parse_mode="HTML",
-                                reply_markup=inline_keyboard_library_registration())
+                                reply_markup=inline_keyboard_library_registration(),
+                                disable_web_page_preview=True)
     await call.answer()
 
 
@@ -98,14 +95,10 @@ async def callback_library_registration_button(call: CallbackQuery):
 
 
 @dp.callback_query_handler(lib_res_callback.filter())
-async def callback_process_name(call: CallbackQuery, state: FSMContext):
-    try:
-        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    except:
-        pass
-    async with state.proxy() as data:
-        data['book_database'] = call.data[4:]
-    lib = await db.find_library_resource(call.data[4:])
+async def callback_process_name(call: CallbackQuery, state: FSMContext, callback_data: dict):
+    lib_id = callback_data.get('id')
+    lib = await db.find_library_resource(lib_id)
+    await state.update_data(book_database=lib['button_name'])
     await bot.edit_message_text(chat_id=call.message.chat.id,
                                 message_id=call.message.message_id,
                                 text=f"Вы выбрали '{lib['button_name']}'.\n"
@@ -157,12 +150,11 @@ async def send_license_db_reg_data_to_email(message: types.Message, state: FSMCo
             phone = f"+{phone}"
         async with state.proxy() as data:
             data['phone'] = phone
-        lib = await db.find_library_resource(data['book_database'])
         message_txt = f"Ваши данные:\n" \
                       f"ФИО: {data['names']}\n" \
                       f"Ваш email: {data['email']}\n" \
                       f"Ваш телефон: {data['phone']}\n" \
-                      f"Желаемая база регистрации: {lib['button_name']}"
+                      f"Желаемая база регистрации: {data['book_database']}"
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
         await state.reset_state(with_data=False)
     else:

@@ -324,3 +324,40 @@ def inline_keyboard_cancel_tutors_admin():
     cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
     markup.add(cancel_button)
     return markup
+
+
+def inline_keyboard_description_image_tutors_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button1 = InlineKeyboardButton(text="➕ Изменить или добавить фото", callback_data="update_image_pps_admin")
+    callback_button2 = InlineKeyboardButton(text="🗑 Удалить фото", callback_data="delete_pps_photo_state")
+    callback_button3 = InlineKeyboardButton(text="✅ Изменить описание", callback_data="update_pps_description_state")
+    cancel_button = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
+    markup.add(callback_button1, callback_button2, callback_button3, cancel_button)
+    return markup
+
+
+def cancel_or_description_or_send_tutors_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button = InlineKeyboardButton(text="♻ Изменить описание", callback_data="update_pps_description_state")
+    callback_button1 = InlineKeyboardButton(text="✅ Отправить фото", callback_data="send_tutors_management_photo")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
+    markup.add(callback_button, callback_button1, callback_button2)
+    return markup
+
+
+def cancel_or_update_or_image_tutors_admin():
+    markup = InlineKeyboardMarkup(row_width=1)
+    callback_button = InlineKeyboardButton(text="➕ Прикрепить или изменить фото",
+                                           callback_data="update_image_pps_admin")
+    callback_button1 = InlineKeyboardButton(text="✅ Отправить изменения описания", callback_data="send_tutors_management_description")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
+    markup.add(callback_button, callback_button1, callback_button2)
+    return markup
+
+
+def cancel_or_delete_photo_pps_admin():
+    markup = InlineKeyboardMarkup()
+    callback_button = InlineKeyboardButton(text="✅ Удалить", callback_data="delete_tutors_management_photo")
+    callback_button2 = InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_step_tutors_admin")
+    markup.add(callback_button, callback_button2)
+    return markup

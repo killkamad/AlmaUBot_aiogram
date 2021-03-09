@@ -1,7 +1,7 @@
 import logging
 from aiogram.utils import exceptions
 from aiogram import types
-from aiogram.types import CallbackQuery, ContentType
+from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 
@@ -27,6 +27,7 @@ import aiogram.utils.markdown as fmt
 from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
+
 ############### Админ меню для AlmaU Shop ####################
 # Парсинг сайта almaushop.kz мерча и загрузка данных в таблицу в БД
 @dp.callback_query_handler(text_contains='update_almaushop_merch')
@@ -39,6 +40,7 @@ async def callback_inline_update_almaushop_merch(call: CallbackQuery):
         await bot.send_message(call.message.chat.id,
                                '🔄 Началось обновление данных в таблице, пожалуйста ожидайте!')
         await db.clear_almaushop_table()
+        await bot.send_chat_action(call.message.chat.id, ChatActions.UPLOAD_DOCUMENT)
         for i in shop.result:
             await db.add_almau_shop_data(call.message.chat.id, i.product_name, i.price, i.currency, i.img, i.url)
         await bot.send_message(call.message.chat.id, '✅ Данные в таблице almau shop успешно обновлены')
@@ -58,6 +60,7 @@ async def callback_inline_update_almaushop_books(call: CallbackQuery):
     try:
         await bot.send_message(call.message.chat.id, '🔄 Началось обновление данных в таблице, пожалуйста ожидайте!')
         await db.clear_almaushop_books_table()
+        await bot.send_chat_action(call.message.chat.id, ChatActions.UPLOAD_DOCUMENT)
         for i in book_shop.result:
             await db.add_almau_shop_books(call.message.chat.id, i.book_name, i.author_name, i.price, i.currency, i.img,
                                           i.url)

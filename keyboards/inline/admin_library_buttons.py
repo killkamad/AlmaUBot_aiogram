@@ -102,8 +102,8 @@ async def inline_keyboard_del_lib_res(lib_type):
     markup = InlineKeyboardMarkup(row_width=1)
     resource = await db.select_data_lib_resource(lib_type)
     markup.add(*[InlineKeyboardButton(text=f"{item['button_name']}",
-                                      callback_data=lib_res_delete_callback.new(resource_name=item['button_name'])) for item in resource])
-    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="edit_lib_resource"))
+                                      callback_data=lib_res_delete_callback.new(id=item['id'])) for item in resource])
+    markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="back_del_lib_resource"))
     return markup
 
 

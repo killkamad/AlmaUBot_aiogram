@@ -6,7 +6,7 @@ from aiogram import types
 
 from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_library_choice_db, \
     keyboard_library_send_phone
-from keyboards.inline import inline_keyboard_menu
+from keyboards.inline import inline_keyboard_menu, lib_res_callback
 from states.library_state import EmailReg
 from loader import dp, bot
 from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
@@ -56,15 +56,20 @@ async def library_text_buttons_handler(message: types.Message):
 
 @dp.callback_query_handler(text=['library_registration'])
 async def callback_library_registration(call: CallbackQuery):
+    resource = await db.select_data_lib_resource_reg()
+    libs = []
+    for res in resource:
+        libs.append(['- ' + res['button_name'] + ' ' + res['lib_url']])
+    def text_libs():
+        for i in range(len(libs)):
+            for j in range(len(libs[i])):
+                info = str(libs[i][j]) + '\n'
+                return(info)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Регистрация на лицензионные базы данных\n'
                                      'Такие как:\n'
-                                     '- IPR Books iprbookshop.ru\n'
-                                     '- Scopus scopus.com\n'
-                                     '- Web of Science webofknowledge.com\n'
-                                     '- Образовательная Платформа ЮРАЙТ urait.ru\n'
-                                     '- Электронно-Библиотечная Система Polpred polpred.com\n'
-                                     '- Республиканская Межвузовская Электронная Библиотека rmebrk.kz',
+                                     f'{text_libs()}',
+                                parse_mode="HTML",
                                 reply_markup=inline_keyboard_library_registration())
     await call.answer()
 
@@ -88,25 +93,22 @@ async def callback_library_registration_button(call: CallbackQuery):
                                      'Если вы не можете отправить данные через бота, то вы можете зарегестроваться через сайт lib.almau.edu.kz/page/9 \n'
                                      'Выберите базу данных на которую хотите зарегистрироваться',
                                 disable_web_page_preview=True,
-                                reply_markup=inline_keyboard_library_choice_db())
+                                reply_markup=await inline_keyboard_library_choice_db())
     await call.answer()
 
 
-# Сохранение выбранной базы данных и запрос ФИО
-# @dp.message_handler(
-#     lambda message: message.text in ['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'],
-#     state=EmailReg.bookbase)
-@dp.callback_query_handler(text=['IPR Books', 'Scopus', 'Web of Science', 'ЮРАЙТ', 'Polpred', 'РМЭБ'])
+@dp.callback_query_handler(lib_res_callback.filter())
 async def callback_process_name(call: CallbackQuery, state: FSMContext):
     try:
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     except:
         pass
     async with state.proxy() as data:
-        data['book_database'] = call.data
+        data['book_database'] = call.data[4:]
+    lib = await db.find_library_resource(call.data[4:])
     await bot.edit_message_text(chat_id=call.message.chat.id,
                                 message_id=call.message.message_id,
-                                text=f"Вы выбрали '{call.data}'.\n"
+                                text=f"Вы выбрали '{lib['button_name']}'.\n"
                                      f"Напишите ваше ФИО",
                                 reply_markup=inline_keyboard_cancel_lic_db_reg())
     await EmailReg.names.set()
@@ -155,11 +157,12 @@ async def send_license_db_reg_data_to_email(message: types.Message, state: FSMCo
             phone = f"+{phone}"
         async with state.proxy() as data:
             data['phone'] = phone
+        lib = await db.find_library_resource(data['book_database'])
         message_txt = f"Ваши данные:\n" \
                       f"ФИО: {data['names']}\n" \
                       f"Ваш email: {data['email']}\n" \
                       f"Ваш телефон: {data['phone']}\n" \
-                      f"Желаемая база регистрации: {data['book_database']}"
+                      f"Желаемая база регистрации: {lib['button_name']}"
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
         await state.reset_state(with_data=False)
     else:

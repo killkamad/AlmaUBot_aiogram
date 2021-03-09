@@ -267,7 +267,7 @@ async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContex
                                          'Выберите справку для удаления',
                                     parse_mode='HTML',
                                     reply_markup=await inline_keyboard_delete_certificate(data['id_student']))
-        await state.reset_state()
+        await state.reset_state(with_data=False)
         logging.info(f'User({call.message.chat.id}) удалил справку для {data["button_name"]}')
         await call.answer()
     except Exception as e:

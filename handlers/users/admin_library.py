@@ -14,6 +14,7 @@ from keyboards.inline import inline_keyboard_library_first_page_admin, inline_ke
     inline_keyboard_library_res_admin, inline_keyboard_library_res_edit_admin, cancel_or_add_lib_resource, \
     inline_keyboard_del_lib_res, lib_res_delete_callback, cancel_or_delete_lib_resource, cancel_edit_lib_res
 
+
 from states.admin import EditButtonContentLibrary, AddLibraryResource, DeleteLibraryResource
 
 
@@ -37,22 +38,30 @@ async def edit_library_resources(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 
-@dp.callback_query_handler(text_contains='cancel_edit_lib_resource', state=['*'])
+@dp.callback_query_handler(text='cancel_edit_lib_resource', state=['*'])
 async def callback_inlint_resource_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил добавление ресурса call.data - {call.data}')
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await call.message.answer('❌ Добавление ресурса было отменено\n'
-                              'Выберите электронные ресурсы для изменения:',
-                              parse_mode='HTML',
-                              reply_markup=inline_keyboard_library_res_admin())
+    data = await state.get_data()
+    lib_type = data['lib_type']
     await state.reset_state()
+    await state.update_data(lib_type=lib_type)
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await call.message.answer('❌ Добавление ресурса было отменено\n',
+                              parse_mode='HTML',
+                              reply_markup=inline_keyboard_library_res_edit_admin())
+    await AddLibraryResource.lib_type.set()
     await call.answer()
 
 
-@dp.callback_query_handler(text=['edit_library_free_kz', 'edit_library_free_foreign', 'edit_library_online_libs'])
-async def edit_library_free_kz_libs(call: CallbackQuery, state: FSMContext):
+@dp.callback_query_handler(text=['edit_library_registration', 'edit_library_free_kz', 'edit_library_free_foreign', 'edit_library_online_libs'])
+async def edit_library_free_libs(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    if call.data == 'edit_library_free_kz':
+    if call.data == 'edit_library_registration':
+        await state.update_data(lib_type='reg')
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='📕 Лицензионные Базы Данных:',
+                                    reply_markup=inline_keyboard_library_res_edit_admin())
+    elif call.data == 'edit_library_free_kz':
         await state.update_data(lib_type='kz')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text='📗 Базы данных свободного доступа(Казахстанские):',
@@ -74,6 +83,7 @@ async def edit_library_free_kz_libs(call: CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text='add_resource', state=AddLibraryResource.lib_type)
 async def add_library_resource(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
     await bot.send_message(call.message.chat.id, 'Напишите название электронного ресурса:', reply_markup=cancel_edit_lib_res())
     await AddLibraryResource.button_name.set()
     await call.answer()
@@ -97,8 +107,7 @@ async def add_library_resource(message: types.Message, state: FSMContext):
     text = f'{data["button_name"]}, '
     await bot.send_message(chat_id=message.chat.id,
                            text=f'Название ресурса: <b>{data["button_name"]}</b>\n'
-                                f'Ссылка на ресурс: {data["lib_url"]}\n'
-                                f'Тип ресурса: {data["lib_type"]}',
+                                f'Ссылка на ресурс: {data["lib_url"]}\n',
                            parse_mode="HTML",
                            reply_markup=cancel_or_add_lib_resource())
 
@@ -123,12 +132,15 @@ async def add_lib_resource_to_db(call: CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text='cancel_add_lib_resource', state=['*'])
 async def add_lib_resource_to_db(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил добавление ресурса call.data - {call.data}')
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await call.message.answer('<b>Добавление отменено</b>\n'
-                              'Выберите электронные ресурсы для изменения:',
-                              parse_mode='HTML',
-                              reply_markup=inline_keyboard_library_res_admin())
+    data = await state.get_data()
+    lib_type = data['lib_type']
     await state.reset_state()
+    await state.update_data(lib_type=lib_type)
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await call.message.answer('❌ Добавление ресурса было отменено',
+                              parse_mode='HTML',
+                              reply_markup=inline_keyboard_library_res_edit_admin())
+    await AddLibraryResource.lib_type.set()
     await call.answer()
 #-------------------- Конец добавление электронного ресурса --------------------
 
@@ -144,13 +156,22 @@ async def del_library_resource(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 
+@dp.callback_query_handler(text='back_del_lib_resource', state=['*'])
+async def callback_inlint_resource_cancel(call: CallbackQuery, state: FSMContext):
+    logging.info(f'User({call.message.chat.id}) отменил добавление ресурса call.data - {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Возврат в изменение электронных ресурсов',
+                                reply_markup=inline_keyboard_library_res_edit_admin())
+    await call.answer()
+
+
 @dp.callback_query_handler(lib_res_delete_callback.filter(), state=['*'])
 async def del_library_resource(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    data = callback_data.get('resource_name')
-    await state.update_data(button_name=data)
+    data = callback_data.get('id')
+    await state.update_data(id=data)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы действительно хотите удалить ресурс <b>{data}</b>?',
+                                text=f'Вы действительно хотите удалить данный ресурс?',
                                 reply_markup=cancel_or_delete_lib_resource())
     await DeleteLibraryResource.confirm_delete.set()
     await call.answer()
@@ -160,14 +181,13 @@ async def del_library_resource(call: CallbackQuery, callback_data: dict, state: 
 async def del_library_resource(call: CallbackQuery,  state: FSMContext):
     data = await state.get_data()
     try:
-        await db.delete_library_resource(data["button_name"])
+        await db.delete_library_resource(data["id"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=f'Ресурс <b>{data["button_name"]}</b> успешно удален из базы данных\n'
-                                          'Выберите электронные ресурсы для изменения:',
+                                    text=f'Ресурс успешно удален из базы данных\n',
                                     parse_mode='HTML',
                                     reply_markup=inline_keyboard_library_res_admin())
         await state.reset_state()
-        logging.info(f'User({call.message.chat.id}) удалил ресурс {data["button_name"]}')
+        logging.info(f'User({call.message.chat.id}) удалил ресурс {data["id"]}')
         await call.answer()
     except Exception as e:
         await call.message.answer(f'Ошибка справка не удалена, (Ошибка - {e})')
@@ -177,12 +197,15 @@ async def del_library_resource(call: CallbackQuery,  state: FSMContext):
 @dp.callback_query_handler(text_contains='cancel_del_lib_resource', state=DeleteLibraryResource.confirm_delete)
 async def callback_inlint_del_resource_cancel(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) отменил удаление ресурса call.data - {call.data}')
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await call.message.answer('<b>Удаление отменено</b>\n'
-                              'Выберите электронные ресурсы для изменения:',
-                              parse_mode='HTML',
-                              reply_markup=inline_keyboard_library_res_admin())
+    data = await state.get_data()
+    lib_type = data['lib_type']
     await state.reset_state()
+    await state.update_data(lib_type=lib_type)
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await call.message.answer('❌ Удаление ресурса было отменено',
+                              parse_mode='HTML',
+                              reply_markup=inline_keyboard_library_res_edit_admin())
+    await AddLibraryResource.lib_type.set()
     await call.answer()
 #--------------------- Конец удаление электронного ресурса ---------------------
 

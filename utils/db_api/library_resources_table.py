@@ -27,6 +27,17 @@ async def select_data_lib_resource(lib_type):
         logging.info(error)
 
 
+async def select_data_lib_resource_reg():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT * FROM library_resources WHERE lib_type = 'reg'"
+            record: Record = await connection.fetch(sql_select)
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def select_data_lib_resource_kz():
     pool: Connection = db
     try:
@@ -60,13 +71,24 @@ async def select_data_lib_resource_online():
         logging.info(error)
 
 
-async def delete_library_resource(button_name):
+async def delete_library_resource(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Delete from library_resources where button_name = $1"
-            record: Record = await connection.fetchrow(sql_ex, str(button_name))
-            logging.info(f"DELETED resource ({button_name})")
+            sql_ex = "Delete from library_resources where id = $1"
+            record: Record = await connection.fetchrow(sql_ex, int(id))
+            logging.info(f"DELETED resource ({id})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def find_library_resource(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "SELECT * from library_resources where id = $1"
+            record: Record = await connection.fetchrow(sql_ex, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)

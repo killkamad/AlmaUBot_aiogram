@@ -79,8 +79,8 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=ContentType.ANY, state=SendContactCenter.name)
 async def message_send_contact_center_name(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
-    if message.content_type == 'text' and len(message.text) <= 29:
-        await state.update_data(name=message.text.lower(),
+    if message.content_type == 'text' and len(message.text) <= 64:
+        await state.update_data(name=message.text,
                                 user_id=message.chat.id)
         await bot.send_message(message.chat.id, 'Отправьте описание контакт центра',
                                reply_markup=inline_keyboard_cancel_contact_center_admin())
@@ -88,7 +88,8 @@ async def message_send_contact_center_name(message: types.Message, state: FSMCon
     else:
         print(message.content_type)
         await bot.send_message(message.chat.id,
-                               'Ошибка - ваше сообщение должно содержать только текст и не превышать 29 символов.\nПовторите название для кнопки, например (бухгалтерия):',
+                               'Ошибка - ваше сообщение должно содержать только текст и не превышать 64 символов.\n'
+                               'Повторите название для кнопки, например (бухгалтерия):',
                                reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
@@ -97,11 +98,17 @@ async def message_send_contact_center_name(message: types.Message, state: FSMCon
 async def message_send_contact_center_description(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
-        await state.update_data(description=message.text.lower())
-        data = await state.get_data()
-        txt = f'Название кнопки будет: {data["name"]}'
-        await bot.send_message(message.chat.id, txt, reply_markup=cancel_or_send_contact_center_admin())
-        await state.reset_state(with_data=False)
+        if len(message.text) <= 4000:
+            await state.update_data(description=message.text)
+            data = await state.get_data()
+            txt = f'Название кнопки будет: {data["name"]}'
+            await bot.send_message(message.chat.id, txt, reply_markup=cancel_or_send_contact_center_admin())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id,
+                                   'Ошибка - ваше сообщение должно содержать только текст и не превышать 4000 символов.\n'
+                                   'Попробуйте заново отправить описание:',
+                                   reply_markup=inline_keyboard_cancel_contact_center_admin())
     else:
         await message.answer('Ошибка - вы отправили не текст повторите',
                              reply_markup=inline_keyboard_cancel_contact_center_admin())
@@ -138,21 +145,22 @@ async def callback_inline_update_schedule_bot(call: CallbackQuery):
 @dp.callback_query_handler(nav_center_callback_update.filter(), state=UpdateContactCenter.name)
 async def callback_inline_updade_contact_center(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    callback_name = callback_data.get('name')
-    await state.update_data(name=callback_name, user_id=call.message.chat.id)
+    callback_id = callback_data.get('id')
+    center_name = await db.search_contact_center_name(callback_id)
+    await state.update_data(name=center_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Напишете заново новую информацию для <b>{callback_name}</b>:',
+                                text=f'Напишете заново новую информацию для <b>{center_name}</b>:',
                                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_contact_center_admin())
     await UpdateContactCenter.description.set()
     await call.answer()
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=UpdateContactCenter.description)
-async def updade_contact_center_step(message: types.Message, state: FSMContext):
+async def update_contact_center_step(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     await UpdateContactCenter.description.set()
     if message.content_type == 'text':
-        await state.update_data(description=message.text.lower())
+        await state.update_data(description=message.text)
         data = await state.get_data()
         await bot.send_message(message.chat.id, text=f'Название кнопки: <b>{data["name"]}</b> \n'
                                                      f'Новое описание:<b>{data["description"]}</b>',
@@ -199,12 +207,13 @@ async def callback_inline_delete_contact_center_admin(call: CallbackQuery):
 
 
 @dp.callback_query_handler(nav_center_callback_delete.filter(), state=DeleteContactCenter.name)
-async def callback_inline_updade_contact_center(call: CallbackQuery, state: FSMContext, callback_data: dict):
+async def callback_inline_update_contact_center(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    callback_name = callback_data.get('name')
-    await state.update_data(name=callback_name, user_id=call.message.chat.id)
+    callback_id = callback_data.get('id')
+    center_name = await db.search_contact_center_name(callback_id)
+    await state.update_data(name=center_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы точно уверены, что хотите удалить информацию  <b>{callback_name}</b>:',
+                                text=f'Вы точно уверены, что хотите удалить информацию  <b>{center_name}</b>:',
                                 reply_markup=cancel_or_delete_contact_center_admin())
     await DeleteContactCenter.confirm_delete.set()
     await call.answer()
@@ -244,23 +253,23 @@ async def callback_tutors_university_admin_state(call: CallbackQuery):
 @dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_shcool_admin'),
                            state=PpsAdmin.school)
 async def pps_admin_state_shcool(call: CallbackQuery, state: FSMContext):
-    shcoolnumber = call.data[-1]
-    if shcoolnumber == '1':
+    school_number = call.data[-1]
+    if school_number == '1':
         async with state.proxy() as data:
             data['shcool'] = "Школа менеджмента"
-    if shcoolnumber == '2':
+    if school_number == '2':
         async with state.proxy() as data:
             data['shcool'] = "Школа политики и права"
-    if shcoolnumber == '3':
+    if school_number == '3':
         async with state.proxy() as data:
             data['shcool'] = "Школа Инженерного Менеджмента"
-    if shcoolnumber == '4':
+    if school_number == '4':
         async with state.proxy() as data:
             data['shcool'] = "Школа предпринимательства и инноваций"
-    if shcoolnumber == '5':
+    if school_number == '5':
         async with state.proxy() as data:
             data['shcool'] = "Высшая Школа Бизнеса"
-    if shcoolnumber == '6':
+    if school_number == '6':
         async with state.proxy() as data:
             data['shcool'] = "Школа Экономики и Финансов"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -284,17 +293,17 @@ async def callback_tutors_university_admin_state(call: CallbackQuery, state: FSM
 @dp.callback_query_handler(lambda shcool: shcool.data and shcool.data.startswith('choice_position_admin'),
                            state=PpsAdmin.position)
 async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
-    positionnum = call.data[-1]
-    if positionnum == '1':
+    position_number = call.data[-1]
+    if position_number == '1':
         async with state.proxy() as data:
             data['position'] = "Декан"
-    if positionnum == '2':
+    if position_number == '2':
         async with state.proxy() as data:
             data['position'] = "Преподаватели"
-    if positionnum == '3':
+    if position_number == '3':
         async with state.proxy() as data:
             data['position'] = "Ректор"
-    if positionnum == '4':
+    if position_number == '4':
         async with state.proxy() as data:
             data['position'] = "Проректоры"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -308,7 +317,7 @@ async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
 async def message_send_tutors_management(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
-        await state.update_data(description=message.text.lower(), user_id=message.chat.id)
+        await state.update_data(description=message.text, user_id=message.chat.id)
         await bot.send_message(message.chat.id, text='Отправить это описание?',
                                reply_markup=cancel_or_send_tutors_management())
         await state.reset_state(with_data=False)
@@ -365,9 +374,9 @@ async def callback_map_nav_admin_state(call: CallbackQuery):
 
 @dp.callback_query_handler(text='new_building_choice_admin', state=MapNavigation.building)
 async def map_nav_admin_state_building1(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Новое здание'
+    building_data = 'Новое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = building_data
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите добавить кабинет',
                                 reply_markup=map_nav_admin_choice_floor_new())
@@ -377,9 +386,9 @@ async def map_nav_admin_state_building1(call: CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text='old_building_choice_admin', state=MapNavigation.building)
 async def map_nav_admin_state_building2(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Старое здание'
+    building_data = 'Старое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = building_data
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите добавить кабинет',
                                 reply_markup=map_nav_admin_choice_floor_old())
@@ -390,23 +399,23 @@ async def map_nav_admin_state_building2(call: CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin'),
                            state=MapNavigation.floor)
 async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
-    floornumber = call.data[-1]
-    if floornumber == '1':
+    floor_number = call.data[-1]
+    if floor_number == '1':
         async with state.proxy() as data:
             data['floor'] = "1 этаж"
-    if floornumber == '2':
+    if floor_number == '2':
         async with state.proxy() as data:
             data['floor'] = "2 этаж"
-    if floornumber == '3':
+    if floor_number == '3':
         async with state.proxy() as data:
             data['floor'] = "3 этаж"
-    if floornumber == '4':
+    if floor_number == '4':
         async with state.proxy() as data:
             data['floor'] = "4 этаж"
-    if floornumber == '5':
+    if floor_number == '5':
         async with state.proxy() as data:
             data['floor'] = "5 этаж"
-    if floornumber == '6':
+    if floor_number == '6':
         async with state.proxy() as data:
             data['floor'] = "6 этаж"
     # print(data['floor'])
@@ -451,7 +460,7 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
 async def map_nav_admin_state_description(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
-        await state.update_data(description=message.text.lower(), user_id=message.chat.id)
+        await state.update_data(description=message.text, user_id=message.chat.id)
         data = await state.get_data()
         await bot.send_message(message.chat.id, text=f"Отправить описание?:\n"
                                                      f"{data['building']}\n"
@@ -563,23 +572,23 @@ async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMCon
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin_update'),
                            state=MapNavigationUpdate.floor)
 async def map_nav_admin_state_floor_update(call: CallbackQuery, state: FSMContext):
-    floornumber = call.data[-1]
-    if floornumber == '1':
+    floor_number = call.data[-1]
+    if floor_number == '1':
         async with state.proxy() as data:
             data['floor'] = "1 этаж"
-    if floornumber == '2':
+    if floor_number == '2':
         async with state.proxy() as data:
             data['floor'] = "2 этаж"
-    if floornumber == '3':
+    if floor_number == '3':
         async with state.proxy() as data:
             data['floor'] = "3 этаж"
-    if floornumber == '4':
+    if floor_number == '4':
         async with state.proxy() as data:
             data['floor'] = "4 этаж"
-    if floornumber == '5':
+    if floor_number == '5':
         async with state.proxy() as data:
             data['floor'] = "5 этаж"
-    if floornumber == '6':
+    if floor_number == '6':
         async with state.proxy() as data:
             data['floor'] = "6 этаж"
     floor = data['floor']
@@ -620,7 +629,7 @@ async def map_nav_admin_state_description_update(message: types.Message, state: 
         data = await state.get_data()
         await state.update_data(user_id=message.chat.id)
         async with state.proxy() as data:
-            data['description'] = message.text.lower()
+            data['description'] = message.text
         if len(data) > 5:
             await bot.send_message(message.chat.id, text=f"описание добавлено:\n"
                                                          f"{data['building']}\n"
@@ -717,8 +726,8 @@ async def map_nav_admin_state_send_final_photo(call: CallbackQuery, state: FSMCo
     try:
         data = await state.get_data()
         await db.update_map_nav_description_data_nodescription(data['user_id'], data['building'], data['floor'],
-                                                         data['cabinet'],
-                                                         data['image'])
+                                                               data['cabinet'],
+                                                               data['image'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=f"{data['cabinet']} для {data['building']} {data['floor']} изменен\n"
                                          "Админ меню карт-навигации",
@@ -729,6 +738,7 @@ async def map_nav_admin_state_send_final_photo(call: CallbackQuery, state: FSMCo
     except Exception as e:
         await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
         print(e)
+
 
 #######################################  Удаление Кабинетов   ##########################################
 
@@ -744,9 +754,9 @@ async def callback_map_nav_admin_state_delete(call: CallbackQuery):
 
 @dp.callback_query_handler(text='new_building_choice_admin_delete', state=MapNavigationDelete.building)
 async def map_nav_admin_state_building1_delete(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Новое здание'
+    building_data = 'Новое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = building_data
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите удалить кабинет',
                                 reply_markup=map_nav_admin_choice_floor_new_delete())
@@ -756,9 +766,9 @@ async def map_nav_admin_state_building1_delete(call: CallbackQuery, state: FSMCo
 
 @dp.callback_query_handler(text='old_building_choice_admin_delete', state=MapNavigationDelete.building)
 async def map_nav_admin_state_building2_delete(call: CallbackQuery, state: FSMContext):
-    databuilding = 'Старое здание'
+    building_data = 'Старое здание'
     async with state.proxy() as data:
-        data['building'] = databuilding
+        data['building'] = building_data
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите этаж в каком хотите удалить кабинет',
                                 reply_markup=map_nav_admin_choice_floor_old_delete())
@@ -769,23 +779,23 @@ async def map_nav_admin_state_building2_delete(call: CallbackQuery, state: FSMCo
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin_delete'),
                            state=MapNavigationDelete.floor)
 async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
-    floornumber = call.data[-1]
-    if floornumber == '1':
+    floor_number = call.data[-1]
+    if floor_number == '1':
         async with state.proxy() as data:
             data['floor'] = "1 этаж"
-    if floornumber == '2':
+    if floor_number == '2':
         async with state.proxy() as data:
             data['floor'] = "2 этаж"
-    if floornumber == '3':
+    if floor_number == '3':
         async with state.proxy() as data:
             data['floor'] = "3 этаж"
-    if floornumber == '4':
+    if floor_number == '4':
         async with state.proxy() as data:
             data['floor'] = "4 этаж"
-    if floornumber == '5':
+    if floor_number == '5':
         async with state.proxy() as data:
             data['floor'] = "5 этаж"
-    if floornumber == '6':
+    if floor_number == '6':
         async with state.proxy() as data:
             data['floor'] = "6 этаж"
     floor = data['floor']
@@ -833,3 +843,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
                                 reply_markup=inline_keyboard_map_nav_admin_menu())
     await state.reset_state()
     await call.answer()
+
+
+
+

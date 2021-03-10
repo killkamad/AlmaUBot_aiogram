@@ -189,7 +189,7 @@ async def create_table_contact_centers():
                 CREATE TABLE if not exists contact_centers(
                 id  serial unique primary key,
                 id_Telegram INT NOT NULL,
-                description_contact_center VARCHAR (990),
+                description_contact_center VARCHAR (4000),
                 name_contact_center VARCHAR (200))
                 """
             record: Record = await connection.fetchval(sql_ex)

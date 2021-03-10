@@ -39,9 +39,9 @@ cabinet_callback_update = CallbackData('cabu', 'cabinet')
 cabinet_callback_delete = CallbackData('cabd', 'cabinet')
 
 # centers univer
-nav_center_callback = CallbackData('cntr', 'name')
-nav_center_callback_update = CallbackData('cntr_u', 'name')
-nav_center_callback_delete = CallbackData('cntr_d', 'name')
+nav_center_callback = CallbackData('cntr', 'id')
+nav_center_callback_update = CallbackData('cntr_u', 'id')
+nav_center_callback_delete = CallbackData('cntr_d', 'id')
 
 #Library resources
 lib_res_callback = CallbackData('lib', 'id')

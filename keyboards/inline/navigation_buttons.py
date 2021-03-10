@@ -31,12 +31,12 @@ def inline_keyboard_nav_unifi():
 
 
 async def inline_keyboard_contacts_center():
-    markup = InlineKeyboardMarkup(row_width=2)
-    ceneters = await db.select_data_contact_centers()
+    markup = InlineKeyboardMarkup(row_width=1)
+    centers = await db.select_data_contact_centers()
     markup.add(
         *[InlineKeyboardButton(text=item['name_contact_center'],
-                               callback_data=nav_center_callback.new(name=item["name_contact_center"]))
-          for item in ceneters])
+                               callback_data=nav_center_callback.new(id=item["id"]))
+          for item in centers])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="/nav_unifi"))
     return markup
 
@@ -235,10 +235,10 @@ async def inline_keyboard_cabinets_first_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "1 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -247,10 +247,10 @@ async def inline_keyboard_cabinets_second_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "2 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -259,10 +259,10 @@ async def inline_keyboard_cabinets_third_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "3 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -271,10 +271,10 @@ async def inline_keyboard_cabinets_fourth_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "4 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -283,10 +283,10 @@ async def inline_keyboard_cabinets_fifth_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "5 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -295,10 +295,10 @@ async def inline_keyboard_cabinets_sixth_new():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Новое здание"
     floor = "6 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="new_building"))
     return markup
 
@@ -308,10 +308,10 @@ async def inline_keyboard_cabinets_first_old():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "1 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="old_building"))
     return markup
 
@@ -320,10 +320,10 @@ async def inline_keyboard_cabinets_second_old():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "2 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="old_building"))
     return markup
 
@@ -332,10 +332,10 @@ async def inline_keyboard_cabinets_third_old():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "3 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="old_building"))
     return markup
 
@@ -344,9 +344,9 @@ async def inline_keyboard_cabinets_fourth_old():
     markup = InlineKeyboardMarkup(row_width=3)
     building = "Старое здание"
     floor = "4 этаж"
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
-          item in mapnav])
+          item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="old_building"))
     return markup

@@ -40,7 +40,7 @@ async def callback_inline_contacts_center(call: CallbackQuery):
 @dp.callback_query_handler(nav_center_callback.filter())
 async def callback_inline_contacts_center_call(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    callback_center = callback_data.get('name')
+    callback_center = callback_data.get('id')
     description = await db.contact_center_description(callback_center)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=description, reply_markup=inline_keyboard_contacts_center_back())

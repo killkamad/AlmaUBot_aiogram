@@ -48,13 +48,25 @@ async def update_contact_center_data(id_Telegram, description_contact_center, na
 
 
 # Описание определенного  центра
-async def contact_center_description(name):
+async def contact_center_description(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT description_contact_center FROM contact_centers WHERE name_contact_center = $1;"
-            record: Record = await connection.fetchrow(sql_select, name)
+            sql_select = "SELECT description_contact_center FROM contact_centers WHERE id = $1;"
+            record: Record = await connection.fetchrow(sql_select, int(id))
             record = list(record)[0]
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+# Поиск название контакт центра по айди
+async def search_contact_center_name(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT name_contact_center FROM contact_centers WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -73,8 +85,10 @@ async def select_data_contact_centers():
 
 
 async def main():
-    print(await select_data_contact_centers())
-
+    # a = await select_data_contact_centers()
+    # for i in a:
+    #     print(i['id'])
+    print(await search_contact_center_name(26))
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

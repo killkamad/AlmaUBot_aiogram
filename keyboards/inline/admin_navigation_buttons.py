@@ -39,12 +39,12 @@ def cancel_or_send_contact_center_admin():
 
 
 async def inline_keyboard_contacts_center_update():
-    markup = InlineKeyboardMarkup(row_width=2)
-    ceneters = await db.select_data_contact_centers()
+    markup = InlineKeyboardMarkup(row_width=1)
+    centers = await db.select_data_contact_centers()
     markup.add(
         *[InlineKeyboardButton(text=item['name_contact_center'],
-                               callback_data=nav_center_callback_update.new(name=item["name_contact_center"]))
-          for item in ceneters])
+                               callback_data=nav_center_callback_update.new(id=item["id"]))
+          for item in centers])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_contact_center_admin"))
     return markup
 
@@ -58,12 +58,12 @@ def cancel_or_update_contact_center_admin():
 
 
 async def inline_keyboard_contacts_center_delete():
-    markup = InlineKeyboardMarkup(row_width=2)
-    ceneters = await db.select_data_contact_centers()
+    markup = InlineKeyboardMarkup(row_width=1)
+    centers = await db.select_data_contact_centers()
     markup.add(
         *[InlineKeyboardButton(text=item['name_contact_center'],
-                               callback_data=nav_center_callback_delete.new(name=item["name_contact_center"]))
-          for item in ceneters])
+                               callback_data=nav_center_callback_delete.new(id=item["id"]))
+          for item in centers])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_contact_center_admin"))
     return markup
 
@@ -123,10 +123,10 @@ def cancel_or_send_map_nav_admin():
 
 async def inline_keyboard_cabinets_admin(building, floor):
     markup = InlineKeyboardMarkup(row_width=2)
-    mapnav = await db.map_nav_description(building, floor)
+    map_navigation = await db.map_nav_description(building, floor)
     markup.add(
         *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback_update.new(cabinet=item["cabinet"]))
-          for item in mapnav])
+          for item in map_navigation])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_step_map_nav_admin"))
     return markup
 

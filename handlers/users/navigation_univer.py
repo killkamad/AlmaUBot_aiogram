@@ -15,8 +15,45 @@ from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inlin
     inline_keyboard_cabinets_third_new, inline_keyboard_cabinets_fourth_new, inline_keyboard_cabinets_fourth_old, \
     inline_keyboard_cabinets_fifth_new, inline_keyboard_cabinets_sixth_new, inline_keyboard_pps_shcool_choise
 from utils import db_api as db
-
+from asyncio import create_task
 from keyboards.inline import cabinet_callback, nav_center_callback
+
+
+scholl_tuple = ('Школа менеджмента', 'Школа политики и права', 
+                'Школа предпринимательства и инноваций',
+                'Школа Экономики и Финансов',
+                'Школа Инженерного Менеджмента',
+                'Высшая Школа Бизнеса', 'Ректорат')
+position_tuple = ('Декан', 'Преподаватели', 'Ректор', 'Проректоры')
+
+
+async def check_photo_map_nav_function(keyboard, text_buttons, call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в навигацию ({call.data})")
+    
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                                text=text_buttons,
+                                reply_markup=keyboard)
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=text_buttons,
+                                    reply_markup=keyboard)
+    await call.answer()
+
+
+async def check_photo_is_none_map_nav_function(keyboard, description, photo_id, call: CallbackQuery):
+    logging.info(f"User({call.message.chat.id}) вошел в  ({call.data})")
+    if photo_id == "None":
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=keyboard)
+    else:
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                     reply_markup=keyboard)   
+    await call.answer()
 
 
 @dp.callback_query_handler(text='/nav_unifi')
@@ -69,350 +106,142 @@ async def callback_inline_tutors_university(call: CallbackQuery):
 @dp.callback_query_handler(text='shcool_management')
 async def callback_inline_shcool_management(call: CallbackQuery):
     schoolUni = "1"
-    logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Школа менеджмента',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Школа менеджмента',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
+    text_buttons = scholl_tuple[0]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 @dp.callback_query_handler(text='shcool_law')
 async def callback_inline_shcool_law(call: CallbackQuery):
     schoolUni = "2"
-    logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Школа политики и права',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Школа политики и права',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
+    text_buttons = scholl_tuple[1]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 @dp.callback_query_handler(text='shcool_inovation')
 async def callback_inline_shcool_inovation(call: CallbackQuery):
     schoolUni = "3"
-    logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Школа предпринимательства и инноваций',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Школа предпринимательства и инноваций',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
-
+    text_buttons = scholl_tuple[2]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 @dp.callback_query_handler(text='shcool_economic')
 async def callback_inline_shcool_economic(call: CallbackQuery):
     schoolUni = "4"
-    logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Школа Экономики и Финансов',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Школа Экономики и Финансов',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
+    text_buttons = scholl_tuple[3]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 @dp.callback_query_handler(text='shcool_engineer')
 async def callback_inline_shcool_engineer(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
     schoolUni = "5"
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Школа Инженерного Менеджмента',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Школа Инженерного Менеджмента',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
+    text_buttons = scholl_tuple[4]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 @dp.callback_query_handler(text='shcool_bussines')
 async def callback_inline_shcool_bussines(call: CallbackQuery):
     schoolUni = "6"
-    logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Высшая Школа Бизнеса',
-                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Высшая Школа Бизнеса',
-                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
-    await call.answer()
+    text_buttons = scholl_tuple[5]
+    keyboard = inline_keyboard_pps_shcool_choise(schoolUni)
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 @dp.callback_query_handler(text='rectorat')
 async def callback_inline_rectorat(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Ректорат")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Ректорат',
-                               reply_markup=inline_keyboard_pps_rectorat())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Ректорат',
-                                    reply_markup=inline_keyboard_pps_rectorat())
-    await call.answer()
-
+    text_buttons = scholl_tuple[6]
+    keyboard = inline_keyboard_pps_rectorat()
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 ####### Хэндлеры описания деканов в ппс
-@dp.callback_query_handler(
-    lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_dekan_shcool_'))
+@dp.callback_query_handler(lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_dekan_shcool_'))
 async def callback_handler_dekan_pps(call: CallbackQuery):
     calldatalast = call.data[-1]
     if calldatalast == '1':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
-        shcool = 'Школа менеджмента'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_management_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_management_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_management_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '2':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
-        shcool = 'Школа политики и права'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_law_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_law_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_law_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '3':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
-        shcool = 'Школа предпринимательства и инноваций'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_inovation_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_inovation_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_inovation_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '4':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
-        shcool = 'Школа Экономики и Финансов'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_economic_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_economic_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_economic_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '5':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
-        shcool = 'Школа Инженерного Менеджмента'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_engineer_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_engineer_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_engineer_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '6':
-        logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
-        shcool = 'Высшая Школа Бизнеса'
-        position = 'Декан'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_bussines_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_bussines_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_bussines_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[0])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
 
 
 ####### Хэндлеры описания преподавателей в ппс
-@dp.callback_query_handler(
-    lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_tutors_shcool_'))
+@dp.callback_query_handler(lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_tutors_shcool_'))
 async def callback_handler_tutors_pps(call: CallbackQuery):
     calldatalast = call.data[-1]
     if calldatalast == '1':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
-        shcool = 'Школа менеджмента'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_management_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_management_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_management_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '2':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
-        shcool = 'Школа политики и права'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_law_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_law_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_law_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '3':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
-        shcool = 'Школа предпринимательства и инноваций'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_inovation_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_inovation_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_inovation_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '4':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
-        shcool = 'Школа Экономики и Финансов'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_economic_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_economic_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_economic_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '5':
-        logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
-        shcool = 'Школа Инженерного Менеджмента'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_engineer_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_engineer_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_engineer_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '6':
-        logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
-        shcool = 'Высшая Школа Бизнеса'
-        position = 'Преподаватели'
-        description = await db.pps_center_description(shcool, position)
-        photo_id = await db.find_photoid_pps(shcool, position)
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_pps_shcool_bussines_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_pps_shcool_bussines_back())
-        await call.answer()
+            keyboard = inline_keyboard_pps_shcool_bussines_back()
+            description = await db.pps_center_description(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast)-1], position_tuple[1])
+            await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
 
 
 @dp.callback_query_handler(text='rectorat_rector')
 async def callback_inline_rectorat_rector(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Ректорат")
-    shcool = 'Ректорат'
-    position = 'Ректор'
-    description = await db.pps_center_description(shcool, position)
-    photo_id = await db.find_photoid_pps(shcool, position)
-    if photo_id == "None":
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_pps_rectorat_back())
-    else:
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                             reply_markup=inline_keyboard_pps_rectorat_back())
-    await call.answer()
+    keyboard = inline_keyboard_pps_rectorat_back()
+    description = await db.pps_center_description(scholl_tuple[6], position_tuple[2])
+    photo_id = await db.find_photoid_pps(scholl_tuple[6], position_tuple[2])
+    await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
 
 
 @dp.callback_query_handler(text='rectorat_humans')
 async def callback_inline_rectorat_humans(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в humans Ректорат")
-    shcool = 'Ректорат'
-    position = 'Проректоры'
-    description = await db.pps_center_description(shcool, position)
-    photo_id = await db.find_photoid_pps(shcool, position)
-    if photo_id == "None":
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=description,
-                                    reply_markup=inline_keyboard_pps_rectorat_back())
-    else:
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                             reply_markup=inline_keyboard_pps_rectorat_back())
-    await call.answer()
-
+    keyboard = inline_keyboard_pps_rectorat_back()
+    description = await db.pps_center_description(scholl_tuple[6], position_tuple[3])
+    photo_id = await db.find_photoid_pps(scholl_tuple[6], position_tuple[3])
+    await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
 
 ##########################  Профессорско-преподовательский состав КОНЕЦ ###########################
 
@@ -420,214 +249,80 @@ async def callback_inline_rectorat_humans(call: CallbackQuery):
 ##########################  Навигация по университету #############################################
 @dp.callback_query_handler(text='map_nav')
 async def callback_inline_nav_unifi_map_nav(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Карта-навигация по университету, выбирете здание:',
-                               reply_markup=inline_keyboard_map_nav())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Карта-навигация по университету, выбирете здание:',
-                                    reply_markup=inline_keyboard_map_nav())
-    await call.answer()
+    text_buttons = 'Карта-навигация по университету, выбирете здание:'
+    keyboard = inline_keyboard_map_nav()
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 ########
 @dp.callback_query_handler(text='old_building')
 async def callback_inline_nav_unifi_old_building(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Старое здание университета, выберите этаж:',
-                               reply_markup=inline_keyboard_old_building())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Старое здание университета, выберите этаж:',
-                                    reply_markup=inline_keyboard_old_building())
-    await call.answer()
+    text_buttons = 'Старое здание университета, выберите этаж:'
+    keyboard = inline_keyboard_old_building()
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 #######
 @dp.callback_query_handler(text='new_building')
 async def callback_inline_nav_unifi_new_building(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Новое здание университета, выберите этаж:',
-                               reply_markup=inline_keyboard_new_building())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Новое здание университета, выберите этаж:',
-                                    reply_markup=inline_keyboard_new_building())
-    await call.answer()
+    text_buttons = 'Новое здание университета, выберите этаж:'
+    keyboard = inline_keyboard_new_building()
+    await create_task(check_photo_map_nav_function(keyboard, text_buttons, call))
 
 
 ######### хэндлеры старое здание
+choise_cab = "Выберите кабинет:"
 @dp.callback_query_handler(text='old_building_first')
 async def callback_inline_nav_unifi_old_building_first(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 1 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_first_old())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_first_old())
-    await call.answer()
+    keyboard = await inline_keyboard_cabinets_first_old()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 
 @dp.callback_query_handler(text='old_building_second')
 async def callback_inline_nav_unifi_old_building_second(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 2 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_second_old())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_second_old())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_second_old()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='old_building_third')
 async def callback_inline_nav_unifi_old_building_third(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 3 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_third_old())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_third_old())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_third_old()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='old_building_fourth')
 async def callback_inline_nav_unifi_old_building_fourth(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 4 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_fourth_old())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_fourth_old())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_fourth_old()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 ############## хэндлеры новое здание
 @dp.callback_query_handler(text='new_building_first')
 async def callback_inline_nav_unifi_new_building_first(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_first_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_first_new())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_first_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='new_building_second')
 async def callback_inline_nav_unifi_new_building_second(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 2 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_second_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_second_new())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_second_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='new_building_third')
 async def callback_inline_nav_unifi_new_building_third(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 3 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_third_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_third_new())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_third_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='new_building_fourth')
 async def callback_inline_nav_unifi_new_building_fourth(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 4 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_fourth_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_fourth_new())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_fourth_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='new_building_fifth')
 async def callback_inline_nav_unifi_new_building_fifth(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 5 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_fifth_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_fifth_new())
-    await call.answer()
-
+    keyboard = await inline_keyboard_cabinets_fifth_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 @dp.callback_query_handler(text='new_building_sixth')
 async def callback_inline_nav_unifi_new_building_sixth(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 6 этаж")
-    if call.message.content_type == 'photo':
-        await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text='Выберите кабинет:',
-                               reply_markup=await inline_keyboard_cabinets_sixth_new())
-    else:
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text='Выберите кабинет:',
-                                    reply_markup=await inline_keyboard_cabinets_sixth_new())
-    await call.answer()
+    keyboard = await inline_keyboard_cabinets_sixth_new()
+    await create_task(check_photo_map_nav_function(keyboard, choise_cab, call))
 
 
 # сделал очень тупую конструкцию для кнопки назад
@@ -643,131 +338,55 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     if floor == '1 этаж' and building == 'Старое здание':
         building_callback = "old_"
         floor_callback = "_first"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '2 этаж' and building == 'Старое здание':
         building_callback = "old_"
         floor_callback = "_second"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '3 этаж' and building == 'Старое здание':
         building_callback = "old_"
         floor_callback = "_third"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '4 этаж' and building == 'Старое здание':
         building_callback = "old_"
         floor_callback = "_fourth"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '1 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_first"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '2 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_second"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '3 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_third"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '4 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_fourth"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '5 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_fifth"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     elif floor == '6 этаж' and building == 'Новое здание':
         building_callback = "new_"
         floor_callback = "_sixth"
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                       floor_callback))
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_old_building_back(building_callback, floor_callback))
+        keyboard = inline_keyboard_old_building_back(building_callback, floor_callback)
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     else:
-        if photo_id == "None":
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                        text=description,
-                                        reply_markup=inline_keyboard_new_building_back())
-        else:
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
-            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
-                                 reply_markup=inline_keyboard_new_building_back())
+        keyboard = inline_keyboard_new_building_back
+        await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     await call.answer()
 ##########################  Навигация по университету КОНЕЦ #############################################

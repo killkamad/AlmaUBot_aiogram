@@ -4,9 +4,7 @@ import logging
 from aiogram.types import CallbackQuery
 from loader import dp, bot
 from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \
-    inline_keyboard_contacts_center_back, inline_keyboard_pps, inline_keyboard_pps_shcool_management, \
-    inline_keyboard_pps_rectorat, inline_keyboard_pps_shcool_law, inline_keyboard_pps_shcool_inovation, \
-    inline_keyboard_pps_shcool_economic, inline_keyboard_pps_shcool_engineer, inline_keyboard_pps_shcool_bussines, \
+    inline_keyboard_contacts_center_back, inline_keyboard_pps, inline_keyboard_pps_rectorat, \
     inline_keyboard_pps_rectorat_back, inline_keyboard_pps_shcool_bussines_back, \
     inline_keyboard_pps_shcool_engineer_back, inline_keyboard_pps_shcool_economic_back, \
     inline_keyboard_pps_shcool_inovation_back, inline_keyboard_pps_shcool_law_back, \
@@ -15,7 +13,7 @@ from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inlin
     inline_keyboard_old_building_back, inline_keyboard_cabinets_first_old, inline_keyboard_cabinets_second_old, \
     inline_keyboard_cabinets_third_old, inline_keyboard_cabinets_first_new, inline_keyboard_cabinets_second_new, \
     inline_keyboard_cabinets_third_new, inline_keyboard_cabinets_fourth_new, inline_keyboard_cabinets_fourth_old, \
-    inline_keyboard_cabinets_fifth_new, inline_keyboard_cabinets_sixth_new
+    inline_keyboard_cabinets_fifth_new, inline_keyboard_cabinets_sixth_new, inline_keyboard_pps_shcool_choise
 from utils import db_api as db
 
 from keyboards.inline import cabinet_callback, nav_center_callback
@@ -29,6 +27,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
     await call.answer()
 
 
+##########################  Контакты ключевых центров ##############################
 @dp.callback_query_handler(text='contacts_center')
 async def callback_inline_contacts_center(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Контакты ключевых центров")
@@ -55,8 +54,11 @@ async def callback_inline_contacts_center_call(call: CallbackQuery, callback_dat
     #                                 text=description, reply_markup=inline_keyboard_contacts_center_back())
 
 
+##########################  Контакты ключевых центров  КОНЕЦ   ##############################
+
+##########################  Профессорско-преподовательский состав ###########################
 @dp.callback_query_handler(text='tutors_university')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_tutors_university(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Профессорско-преподавательский состав")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Профессорско-преподавательский состав, выберите школу',
@@ -65,228 +67,365 @@ async def callback_inline_contacts_center(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='shcool_management')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_management(call: CallbackQuery):
+    schoolUni = "1"
     logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Школа менеджмента', reply_markup=inline_keyboard_pps_shcool_management())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Школа менеджмента',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Школа менеджмента',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_law')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_law(call: CallbackQuery):
+    schoolUni = "2"
     logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Школа политики и права', reply_markup=inline_keyboard_pps_shcool_law())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Школа политики и права',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Школа политики и права',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_inovation')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_inovation(call: CallbackQuery):
+    schoolUni = "3"
     logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Школа предпринимательства и инноваций',
-                                reply_markup=inline_keyboard_pps_shcool_inovation())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Школа предпринимательства и инноваций',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Школа предпринимательства и инноваций',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_economic')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_economic(call: CallbackQuery):
+    schoolUni = "4"
     logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Школа Экономики и Финансов', reply_markup=inline_keyboard_pps_shcool_economic())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Школа Экономики и Финансов',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Школа Экономики и Финансов',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_engineer')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_engineer(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Школа Инженерного Менеджмента',
-                                reply_markup=inline_keyboard_pps_shcool_engineer())
+    schoolUni = "5"
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Школа Инженерного Менеджмента',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Школа Инженерного Менеджмента',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='shcool_bussines')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_shcool_bussines(call: CallbackQuery):
+    schoolUni = "6"
     logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Высшая Школа Бизнеса', reply_markup=inline_keyboard_pps_shcool_bussines())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Высшая Школа Бизнеса',
+                               reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Высшая Школа Бизнеса',
+                                    reply_markup=inline_keyboard_pps_shcool_choise(schoolUni))
     await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_rectorat(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Ректорат")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Ректорат', reply_markup=inline_keyboard_pps_rectorat())
+    if call.message.content_type == 'photo':
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text='Ректорат',
+                               reply_markup=inline_keyboard_pps_rectorat())
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text='Ректорат',
+                                    reply_markup=inline_keyboard_pps_rectorat())
     await call.answer()
 
 
-#######
-@dp.callback_query_handler(text='dekan_shcool_management')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
-    shcool = 'Школа менеджмента'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_management_back())
-    await call.answer()
+####### Хэндлеры описания деканов в ппс
+@dp.callback_query_handler(
+    lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_dekan_shcool_'))
+async def callback_handler_dekan_pps(call: CallbackQuery):
+    calldatalast = call.data[-1]
+    if calldatalast == '1':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
+        shcool = 'Школа менеджмента'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_management_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_management_back())
+        await call.answer()
+    if calldatalast == '2':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
+        shcool = 'Школа политики и права'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_law_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_law_back())
+        await call.answer()
+    if calldatalast == '3':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
+        shcool = 'Школа предпринимательства и инноваций'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_inovation_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_inovation_back())
+        await call.answer()
+    if calldatalast == '4':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
+        shcool = 'Школа Экономики и Финансов'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_economic_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_economic_back())
+        await call.answer()
+    if calldatalast == '5':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
+        shcool = 'Школа Инженерного Менеджмента'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_engineer_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_engineer_back())
+        await call.answer()
+    if calldatalast == '6':
+        logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
+        shcool = 'Высшая Школа Бизнеса'
+        position = 'Декан'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_bussines_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_bussines_back())
+        await call.answer()
 
 
-@dp.callback_query_handler(text='dekan_shcool_law')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
-    shcool = 'Школа политики и права'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_law_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='dekan_shcool_inovation')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
-    shcool = 'Школа предпринимательства и инноваций'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_inovation_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='dekan_shcool_economic')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
-    shcool = 'Школа Экономики и Финансов'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_economic_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='dekan_shcool_engineer')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
-    shcool = 'Школа Инженерного Менеджмента'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_engineer_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='dekan_shcool_bussines')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
-    shcool = 'Высшая Школа Бизнеса'
-    position = 'Декан'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_bussines_back())
-    await call.answer()
+####### Хэндлеры описания преподавателей в ппс
+@dp.callback_query_handler(
+    lambda callback_tutors: callback_tutors.data and callback_tutors.data.startswith('callback_tutors_shcool_'))
+async def callback_handler_tutors_pps(call: CallbackQuery):
+    calldatalast = call.data[-1]
+    if calldatalast == '1':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа менеджмента")
+        shcool = 'Школа менеджмента'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_management_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_management_back())
+        await call.answer()
+    if calldatalast == '2':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа политики и права")
+        shcool = 'Школа политики и права'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_law_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_law_back())
+        await call.answer()
+    if calldatalast == '3':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа предпринимательства и инноваций")
+        shcool = 'Школа предпринимательства и инноваций'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_inovation_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_inovation_back())
+        await call.answer()
+    if calldatalast == '4':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа Экономики и Финансов")
+        shcool = 'Школа Экономики и Финансов'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_economic_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_economic_back())
+        await call.answer()
+    if calldatalast == '5':
+        logging.info(f"User({call.message.chat.id}) вошел в Школа Инженерного Менеджмента")
+        shcool = 'Школа Инженерного Менеджмента'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_engineer_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_engineer_back())
+        await call.answer()
+    if calldatalast == '6':
+        logging.info(f"User({call.message.chat.id}) вошел в Высшая школа бизнеса")
+        shcool = 'Высшая Школа Бизнеса'
+        position = 'Преподаватели'
+        description = await db.pps_center_description(shcool, position)
+        photo_id = await db.find_photoid_pps(shcool, position)
+        if photo_id == "None":
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                        text=description,
+                                        reply_markup=inline_keyboard_pps_shcool_bussines_back())
+        else:
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                                 reply_markup=inline_keyboard_pps_shcool_bussines_back())
+        await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat_rector')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_rectorat_rector(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Ректорат")
     shcool = 'Ректорат'
     position = 'Ректор'
     description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_rectorat_back())
-    await call.answer()
-
-
-########################
-@dp.callback_query_handler(text='tutors_shcool_management')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Школа менеджмента")
-    shcool = 'Школа менеджмента'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_management_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='tutors_shcool_law')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Школа политики и права")
-    shcool = 'Школа политики и права'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_law_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='tutors_shcool_inovation')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Школа предпринимательства и инноваций")
-    shcool = 'Школа предпринимательства и инноваций'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_inovation_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='tutors_shcool_economic')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Школа Экономики и Финансов")
-    shcool = 'Школа Экономики и Финансов'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_economic_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='tutors_shcool_engineer')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Школа Инженерного Менеджмента")
-    shcool = 'Школа Инженерного Менеджмента'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_engineer_back())
-    await call.answer()
-
-
-@dp.callback_query_handler(text='tutors_shcool_bussines')
-async def callback_inline_contacts_center(call: CallbackQuery):
-    logging.info(f"User({call.message.chat.id}) вошел в tutors Высшая школа бизнеса")
-    shcool = 'Высшая Школа Бизнеса'
-    position = 'Преподаватели'
-    description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_shcool_bussines_back())
+    photo_id = await db.find_photoid_pps(shcool, position)
+    if photo_id == "None":
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_pps_rectorat_back())
+    else:
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                             reply_markup=inline_keyboard_pps_rectorat_back())
     await call.answer()
 
 
 @dp.callback_query_handler(text='rectorat_humans')
-async def callback_inline_contacts_center(call: CallbackQuery):
+async def callback_inline_rectorat_humans(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в humans Ректорат")
     shcool = 'Ректорат'
     position = 'Проректоры'
     description = await db.pps_center_description(shcool, position)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=description, reply_markup=inline_keyboard_pps_rectorat_back())
+    photo_id = await db.find_photoid_pps(shcool, position)
+    if photo_id == "None":
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=description,
+                                    reply_markup=inline_keyboard_pps_rectorat_back())
+    else:
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_photo(call.message.chat.id, photo_id, caption=description,
+                             reply_markup=inline_keyboard_pps_rectorat_back())
     await call.answer()
 
 
-########
+##########################  Профессорско-преподовательский состав КОНЕЦ ###########################
+
+
+##########################  Навигация по университету #############################################
 @dp.callback_query_handler(text='map_nav')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_map_nav(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Карта-навигация по университету, выбирете здание:',
-                                reply_markup=inline_keyboard_map_nav())
+                               text='Карта-навигация по университету, выбирете здание:',
+                               reply_markup=inline_keyboard_map_nav())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -297,13 +436,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 ########
 @dp.callback_query_handler(text='old_building')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_old_building(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Старое здание университета, выберите этаж:',
-                                reply_markup=inline_keyboard_old_building())
+                               text='Старое здание университета, выберите этаж:',
+                               reply_markup=inline_keyboard_old_building())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -314,13 +453,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 #######
 @dp.callback_query_handler(text='new_building')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Новое здание университета, выберите этаж:',
-                                reply_markup=inline_keyboard_new_building())
+                               text='Новое здание университета, выберите этаж:',
+                               reply_markup=inline_keyboard_new_building())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -331,13 +470,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 ######### хэндлеры старое здание
 @dp.callback_query_handler(text='old_building_first')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_old_building_first(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 1 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_first_old())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_first_old())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -347,13 +486,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='old_building_second')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_old_building_second(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 2 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_second_old())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_second_old())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -363,13 +502,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='old_building_third')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_old_building_third(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 3 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_third_old())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_third_old())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -379,13 +518,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='old_building_fourth')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_old_building_fourth(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации старое здание университета 4 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_fourth_old())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_fourth_old())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -396,13 +535,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 ############## хэндлеры новое здание
 @dp.callback_query_handler(text='new_building_first')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_first(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации новое здание университета 1 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_first_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_first_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -412,13 +551,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='new_building_second')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_second(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 2 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_second_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_second_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -428,13 +567,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='new_building_third')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_third(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 3 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_third_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_third_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -444,13 +583,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='new_building_fourth')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_fourth(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 4 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_fourth_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_fourth_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -460,13 +599,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='new_building_fifth')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_fifth(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 5 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_fifth_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_fifth_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -476,13 +615,13 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='new_building_sixth')
-async def callback_inline_nav_unifi(call: CallbackQuery):
+async def callback_inline_nav_unifi_new_building_sixth(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в карты навигации Новое здание университета 6 этаж")
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
-                                text='Выберите кабинет:',
-                                reply_markup=await inline_keyboard_cabinets_sixth_new())
+                               text='Выберите кабинет:',
+                               reply_markup=await inline_keyboard_cabinets_sixth_new())
     else:
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
@@ -508,7 +647,7 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=description,
                                         reply_markup=inline_keyboard_old_building_back(building_callback,
-                                                                                         floor_callback))
+                                                                                       floor_callback))
         else:
             await bot.delete_message(call.message.chat.id, call.message.message_id)
             await bot.send_photo(call.message.chat.id, photo_id, caption=description,
@@ -631,3 +770,4 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
             await bot.send_photo(call.message.chat.id, photo_id, caption=description,
                                  reply_markup=inline_keyboard_new_building_back())
     await call.answer()
+##########################  Навигация по университету КОНЕЦ #############################################

@@ -20,7 +20,9 @@ from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_k
     map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
     keyboard_pps_choice_position, keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, \
     inline_keyboard_cancel_tutors_admin, cancel_or_send_or_image_map_nav_admin, cancel_or_update_or_image_map_nav_admin, \
-    cancel_or_description_or_image_map_nav_admin, cancel_or_description_or_send_map_nav_admin
+    cancel_or_description_or_image_map_nav_admin, cancel_or_description_or_send_map_nav_admin, \
+    inline_keyboard_description_image_tutors_admin, \
+    cancel_or_description_or_send_tutors_admin, cancel_or_update_or_image_tutors_admin, cancel_or_delete_photo_pps_admin
 
 import asyncio
 
@@ -220,7 +222,7 @@ async def callback_inline_update_contact_center(call: CallbackQuery, state: FSMC
 
 
 @dp.callback_query_handler(text='delete_info_contact_center_admin', state=DeleteContactCenter.confirm_delete)
-async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
+async def callback_inline_delete_info_contact_center_admin(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
         await db.delete_contact_center_button(data["name"])
@@ -280,7 +282,7 @@ async def pps_admin_state_shcool(call: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(text='choice_rectorat_admin', state=PpsAdmin.school)
-async def callback_tutors_university_admin_state(call: CallbackQuery, state: FSMContext):
+async def callback_choice_rectorat_admin_admin_state(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['shcool'] = 'Ректорат'
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -307,10 +309,56 @@ async def pps_admin_state_position(call: CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             data['position'] = "Проректоры"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f"Напишите описание которое хотите изменить для {data['position']} {data['shcool']}",
+                                text=f"Выберите что хотите изменить для: \n {data['position']} {data['shcool']}",
+                                reply_markup=inline_keyboard_description_image_tutors_admin())
+    # await PpsAdmin.description.set()
+    await state.reset_state(with_data=False)
+    await call.answer()
+
+
+@dp.callback_query_handler(text='update_pps_description_state', state=None)
+async def pps_admin_state_cabinet_update_description(call: CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=f'Напишите изменение',
                                 reply_markup=inline_keyboard_cancel_tutors_admin())
     await PpsAdmin.description.set()
     await call.answer()
+
+
+@dp.callback_query_handler(text='update_image_pps_admin', state=None)
+async def pps_admin_image_send_message(call: CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=f'Отправьте фото',
+                                reply_markup=inline_keyboard_cancel_tutors_admin())
+    await PpsAdmin.image.set()
+    await call.answer()
+
+
+@dp.message_handler(content_types=ContentType.ANY, state=PpsAdmin.image)
+async def pps_admin_state_image(message: types.Message, state: FSMContext):
+    await delete_inline_buttons_in_dialogue(message)
+    if message.content_type == 'photo':
+        data = await state.get_data()
+        await state.update_data(user_id=message.chat.id)
+        async with state.proxy() as data:
+            data['image'] = message.photo[-1].file_id
+        if len(data) > 4:
+            await state.update_data(image=message.photo[-1].file_id)
+            await bot.send_message(message.chat.id, text=f"Фото прикреплено!\n"
+                                                         f"{data['position']},{data['shcool']}\n"
+                                                         f"Отправить изменения?",
+                                   reply_markup=cancel_or_send_tutors_management())
+            await state.reset_state(with_data=False)
+        else:
+            await state.update_data(image=message.photo[-1].file_id)
+            await bot.send_message(message.chat.id, text=f"Фото прикреплено!\n"
+                                                         f"{data['position']},{data['shcool']}\n"
+                                                         f"Изменить описание?",
+                                   reply_markup=cancel_or_description_or_send_tutors_admin())
+            await state.reset_state(with_data=False)
+    else:
+        await message.answer('Ошибка - вы отправили не фото повторите',
+                             reply_markup=inline_keyboard_cancel_map_nav_admin())
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=PpsAdmin.description)
@@ -318,19 +366,31 @@ async def message_send_tutors_management(message: types.Message, state: FSMConte
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'text':
         await state.update_data(description=message.text, user_id=message.chat.id)
-        await bot.send_message(message.chat.id, text='Отправить это описание?',
-                               reply_markup=cancel_or_send_tutors_management())
-        await state.reset_state(with_data=False)
+        data = await state.get_data()
+        await state.update_data(user_id=message.chat.id)
+        if len(data) > 4:
+            await bot.send_message(message.chat.id, text=f'Отправить это описание:\n'
+                                                         f"'{data['description']}'\n"
+                                                         f"в'{data['position']}','{data['shcool']}'\n",
+                                   reply_markup=cancel_or_send_tutors_management())
+            await state.reset_state(with_data=False)
+        else:
+            await bot.send_message(message.chat.id, text=f'Отправить это описание:\n'
+                                                         f"'{data['description']}'\n"
+                                                         f"в'{data['position']}','{data['shcool']}'\n"
+                                                         f'Прикрепить или изменить фото?',
+                                   reply_markup=cancel_or_update_or_image_tutors_admin())
+            await state.reset_state(with_data=False)
     else:
         await message.answer('Ошибка - вы отправили не текст повторите',
                              reply_markup=inline_keyboard_cancel_contact_center_admin())
 
 
 @dp.callback_query_handler(text='send_tutors_management', state=None)
-async def callback_inline_send_tutors_management_final(call: CallbackQuery, state: FSMContext):
+async def callback_inline_send_tutors_management_final_description_and_photo(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await db.add_pps_data(data['user_id'], data['shcool'], data['position'], data['description'])
+        await db.add_pps_data(data['user_id'], data['shcool'], data['position'], data['description'], data['image'])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=f'Описание отправлено\n'
                                          'Админ меню навигации',
@@ -342,8 +402,72 @@ async def callback_inline_send_tutors_management_final(call: CallbackQuery, stat
         print(e)
 
 
+@dp.callback_query_handler(text='send_tutors_management_description', state=None)
+async def callback_inline_send_tutors_management_final_description(call: CallbackQuery, state: FSMContext):
+    try:
+        data = await state.get_data()
+        await db.add_pps_data_description(data['user_id'], data['shcool'], data['position'], data['description'])
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'Описание отправлено\n'
+                                         'Админ меню навигации',
+                                    reply_markup=inline_keyboard_nav_university_admin_menu())
+        logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
+        await state.reset_state()
+        await call.answer()
+    except Exception as e:
+        await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
+        print(e)
+
+
+@dp.callback_query_handler(text='send_tutors_management_photo', state=None)
+async def callback_inline_send_tutors_management_final_photo(call: CallbackQuery, state: FSMContext):
+    try:
+        data = await state.get_data()
+        await db.add_pps_data_photo(data['user_id'], data['shcool'], data['position'], data['image'])
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'Фото отправлено\n'
+                                         'Админ меню навигации',
+                                    reply_markup=inline_keyboard_nav_university_admin_menu())
+        logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
+        await state.reset_state()
+        await call.answer()
+    except Exception as e:
+        await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
+        print(e)
+
+
+# Удаление фото с ппс
+@dp.callback_query_handler(text='delete_pps_photo_state', state=None)
+async def pps_admin_state_cabinet_delete_photo(call: CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text=f'Удалить фото?',
+                                reply_markup=cancel_or_delete_photo_pps_admin())
+    await PpsAdmin.image.set()
+    await call.answer()
+
+
+@dp.callback_query_handler(text='delete_tutors_management_photo', state=PpsAdmin.image)
+async def callback_inline_delete_tutors_management_final_photo(call: CallbackQuery, state: FSMContext):
+    try:
+        async with state.proxy() as data:
+            data['image'] = None
+            data['user_id'] = call.message.chat.id
+        data = await state.get_data()
+        await db.add_pps_data_photo(data['user_id'], data['shcool'], data['position'], data['image'])
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'Фото Удалено\n'
+                                         'Админ меню навигации',
+                                    reply_markup=inline_keyboard_nav_university_admin_menu())
+        logging.info(f'User({call.message.chat.id}) отправил информацию для преподавателей менеджмента')
+        await state.reset_state()
+        await call.answer()
+    except Exception as e:
+        await call.message.answer(f'Ошибка описание не отправлено, (Ошибка - {e})')
+        print(e)
+
+
 @dp.callback_query_handler(text='cancel_step_tutors_admin', state=['*'])
-async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
+async def callback_inline_cancel_step_tutors(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -356,7 +480,7 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 
 #############  админ меню карты навигации
 @dp.callback_query_handler(text_contains='map_nav_admin')
-async def callback_inline_contacts_center_admin(call: CallbackQuery):
+async def callback_inline_map_nav_admin_admin(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) вошел в админ карты-навигации, call.data - {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Админ меню карты-навигации:', reply_markup=inline_keyboard_map_nav_admin_menu())
@@ -364,7 +488,7 @@ async def callback_inline_contacts_center_admin(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='send_cabinet_admin', state=None)
-async def callback_map_nav_admin_state(call: CallbackQuery):
+async def callback_map_nav_send_cabinet_admin_state(call: CallbackQuery):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='выберите здание где хотите добавить кабинет',
                                 reply_markup=keyboard_map_nav_choice_building())
@@ -557,7 +681,7 @@ async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMCon
 
 
 @dp.callback_query_handler(text='old_building_choice_admin_update', state=MapNavigationUpdate.building)
-async def map_nav_admin_state_building_update(call: CallbackQuery, state: FSMContext):
+async def map_nav_admin_state_old_building_choice_admin_update(call: CallbackQuery, state: FSMContext):
     data_building = 'Старое здание'
     async with state.proxy() as data:
         data['building'] = data_building
@@ -664,7 +788,7 @@ async def map_nav_admin_image_send_message(call: CallbackQuery, state: FSMContex
 
 
 @dp.message_handler(content_types=ContentType.ANY, state=MapNavigationUpdate.image)
-async def map_nav_admin_state_image(message: types.Message, state: FSMContext):
+async def map_nav_admin_state_image_step(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'photo':
         data = await state.get_data()
@@ -694,7 +818,7 @@ async def map_nav_admin_state_image(message: types.Message, state: FSMContext):
 
 
 @dp.callback_query_handler(text='update_map_navigation_admin', state=None)
-async def map_nav_admin_state_send_final(call: CallbackQuery, state: FSMContext):
+async def map_nav_admin_state_send_final_description(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
         if len(data) > 5:
@@ -778,7 +902,7 @@ async def map_nav_admin_state_building2_delete(call: CallbackQuery, state: FSMCo
 
 @dp.callback_query_handler(lambda floor: floor.data and floor.data.startswith('floor_choice_admin_delete'),
                            state=MapNavigationDelete.floor)
-async def map_nav_admin_state_floor(call: CallbackQuery, state: FSMContext):
+async def map_nav_admin_state_floor_delete(call: CallbackQuery, state: FSMContext):
     floor_number = call.data[-1]
     if floor_number == '1':
         async with state.proxy() as data:
@@ -836,14 +960,10 @@ async def map_nav_admin_state_delete_final(call: CallbackQuery, state: FSMContex
 
 
 @dp.callback_query_handler(text='cancel_step_map_nav_admin', state=['*'])
-async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
+async def callback_inline_cancel_step_map_nav(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text="Админ меню карт-навигации",
                                 reply_markup=inline_keyboard_map_nav_admin_menu())
     await state.reset_state()
     await call.answer()
-
-
-
-

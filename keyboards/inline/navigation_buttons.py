@@ -65,55 +65,10 @@ def inline_keyboard_pps():
     return markup
 
 
-def inline_keyboard_pps_shcool_management():
+def inline_keyboard_pps_shcool_choise(schoolUni):
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_management')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_management')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
-    markup.add(callback_button, callback_button1, callback_button2)
-    return markup
-
-
-def inline_keyboard_pps_shcool_law():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_law')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_law')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
-    markup.add(callback_button, callback_button1, callback_button2)
-    return markup
-
-
-def inline_keyboard_pps_shcool_engineer():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_engineer')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_engineer')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
-    markup.add(callback_button, callback_button1, callback_button2)
-    return markup
-
-
-def inline_keyboard_pps_shcool_inovation():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_inovation')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_inovation')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
-    markup.add(callback_button, callback_button1, callback_button2)
-    return markup
-
-
-def inline_keyboard_pps_shcool_bussines():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_bussines')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_bussines')
-    callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
-    markup.add(callback_button, callback_button1, callback_button2)
-    return markup
-
-
-def inline_keyboard_pps_shcool_economic():
-    markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text="Декан", callback_data='dekan_shcool_economic')
-    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='tutors_shcool_economic')
+    callback_button = InlineKeyboardButton(text="Декан", callback_data='callback_dekan_shcool_'+schoolUni)
+    callback_button1 = InlineKeyboardButton(text="Преподаватели", callback_data='callback_tutors_shcool_'+schoolUni)
     callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data='tutors_university')
     markup.add(callback_button, callback_button1, callback_button2)
     return markup

@@ -56,3 +56,5 @@ almaushop_faq_button = "⁉  ЧаВо"
 
 almaushop_def_buttons = [almaushop_products_button, almaushop_books_button, almaushop_website_button,
                          almaushop_contacts_button, almaushop_faq_button]
+
+feedback_advisor_button = "✏ Написать письмо эдвайзеру"

@@ -43,6 +43,6 @@ nav_center_callback = CallbackData('cntr', 'id')
 nav_center_callback_update = CallbackData('cntr_u', 'id')
 nav_center_callback_delete = CallbackData('cntr_d', 'id')
 
-#Library resources
+# Library resources
 lib_res_callback = CallbackData('lib', 'id')
 lib_res_delete_callback = CallbackData('libd', 'id')

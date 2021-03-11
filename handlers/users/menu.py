@@ -10,7 +10,9 @@ from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_key
     inline_keyboard_main_faq, inline_keyboard_main_faq_back, inline_keyboard_certificate, schedule_callback, \
     inline_keyboard_nav_unifi
 
-from data.config import admins
+# Импорт текстовых кнопок
+from data.config import main_menu_def_buttons, schedule_button_text, faq_button_text, library_button_text, \
+    shop_button_text, calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -106,35 +108,33 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 
 
 @rate_limit(1, 'Меню')
-@dp.message_handler(lambda message: message.text in ["📅 Расписание", "❓ FAQ", "📚 Библиотека", "🌀 AlmaU Shop",
-                                                     "🗒 Академический календарь", "🏢 Получить справку",
-                                                     "📝 Связь с ректором", "🗺️ Навигация по университету"])
+@dp.message_handler(lambda message: message.text in main_menu_def_buttons)
 async def main_menu_handler(message: Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) enter {message.text}")
-    if message.text == "📅 Расписание":
+    if message.text == schedule_button_text:
         await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
-    elif message.text == "❓ FAQ":
+    elif message.text == faq_button_text:
         await state.update_data(page=0)
         data = await state.get_data()
         await message.answer(text=f'F.A.Q Страница {data["page"] + 1}',
                              reply_markup=await inline_keyboard_main_faq(data["page"]))
-    elif message.text == "📚 Библиотека":
+    elif message.text == library_button_text:
         await message.answer(text='Библиотека ↘', reply_markup=keyboard_library())
-    elif message.text == "🌀 AlmaU Shop":
+    elif message.text == shop_button_text:
         await message.answer(text='AlmaU Shop ↘', reply_markup=keyboard_almaushop())
-    elif message.text == "🗒 Академический календарь":
+    elif message.text == calendar_button_text:
         file_id = await db.find_id_academic_calendar()
         await bot.send_document(message.chat.id, file_id)
-    elif message.text == "🏢 Получить справку":
+    elif message.text == certificate_button_text:
         await message.answer(text='Получение справки с места учебы\n' \
                                   'Вы можете получить справку или оставить заявку на получение справки с места учебы по месту требования (военкомат и тд.) ↘',
                              reply_markup=await inline_keyboard_certificate())
-    elif message.text == "📝 Связь с ректором":
+    elif message.text == feedback_button_text:
         await message.answer(
             text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
                  'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.',
             reply_markup=keyboard_feedback())
-    elif message.text == "🗺️ Навигация по университету":
+    elif message.text == navigation_button_text:
         await message.answer(text='Навигация по университету', reply_markup=inline_keyboard_nav_unifi())
 
 

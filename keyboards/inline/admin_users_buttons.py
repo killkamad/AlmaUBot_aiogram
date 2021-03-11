@@ -30,7 +30,7 @@ def inline_keyboard_users_admin_roles():
     callback_admin = InlineKeyboardButton(text="Администратор", callback_data='admin_role')
     callback_library_admin = InlineKeyboardButton(text="Отдел Библиотеки", callback_data='library_admin_role')
     callback_marketing_admin = InlineKeyboardButton(text="Отдел Маркетинга", callback_data='marketing_admin_role')
-    callback_advisor = InlineKeyboardButton(text="Адвайзер", callback_data='advisor_role')
+    callback_advisor = InlineKeyboardButton(text="Эдвайзер", callback_data='advisor_role')
     callback_cancel = InlineKeyboardButton(text="❌ Отмена", callback_data='cancel_role_choice')
     markup.add(callback_admin, callback_library_admin, callback_marketing_admin, callback_advisor, callback_cancel)
     return markup

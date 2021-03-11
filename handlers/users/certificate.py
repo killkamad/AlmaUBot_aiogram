@@ -11,7 +11,7 @@ from loader import dp, bot
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, certificate_callback, \
     inline_keyboard_cancel_request
-from keyboards.default import always_stay_keyboard, keyboard_request_send_phone, keyboard_certificate_type, \
+from keyboards.default import keyboard_request_send_phone, keyboard_certificate_type, \
     keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue

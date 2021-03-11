@@ -58,7 +58,7 @@ async def select_last_ten_users():
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "SELECT idt FROM users WHERE date_time IS NOT NULL ORDER BY date_time DESC;"
+            sql_ex = "SELECT idt FROM users WHERE date_time IS NOT NULL ORDER BY date_time DESC LIMIT 10;"
             record = await connection.fetch(sql_ex)
             return record
     except(Exception, ErrorInAssignmentError) as error:

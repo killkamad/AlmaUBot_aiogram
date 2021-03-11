@@ -4,7 +4,7 @@ from data.config import library_admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
-from keyboards.default import always_stay_keyboard, keyboard_library, keyboard_library_choice_db, \
+from keyboards.default import keyboard_library, keyboard_library_choice_db, \
     keyboard_library_send_phone
 from keyboards.inline import inline_keyboard_menu, lib_res_callback
 from states.library_state import EmailReg

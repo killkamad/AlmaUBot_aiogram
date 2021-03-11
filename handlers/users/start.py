@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 
 from loader import dp, bot
 from keyboards.inline import inline_keyboard_menu
-from keyboards.default import always_stay_keyboard, always_stay_menu_keyboard
+from keyboards.default import always_stay_menu_keyboard
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from datetime import datetime

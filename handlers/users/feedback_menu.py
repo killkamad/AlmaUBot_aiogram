@@ -4,7 +4,7 @@ from data.config import admins
 from aiogram.types import CallbackQuery, ContentType
 from aiogram import types
 
-from keyboards.default import always_stay_keyboard, keyboard_feedback_send_phone, always_stay_menu_keyboard
+from keyboards.default import keyboard_feedback_send_phone, always_stay_menu_keyboard
 from keyboards.inline import inline_keyboard_menu, inline_keyboard_feedback, inline_keyboard_send_msg_data, \
     inline_keyboard_cancel_msg_send
 from states.feedback_state import FeedbackMessage

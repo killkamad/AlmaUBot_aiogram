@@ -1,7 +1,7 @@
 import logging
 import aiogram.utils.markdown as fmt
 from data.config import library_admins
-from aiogram.types import CallbackQuery, ContentType
+from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram import types
 
 from keyboards.default import keyboard_library, keyboard_library_choice_db, \
@@ -150,12 +150,15 @@ async def send_license_db_reg_data_to_email(message: types.Message, state: FSMCo
             phone = f"+{phone}"
         async with state.proxy() as data:
             data['phone'] = phone
-        message_txt = f"Ваши данные:\n" \
-                      f"ФИО: {data['names']}\n" \
-                      f"Ваш email: {data['email']}\n" \
-                      f"Ваш телефон: {data['phone']}\n" \
-                      f"Желаемая база регистрации: {data['book_database']}"
-        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_reg_data())
+        message_txt = f"<b>Ваши данные:</b>\n" \
+                      f"• <b>ФИО:</b> {data['names']}\n" \
+                      f"• <b>Ваш email:</b> {data['email']}\n" \
+                      f"• <b>Ваш телефон:</b> {data['phone']}\n" \
+                      f"• <b>Желаемая база регистрации:</b> {data['book_database']}"
+        await bot.send_message(message.chat.id,
+                               message_txt,
+                               reply_markup=inline_keyboard_send_reg_data(),
+                               parse_mode="HTML")
         await state.reset_state(with_data=False)
     else:
         logging.info(f"User({message.chat.id}) ввел не правильный номер")
@@ -245,6 +248,7 @@ async def send_email_to_library_and_notification(call: CallbackQuery, state: FSM
     )
 
     email_message.attach(sending_message)
+    await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
     await aiosmtplib.send(email_message,
                           hostname="smtp.gmail.com",
                           port=587,

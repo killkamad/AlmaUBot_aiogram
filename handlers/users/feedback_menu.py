@@ -1,7 +1,7 @@
 import logging
 import aiogram.utils.markdown as fmt
 from data.config import admins
-from aiogram.types import CallbackQuery, ContentType
+from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram import types
 
 from keyboards.default import keyboard_feedback_send_phone, always_stay_menu_keyboard
@@ -11,6 +11,7 @@ from states.feedback_state import FeedbackMessage
 from loader import dp, bot
 # from keyboards.inline.feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 
+from data.config import feedback_advisor_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit
@@ -35,10 +36,10 @@ def is_valid_email(s):
 
 
 @rate_limit(1)
-@dp.message_handler(text=['✏ Написать письмо ректору'], state=None)
+@dp.message_handler(text=[feedback_advisor_button], state=None)
 async def feedback_text_buttons_handler(message: types.Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
-    if message.text == '✏ Написать письмо ректору':
+    if message.text == feedback_advisor_button:
         # await message.answer('...', reply_markup=ReplyKeyboardRemove())
         await message.reply("Что вы хотели бы написать?", reply_markup=inline_keyboard_cancel_msg_send())
         await FeedbackMessage.content.set()
@@ -93,12 +94,13 @@ async def SendToEmail(message: types.Message, state: FSMContext):
             phone = f"+{phone}"
         async with state.proxy() as data:
             data['phone'] = phone
-        message_txt = f"Ваши данные:\n" \
-                      f"ФИО: {data['names']}\n" \
-                      f"Ваш email: {data['email']}\n" \
-                      f"Ваш телефон: {data['phone']}\n" \
-                      f"Содержание письма: {data['content']}"
-        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_msg_data())
+        message_txt = f"<b>Ваши данные:</b>\n" \
+                      f"• <b>ФИО:</b> {data['names']}\n" \
+                      f"• <b>Ваш email:</b> {data['email']}\n" \
+                      f"• <b>Ваш телефон:</b> {data['phone']}\n" \
+                      f"• <b>Содержание письма:</b> {data['content']}"
+        await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_msg_data(),
+                               parse_mode='HTML')
         await state.reset_state(with_data=False)
     else:
         logging.info(f"User({message.chat.id}) ввел не правильный номер")
@@ -129,7 +131,7 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
     email_message["From"] = "almaubot@gmail.com"
     email_message["To"] = "killka_m@mail.ru"
     # email_message["To"] = "ketchupass10@gmail.com"
-    email_message["Subject"] = "Письмо ректору от студента"
+    email_message["Subject"] = "Письмо эдвайзеру от студента"
 
     sending_message = MIMEText(
         f"<html>"
@@ -153,6 +155,7 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
     )
 
     email_message.attach(sending_message)
+    await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
     await aiosmtplib.send(email_message,
                           hostname="smtp.gmail.com",
                           port=587,
@@ -166,11 +169,11 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
                            reply_markup=always_stay_menu_keyboard())
     for admin in admins:
         try:
-            await bot.send_message(admin, f"Пришло письмо в адрес ректора:\n"
-                                          f"ФИО - {data['names']}\n"
-                                          f"Email - {data['email']}\n"
-                                          f"Телефон - {data['phone']}\n"
-                                          f"Содержание письма:\n"
+            await bot.send_message(admin, f"<b>Вам пришло письмо от студента:</b>\n"
+                                          f"• <b>ФИО</b> - {data['names']}\n"
+                                          f"• <b>Email</b> - {data['email']}\n"
+                                          f"• <b>Телефон</b> - {data['phone']}\n"
+                                          f"• <b>Содержание письма:</b>\n"
                                           f"{data['content']}")
         except Exception as err:
             logging.exception(err)

@@ -15,13 +15,24 @@ async def aws_select_data_schedule():
         logging.info(error)
 
 
-async def find_schedule_id(name):
+async def find_schedule_id(schedule_id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT id_sched FROM schedule WHERE name_sched = $1;"
-            record: Record = await connection.fetchrow(sql_select, name)
+            sql_select = "SELECT id_sched FROM schedule WHERE id = $1;"
+            record: Record = await connection.fetchrow(sql_select, int(schedule_id))
             record = list(record)[0]
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def find_schedule_name_by_id(schedule_id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT name_sched FROM schedule WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(schedule_id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -82,7 +93,7 @@ async def clear_schedule_table(table_name):
 
 
 async def main():
-    print(await aws_select_data_schedule())
+    print(await find_schedule_name_by_id(17))
 
 
 if __name__ == '__main__':

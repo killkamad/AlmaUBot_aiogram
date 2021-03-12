@@ -1,7 +1,6 @@
 import logging
 
 # Импорт библиотек aiogram
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
@@ -20,7 +19,6 @@ from utils import db_api as db
 # Импорт стейтов
 from states.admin import UpdateUserRole
 import aiogram.utils.markdown as fmt
-from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 

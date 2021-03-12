@@ -1,4 +1,3 @@
-import ast
 import logging
 import re
 import aiogram.utils.markdown as fmt

@@ -24,7 +24,6 @@ from utils.almaushop_parser import AlmauShop, AlmauShopBooks
 from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop, EditButtonContentAlmauShop
 
 import aiogram.utils.markdown as fmt
-from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
@@ -114,6 +113,8 @@ async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentAlmauShop.button_content)
 async def edit_button_content_almaushop_first_step(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
+    # a = await state.get_state()
+    # print(a)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(button_content=message.text)

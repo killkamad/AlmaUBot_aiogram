@@ -1,15 +1,13 @@
 import asyncio
 import logging
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
-from .admin_menu import admin_menu, schedule_admin_menu
-from utils.delete_messages import bot_delete_messages
-
+from .admin_menu import schedule_admin_menu
+from utils import delete_inline_buttons
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_admin, inline_keyboard_cancel_schedule, cancel_or_send_schedule, \
+from keyboards.inline import inline_keyboard_cancel_schedule, cancel_or_send_schedule, \
     inline_keyboard_update_schedule, cancel_or_update_schedule, inline_keyboard_delete_schedule, \
     cancel_or_delete_schedule, schedule_update_callback, schedule_delete_callback, inline_keyboard_schedule_admin
 
@@ -20,7 +18,6 @@ from utils import db_api as db
 from states.admin import SendScheduleToBot, UpdateSchedule, DeleteSchedule
 
 import aiogram.utils.markdown as fmt
-from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
@@ -58,10 +55,11 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 @dp.callback_query_handler(schedule_update_callback.filter())
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    schedule_button_name = callback_data.get('schedule_name')
-    await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
+    schedule_id = callback_data.get('schedule_id')
+    schedule_name = await db.find_schedule_name_by_id(schedule_id)
+    await state.update_data(button_name=schedule_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Отправьте файл с расписанием для кнопки <b>{schedule_button_name}</b>:',
+                                text=f'Отправьте файл с расписанием для кнопки <b>{schedule_name}</b>:',
                                 parse_mode='HTML',
                                 reply_markup=inline_keyboard_cancel_schedule())
     await UpdateSchedule.send_file.set()
@@ -74,13 +72,16 @@ async def change_schedule_id(message: types.Message, state: FSMContext):
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
-        txt = f'Название кнопки: <b>{data["button_name"]}</b>'
+        txt = f'Название кнопки:\n' \
+              f'<b>{data["button_name"]}</b>\n\n' \
+              f'<i><u>Вы уверены?</u></i>'
         await bot.send_document(message.chat.id, data["file_id"], caption=txt,
                                 reply_markup=cancel_or_update_schedule())
         await state.reset_state(with_data=False)
     else:
         await bot.send_message(message.chat.id,
-                               'Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием',
+                               'Ошибка - вы отправили не документ\n'
+                               'Повторите Отправление файла с расписанием',
                                reply_markup=inline_keyboard_cancel_schedule())
 
 
@@ -107,11 +108,16 @@ async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state:
 @dp.callback_query_handler(schedule_delete_callback.filter(), state=None)
 async def callback_inline_update_schedule(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    schedule_button_name = callback_data.get('schedule_name')
-    await state.update_data(button_name=schedule_button_name, user_id=call.message.chat.id)
+    schedule_id = callback_data.get('schedule_id')
+    schedule_name = await db.find_schedule_name_by_id(schedule_id)
+    text_delete = f"Вы хотите удалить кнопку с расписанием\n" \
+                  f"<b>{schedule_name}</b>\n\n" \
+                  f"<i><u>Вы уверены?</u></i>"
+    await state.update_data(button_name=schedule_name, user_id=call.message.chat.id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы точно уверены, что хотите удалить кнопку расписания для <b>{schedule_button_name}</b>',
-                                parse_mode='HTML', reply_markup=cancel_or_delete_schedule())
+                                text=text_delete,
+                                parse_mode='HTML',
+                                reply_markup=cancel_or_delete_schedule())
     await DeleteSchedule.confirm_delete.set()
     await call.answer()
 
@@ -136,8 +142,7 @@ async def message_send_button_name(message: types.Message, state: FSMContext):
         if len(message.text) <= 28:
             await state.update_data(button_name=fmt.quote_html(message.text.lower()),
                                     user_id=message.chat.id)
-            await message.reply('Отправьте файл с расписанием', reply_markup=inline_keyboard_cancel_schedule(),
-                                reply=False)
+            await message.reply('Отправьте файл с расписанием', reply_markup=inline_keyboard_cancel_schedule())
             await SendScheduleToBot.send_file.set()
         else:
             await bot.send_message(message.chat.id,
@@ -146,7 +151,8 @@ async def message_send_button_name(message: types.Message, state: FSMContext):
     else:
         print(message.content_type)
         await bot.send_message(message.chat.id,
-                               'Ошибка - название может содержать только текст\nПовторите название для кнопки, например (3 Курс):',
+                               'Ошибка - название может содержать только текст\n'
+                               'Повторите название для кнопки, например (3 Курс):',
                                reply_markup=inline_keyboard_cancel_schedule())
 
 
@@ -157,16 +163,11 @@ async def message_schedule_send_file(message: types.Message, state: FSMContext):
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
-        txt = f'Название кнопки будет: {data["button_name"]}'
+        txt = f'Название кнопки: {data["button_name"]}'
         await bot.send_document(message.chat.id, data["file_id"], caption=txt,
                                 reply_markup=cancel_or_send_schedule())
         await state.reset_state(with_data=False)
     else:
-        try:
-            # Если есть инлайн клавиатура, убирает ее
-            await bot.edit_message_reply_markup(message.chat.id, message.message_id - 1)  # Убирает инлайн клавиатуру
-        except:
-            pass
         await bot.send_message(message.chat.id,
                                'Ошибка - вы отправили не документ\nПовторите Отправление файла с расписанием',
                                reply_markup=inline_keyboard_cancel_schedule())
@@ -195,9 +196,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
     request = 0
     try:
         data = await state.get_data()
-        # await bot_delete_messages(call.message, 2)
         await db.update_schedule_data(data['user_id'], data['file_id'], data["button_name"])
-        # await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
         await call.message.answer(f'✅ Расписание для <b>{data["button_name"]}</b> успешно обновлено.\n'
                                   f'Админ меню Расписания:',
@@ -216,7 +215,7 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
                     request = 0
             except Exception as e:
                 pass
-                # logging.info(f'Наверно бот заблокирован {e}')
+                # logging.info(f'Ошибка Бот заблокирован {e}')
 
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не обновлено, (Ошибка - {e})')

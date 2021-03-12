@@ -1,7 +1,6 @@
 import logging
 from math import ceil
 
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
@@ -17,10 +16,8 @@ from keyboards.inline import main_faq_edit_callback, main_faq_delete_callback, i
 from utils import db_api as db
 
 # Импорт стейтов
-from states.admin import CreateFaqAlmauShop, DeleteFaqAlmauShop, EditFaqAlmauShop, EditButtonContentAlmauShop, \
-    CreateMainFaq, EditMainFaq, DeleteMainFaq
+from states.admin import CreateMainFaq, EditMainFaq, DeleteMainFaq
 import aiogram.utils.markdown as fmt
-from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 
@@ -28,7 +25,10 @@ from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 @dp.callback_query_handler(text='add_main_faq', state=None)
 async def callback_inline_add_main_faq(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await call.message.answer('Напишите вопрос:\n', reply_markup=inline_keyboard_cancel_faq())
+    await bot.edit_message_text(chat_id=call.message.chat.id,
+                                message_id=call.message.message_id,
+                                text='Напишите вопрос:\n',
+                                reply_markup=inline_keyboard_cancel_faq())
     await CreateMainFaq.question.set()
     await call.answer()
 
@@ -59,9 +59,11 @@ async def callback_inline_add_main_faq_answer_step(message: types.Message, state
             await state.update_data(answer=fmt.quote_html(message.text))
             await message.reply('✅ Ответ получен.\n')
             data = await state.get_data()
-            await message.answer(f'Ваш вопрос - {data["question"]}\n'
-                                 f'Ваш ответ - {data["answer"]}\n\n'
-                                 f'Сохранить их в F.A.Q?', reply_markup=inline_keyboard_add_main_faq_or_cancel())
+            await message.answer(f'• <b>Ваш вопрос</b>\n'
+                                 f'{data["question"]}\n\n'
+                                 f'• <b>Ваш ответ</b>\n'
+                                 f'{data["answer"]}\n\n'
+                                 f'<i><u>Добавть их в F.A.Q?</u></i>', reply_markup=inline_keyboard_add_main_faq_or_cancel())
             await state.reset_state(with_data=False)
         else:
             await message.reply(
@@ -124,8 +126,10 @@ async def callback_inline_edit_main_faq_choice_step(call: CallbackQuery, state: 
     answer = db_request['answer']
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Выберите, что нужно изменить:\n'
-                                     f'<u>Вопрос</u> - {question}\n'
-                                     f'<u>Ответ</u> - {answer}',
+                                     f'• <b>Вопрос</b>\n'
+                                     f'{question}\n\n'
+                                     f'• <b>Ответ</b>\n'
+                                     f'{answer}',
                                 reply_markup=inline_keyboard_edit_main_faq_choice(), parse_mode='HTML')
     await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer),
                             user_id=call.message.chat.id, faq_id=id)
@@ -151,9 +155,11 @@ async def edit_main_faq_choice_step_question_final(message: types.Message, state
             await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='question_to_change')
             data = await state.get_data()
-            await message.answer(f'Ваш новый вопрос - {message.text}\n'
-                                 f'для ответа - {data["answer_text"]}\n'
-                                 f'<u>(Подтвердите изменение)</u>',
+            await message.answer(f'• <b>Ваш новый вопрос</b>\n'
+                                 f'{message.text}\n\n'
+                                 f'• <b>Для ответа</b>\n'
+                                 f'{data["answer_text"]}\n\n'
+                                 f'<i><u>Подтвердите изменение</u></i>',
                                  reply_markup=inline_keyboard_edit_main_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:
@@ -184,9 +190,11 @@ async def edit_main_faq_choice_step_answer_final(message: types.Message, state: 
             await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='answer_to_change')
             data = await state.get_data()
-            await message.answer(f'Ваш новый ответ - {data["selected_item"]}\n'
-                                 f'для вопроса - {data["question_text"]}\n'
-                                 f'<u>(Подтвердите изменение)</u>',
+            await message.answer(f'• <b>Ваш новый ответ</b>\n'
+                                 f'{data["selected_item"]}\n\n'
+                                 f'• <b>Для вопроса</b>\n'
+                                 f'{data["question_text"]}\n\n'
+                                 f'<i><u>Подтвердите изменение</u></i>',
                                  reply_markup=inline_keyboard_edit_main_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:
@@ -274,8 +282,11 @@ async def callback_inline_delete_main_faq_final(call: CallbackQuery, state: FSMC
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     id = callback_data.get('callback_id')
     question = (await db.main_faq_select_question_and_answer(id))['question']
+    text_delete = f"Вы хотите удалить кнопку F.A.Q\n" \
+                  f"<b>{question}</b>\n\n" \
+                  f"<i><u>Вы уверены?</u></i>"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы точно уверены, что хотите удалить кнопку <b>{question}</b>',
+                                text=text_delete,
                                 reply_markup=cancel_or_delete_main_faq())
     await state.update_data(question_text=fmt.quote_html(question), user_id=call.message.chat.id)
     await DeleteMainFaq.confirm_delete.set()

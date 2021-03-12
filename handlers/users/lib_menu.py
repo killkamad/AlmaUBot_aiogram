@@ -1,12 +1,10 @@
 import logging
 import aiogram.utils.markdown as fmt
-from data.config import library_admins
 from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram import types
 
-from keyboards.default import keyboard_library, keyboard_library_choice_db, \
-    keyboard_library_send_phone
-from keyboards.inline import inline_keyboard_menu, lib_res_callback
+from keyboards.default import keyboard_library, keyboard_library_send_phone
+from keyboards.inline import lib_res_callback
 from states.library_state import EmailReg
 from loader import dp, bot
 from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
@@ -15,7 +13,6 @@ from keyboards.inline.library_buttons import inline_keyboard_library_registratio
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit
-from utils.json_loader import json_data
 from aiogram.types import ReplyKeyboardRemove
 
 from email.mime.multipart import MIMEMultipart

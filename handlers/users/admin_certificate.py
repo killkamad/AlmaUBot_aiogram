@@ -1,13 +1,12 @@
 import logging
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
-from .admin_menu import admin_menu, certificate_admin_menu
+from .admin_menu import certificate_admin_menu
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_admin, inline_keyboard_cancel_certificate, cancel_or_send_certificate, \
+from keyboards.inline import inline_keyboard_cancel_certificate, cancel_or_send_certificate, \
     inline_keyboard_update_certificate, cancel_or_update_certificate, inline_keyboard_delete_certificate, \
     cancel_or_delete_certificate, inline_keyboard_upd_req_certificate, \
     inline_keyboard_del_req_certificate, inline_keyboard_certificate_admin, request_callback, \
@@ -21,7 +20,6 @@ from utils import db_api as db
 # Импорт стейтов
 from states.admin import SendCertificate, UpdateCertificate, DeleteCertificate
 
-from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 

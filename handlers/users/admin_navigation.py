@@ -1,10 +1,7 @@
-import ast
 import logging
 
-from aiogram.utils import exceptions
 from aiogram import types
-from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
-    InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import CallbackQuery, ContentType
 from loader import dp, bot
 from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_keyboard_contact_center_admin, \
     cancel_or_send_contact_center_admin, cancel_or_update_contact_center_admin, \
@@ -27,14 +24,12 @@ from keyboards.inline import inline_keyboard_nav_university_admin_menu, inline_k
 import asyncio
 
 from utils import db_api as db
-from .admin_menu import admin_menu
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
-from utils.delete_messages import bot_delete_messages
 from aiogram.dispatcher import FSMContext
 from states.admin import SendContactCenter, UpdateContactCenter, DeleteContactCenter, PpsAdmin, MapNavigation, \
     MapNavigationUpdate, MapNavigationDelete
 
-from keyboards.inline import cabinet_callback, cabinet_callback_update, nav_center_callback_update, \
+from keyboards.inline import cabinet_callback_update, nav_center_callback_update, \
     nav_center_callback_delete
 
 

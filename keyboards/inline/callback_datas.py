@@ -18,9 +18,9 @@ main_faq_edit_callback = CallbackData('edit_main_faq', 'callback_id')
 last_ten_users_callback = CallbackData('L10', 'telegram_id')
 
 # Schedule
-schedule_callback = CallbackData('sch', 'schedule_name')
-schedule_update_callback = CallbackData('schupd', 'schedule_name')
-schedule_delete_callback = CallbackData('schdel', 'schedule_name')
+schedule_callback = CallbackData('sch', 'schedule_id')
+schedule_update_callback = CallbackData('schupd', 'schedule_id')
+schedule_delete_callback = CallbackData('schdel', 'schedule_id')
 
 # Certificate
 certificate_callback = CallbackData('crt', 'id')

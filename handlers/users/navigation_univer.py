@@ -1,4 +1,3 @@
-import ast
 import logging
 
 from aiogram.types import CallbackQuery

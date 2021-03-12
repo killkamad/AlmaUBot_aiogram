@@ -17,7 +17,7 @@ from data.config import almaushop_products_button, almaushop_books_button, almau
 
 # Библиотека регулярных выражений
 @rate_limit(3)
-@dp.message_handler(lambda message: message.text in almaushop_def_buttons)
+@dp.message_handler(lambda message: message.text in [almaushop_products_button, almaushop_books_button])
 async def almaushop_text_buttons_parser_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки AlmaU Shop

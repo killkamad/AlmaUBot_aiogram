@@ -5,17 +5,15 @@ from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram import types
 
 from keyboards.default import keyboard_feedback_send_phone, always_stay_menu_keyboard
-from keyboards.inline import inline_keyboard_menu, inline_keyboard_feedback, inline_keyboard_send_msg_data, \
+from keyboards.inline import inline_keyboard_send_msg_data, \
     inline_keyboard_cancel_msg_send
 from states.feedback_state import FeedbackMessage
 from loader import dp, bot
-# from keyboards.inline.feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg_data, inline_keyboard_cancel_msg_send
 
 from data.config import feedback_advisor_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit
-from utils.json_loader import json_data
 from aiogram.types import ReplyKeyboardRemove
 
 from email.mime.multipart import MIMEMultipart

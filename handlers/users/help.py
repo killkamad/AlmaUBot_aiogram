@@ -1,6 +1,5 @@
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandHelp
-from keyboards.inline.menu_buttons import inline_keyboard_menu
 from loader import dp
 from utils.misc import rate_limit
 

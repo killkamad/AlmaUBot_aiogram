@@ -1,13 +1,11 @@
 import logging
 import asyncio
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 
 from .admin_menu import admin_menu
 from loader import dp, bot
-from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_mass_mailing_send_or_attach, inline_keyboard_cancel_or_send, \
@@ -19,7 +17,6 @@ from utils import db_api as db
 # Импорт стейтов
 from states.admin import MassMailSending
 
-from utils.misc import rate_limit
 import aiogram.utils.markdown as fmt
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
@@ -41,8 +38,8 @@ async def message_send_text(message: types.Message, state: FSMContext):
         if len(message.text) <= 4000:
             await state.update_data(message_text_all=fmt.quote_html(message.text))
             message_txt = f'Ваше сообщение:\n' \
-                          f'{fmt.quote_html(message.text)}' \
-                          f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+                          f'{fmt.quote_html(message.text)}\n\n' \
+                          f'<i><u>Вы уверены?</u></i>'
             await bot.send_message(message.chat.id, message_txt,
                                    parse_mode='HTML',
                                    reply_markup=inline_keyboard_mass_mailing_send_or_attach())
@@ -76,8 +73,8 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         # logging.info(message.photo[-1].file_id)
         data = await state.get_data()
         message_txt = f'Ваше сообщение:\n' \
-                      f'{data["message_text_all"]}' \
-                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+                      f'{data["message_text_all"]}\n\n' \
+                      f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     elif message.content_type == 'document':
@@ -85,8 +82,8 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         # logging.info(message.document.file_id)
         data = await state.get_data()
         message_txt = f'Ваше сообщение:\n' \
-                      f'{data["message_text_all"]}' \
-                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+                      f'{data["message_text_all"]}\n\n' \
+                      f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     elif message.content_type == 'voice':
@@ -94,8 +91,8 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         # logging.info(message.voice.file_id)
         data = await state.get_data()
         message_txt = f'Ваше сообщение:\n' \
-                      f'{data["message_text_all"]}' \
-                      f'\n <i><u>ВЫ УВЕРЕНЫ?</u></i>'
+                      f'{data["message_text_all"]}\n\n' \
+                      f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
         await state.reset_state(with_data=False)
     else:

@@ -6,7 +6,7 @@ from .callback_datas import schedule_update_callback, schedule_delete_callback
 # Админ меню Расписания
 def inline_keyboard_schedule_admin():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_upload = InlineKeyboardButton(text="📤 Загрузить расписание", callback_data='send_schedule_bot')
+    callback_upload = InlineKeyboardButton(text="📤 Добавить расписание", callback_data='send_schedule_bot')
     callback_update = InlineKeyboardButton(text="♻ Обновить расписание", callback_data='update_schedule_bot')
     callback_delete = InlineKeyboardButton(text="❌ Удалить расписание", callback_data='delete_schedule_bot')
     callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data='back_to_admin_menu')
@@ -46,7 +46,7 @@ async def inline_keyboard_update_schedule():
     markup = InlineKeyboardMarkup(row_width=2)
     schedule = await db.aws_select_data_schedule()
     markup.add(*[InlineKeyboardButton(text=item['name_sched'],
-                                      callback_data=schedule_update_callback.new(schedule_name=item["name_sched"])) for
+                                      callback_data=schedule_update_callback.new(schedule_id=item["id"])) for
                  item in schedule])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_update_step"))
     return markup
@@ -57,7 +57,7 @@ async def inline_keyboard_delete_schedule():
     markup = InlineKeyboardMarkup(row_width=2)
     schedule = await db.aws_select_data_schedule()
     markup.add(*[InlineKeyboardButton(text=item['name_sched'],
-                                      callback_data=schedule_delete_callback.new(schedule_name=item["name_sched"])) for
+                                      callback_data=schedule_delete_callback.new(schedule_id=item["id"])) for
                  item in schedule])
     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="cancel_delete_step"))
     return markup

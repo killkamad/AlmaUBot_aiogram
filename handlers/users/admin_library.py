@@ -1,11 +1,9 @@
 import logging
 
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
-from utils.delete_messages import bot_delete_messages
 from utils import db_api as db
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
@@ -224,40 +222,49 @@ async def callback_inlint_del_resource_cancel(call: CallbackQuery, state: FSMCon
 async def edit_button_content_library(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     if call.data == 'edit_lib_website':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 🌐 Вебсайт:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 🌐 Вебсайт:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='🌐 Вебсайт')
     elif call.data == 'edit_lib_contacts':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки ☎ Контакты:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки ☎ Контакты:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='☎ Контакты')
     elif call.data == 'edit_lib_work_hours':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 🕐 Время работы:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 🕐 Время работы:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='🕐 Время работы')
     elif call.data == 'edit_lib_courses':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 🎓 Онлайн курсы:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 🎓 Онлайн курсы:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='🎓 Онлайн курсы')
     elif call.data == 'edit_lib_idcard':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 💳 Потерял(a) ID-карту:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 💳 Потерял(a) ID-карту:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='💳 Потерял(a) ID-карту')
     elif call.data == 'edit_lib_rules':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки ⚠ Правила:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки ⚠ Правила:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='⚠ Правила')
     elif call.data == 'edit_lib_rights':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 📰 Права читателя:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 📰 Права читателя:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='📰 Права читателя')
     elif call.data == 'edit_lib_unallow':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки 🚫 Что не разрешается:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки 🚫 Что не разрешается:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='🚫 Что не разрешается')
     elif call.data == 'edit_lib_respons':
-        await bot.send_message(call.message.chat.id, 'Напишите новый текст для кнопки ⛔ Ответственность за нарушения:',
-                               reply_markup=inline_keyboard_cancel_edit_library_button())
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Напишите новый текст для кнопки ⛔ Ответственность за нарушения:',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
         await state.update_data(button_name='⛔ Ответственность за нарушения')
     await EditButtonContentLibrary.button_content.set()
     await call.answer()
@@ -288,11 +295,11 @@ async def edit_button_content_library_cancel(call: CallbackQuery, state: FSMCont
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     try:
         data = await state.get_data()
-        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text=f'❌ Отмена изменения контента кнопки - "{data["button_name"]}" для раздела Библиотека\n'
-                                    'Возврат в Админ меню Библиотека:',
-                               reply_markup=inline_keyboard_library_first_page_admin())
+        # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'❌ Отмена изменения контента кнопки - "{data["button_name"]}" для раздела Библиотека\n'
+                                         'Возврат в Админ меню Библиотека:',
+                                    reply_markup=inline_keyboard_library_first_page_admin())
         await state.reset_state()
         await call.answer()
     except Exception as error:
@@ -306,11 +313,11 @@ async def edit_button_content_library_confirm(call: CallbackQuery, state: FSMCon
     try:
         data = await state.get_data()
         await db.edit_library_menu_button(call.message.chat.id, data['button_name'], data['button_content'])
-        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text=f'✅ Успешно изменен контент для кнопки - "{data["button_name"]}" для раздела Библиотека\n'
-                                    'Админ меню Библиотека:',
-                               reply_markup=inline_keyboard_library_first_page_admin())
+        # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'✅ Успешно изменен контент для кнопки - "{data["button_name"]}" для раздела Библиотека\n'
+                                         'Админ меню Библиотека:',
+                                    reply_markup=inline_keyboard_library_first_page_admin())
         await state.reset_state()
         await call.answer()
     except Exception as error:
@@ -323,11 +330,11 @@ async def edit_button_content_library_cancel(call: CallbackQuery, state: FSMCont
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     try:
         data = await state.get_data()
-        await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-        await bot.send_message(chat_id=call.message.chat.id,
-                               text=f'❌ Отмена изменения контента для кнопки - "{data["button_name"]}" для раздела Библиотека\n'
-                                    'Возврат в Админ меню Библиотека:',
-                               reply_markup=inline_keyboard_library_first_page_admin())
+        # await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'❌ Отмена изменения контента для кнопки - "{data["button_name"]}" для раздела Библиотека\n'
+                                         'Возврат в Админ меню Библиотека:',
+                                    reply_markup=inline_keyboard_library_first_page_admin())
         await state.reset_state()
         await call.answer()
     except Exception as error:

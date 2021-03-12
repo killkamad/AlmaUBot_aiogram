@@ -1,10 +1,8 @@
 import logging
-from aiogram.utils import exceptions
 from aiogram import types
 from aiogram.types import CallbackQuery, ContentType
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
-from utils.delete_messages import bot_delete_messages
 
 # Импорт клавиатур
 from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_calendar, \

@@ -20,7 +20,6 @@ from utils.misc import rate_limit
 from states.register_user_phone import RegisterUserPhone
 
 from aiogram.dispatcher import FSMContext
-from states.feedback_state import FeedbackMessage
 
 _main_menu_text = 'Главное меню:\n' \
                   '- Расписание - просмотр актуального расписания\n' \
@@ -244,8 +243,8 @@ async def callback_inline(call: CallbackQuery):
 @dp.callback_query_handler(schedule_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    schedule_name = callback_data.get('schedule_name')  # Получение названия кнопки из callback_data
-    file_id = await db.find_schedule_id(schedule_name)  # Получение file_id кнопки из БД
+    schedule_id = callback_data.get('schedule_id')  # Получение названия кнопки из callback_data
+    file_id = await db.find_schedule_id(schedule_id)  # Получение file_id кнопки из БД
     await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
     await call.answer()
 
@@ -255,9 +254,17 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(main_faq_callback.filter())
 async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
     id = callback_data.get('callback_id')
-    answer = (await db.main_faq_select_question_and_answer(id))['answer']
+    db_request = await db.main_faq_select_question_and_answer(id)
+    question = db_request['question']
+    answer = db_request['answer']
+    text_faq = f'• <b>Вопрос:</b>\n' \
+               f'{question} \n\n' \
+               f'• <b>Ответ:</b>\n' \
+               f'{answer}'
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=answer, reply_markup=inline_keyboard_main_faq_back())
+                                text=text_faq,
+                                reply_markup=inline_keyboard_main_faq_back(),
+                                parse_mode="HTML")
     await call.answer()
 
 

@@ -72,6 +72,17 @@ async def search_contact_center_name(id):
         logging.info(error)
 
 
+async def description_contact_center_name(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT description_contact_center FROM contact_centers WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 # Все данные о контактах ключевых центров
 async def select_data_contact_centers():
     pool: Connection = db

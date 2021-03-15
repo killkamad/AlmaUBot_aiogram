@@ -1,0 +1,6 @@
+change_role_button_text = "♻ Изменить роль пользователю"
+last_ten_button_text = "🔟 Показать 10 последних"
+admin_button_text = "Администратор"
+lib_admin_button_text = "Отдел Библиотеки"
+mark_admin_button_text = "Отдел Маркетинга"
+advisor_button_text = "Эдвайзер"

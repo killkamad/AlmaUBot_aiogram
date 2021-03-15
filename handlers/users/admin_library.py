@@ -12,6 +12,13 @@ from keyboards.inline import inline_keyboard_library_first_page_admin, inline_ke
     inline_keyboard_library_res_admin, inline_keyboard_library_res_edit_admin, cancel_or_add_lib_resource, \
     inline_keyboard_del_lib_res, lib_res_delete_callback, cancel_or_delete_lib_resource, cancel_edit_lib_res
 
+from data.button_names.lib_buttons import lib_website_button, lib_resources_button, lib_contacts_button, \
+                                          lib_work_hours_button, lib_courses_button, lib_idcard_button, \
+                                          lib_rules_button, lib_rights_button, lib_unallowed_button, \
+                                          lib_responsibility_button, lib_booking_button, lib_reg_db_button, \
+                                          lib_free_kz_button, lib_free_foreign_button, lib_free_online_button, \
+                                          add_lib_resource_button, del_lib_resource_button
+
 from states.admin import EditButtonContentLibrary, AddLibraryResource, DeleteLibraryResource
 
 
@@ -57,22 +64,22 @@ async def edit_library_free_libs(call: CallbackQuery, state: FSMContext):
     if call.data == 'edit_library_registration':
         await state.update_data(lib_type='reg')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='📕 Лицензионные Базы Данных:',
+                                    text=lib_reg_db_button+':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_free_kz':
         await state.update_data(lib_type='kz')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='📗 Базы данных свободного доступа(Казахстанские):',
+                                    text=lib_free_kz_button+':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_free_foreign':
         await state.update_data(lib_type='foreign')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='📗 Базы данных свободного доступа(Зарубежные):',
+                                    text=lib_free_foreign_button+':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_online_libs':
         await state.update_data(lib_type='online')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='📗 Онлайн библиотеки:',
+                                    text=lib_free_online_button+':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
@@ -143,8 +150,6 @@ async def add_lib_resource_to_db(call: CallbackQuery, state: FSMContext):
                               reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
-
-
 # -------------------- Конец добавление электронного ресурса --------------------
 
 
@@ -210,62 +215,75 @@ async def callback_inlint_del_resource_cancel(call: CallbackQuery, state: FSMCon
                               reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
-
-
 # --------------------- Конец удаление электронного ресурса ---------------------
 
 
 @dp.callback_query_handler(text=['edit_lib_website', 'edit_lib_contacts', 'edit_lib_work_hours',
                                  'edit_lib_courses', 'edit_lib_idcard', 'edit_lib_rules',
-                                 'edit_lib_rights', 'edit_lib_unallow', 'edit_lib_respons'],
+                                 'edit_lib_rights', 'edit_lib_unallow', 'edit_lib_respons', 'edit_lib_booking'],
                            state=None)
 async def edit_button_content_library(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     if call.data == 'edit_lib_website':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 🌐 Вебсайт:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_website_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='🌐 Вебсайт')
+        await state.update_data(button_name=lib_website_button)
     elif call.data == 'edit_lib_contacts':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки ☎ Контакты:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_contacts_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='☎ Контакты')
+        await state.update_data(button_name=lib_contacts_button)
     elif call.data == 'edit_lib_work_hours':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 🕐 Время работы:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_work_hours_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='🕐 Время работы')
+        await state.update_data(button_name=lib_work_hours_button)
     elif call.data == 'edit_lib_courses':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 🎓 Онлайн курсы:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_courses_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='🎓 Онлайн курсы')
+        await state.update_data(button_name=lib_courses_button)
     elif call.data == 'edit_lib_idcard':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 💳 Потерял(a) ID-карту:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_idcard_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='💳 Потерял(a) ID-карту')
+        await state.update_data(button_name=lib_idcard_button)
     elif call.data == 'edit_lib_rules':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки ⚠ Правила:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_rules_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='⚠ Правила')
+        await state.update_data(button_name=lib_rules_button)
     elif call.data == 'edit_lib_rights':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 📰 Права читателя:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_rights_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='📰 Права читателя')
+        await state.update_data(button_name=lib_rights_button)
     elif call.data == 'edit_lib_unallow':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки 🚫 Что не разрешается:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_unallowed_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='🚫 Что не разрешается')
+        await state.update_data(button_name=lib_unallowed_button)
     elif call.data == 'edit_lib_respons':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки ⛔ Ответственность за нарушения:',
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_responsibility_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_edit_library_button())
-        await state.update_data(button_name='⛔ Ответственность за нарушения')
+        await state.update_data(button_name=lib_responsibility_button)
+    elif call.data == 'edit_lib_booking':
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=f'Напишите новый текст для кнопки \n' f'{lib_booking_button}:',
+                                    parse_mode='HTML',
+                                    reply_markup=inline_keyboard_cancel_edit_library_button())
+        await state.update_data(button_name=lib_booking_button)
     await EditButtonContentLibrary.button_content.set()
     await call.answer()
 

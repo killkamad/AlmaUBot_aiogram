@@ -10,7 +10,7 @@ from keyboards.inline import inline_keyboard_send_msg_data, \
 from states.feedback_state import FeedbackMessage
 from loader import dp, bot
 
-from data.config import feedback_advisor_button
+from data.button_names.feedback_buttons import feedback_advisor_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit

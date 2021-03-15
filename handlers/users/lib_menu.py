@@ -10,6 +10,10 @@ from loader import dp, bot
 from keyboards.inline.library_buttons import inline_keyboard_library_registration, inline_keyboard_send_reg_data, \
     inline_keyboard_library_el_res, inline_keyboard_library_base_kaz, inline_keyboard_cancel_lic_db_reg, \
     inline_keyboard_library_base_zarub, inline_keyboard_library_online_bib, inline_keyboard_library_choice_db
+
+# Импорт названий клавиатур
+from data.button_names.lib_buttons import lib_def_buttons, lib_resources_button
+
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 from utils.misc import rate_limit
@@ -34,18 +38,14 @@ def is_valid_email(s):
 
 @rate_limit(1)
 @dp.message_handler(
-    lambda message: message.text in ['🌐 Вебсайт', '⚡ Электронные ресурсы', '☎ Контакты', '🕐 Время работы',
-                                     '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила', '📰 Права читателя',
-                                     '🚫 Что не разрешается', '⛔ Ответственность за нарушения'])
+    lambda message: message.text in lib_def_buttons or message.text==lib_resources_button)
 async def library_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки БИБЛИОТЕКИ
-    if message.text in ['🌐 Вебсайт', '☎ Контакты', '🕐 Время работы',
-                        '🎓 Онлайн курсы', '💳 Потерял(a) ID-карту', '⚠ Правила',
-                        '📰 Права читателя', '🚫 Что не разрешается', '⛔ Ответственность за нарушения']:
+    if message.text in lib_def_buttons:
         button_content = await db.select_library_menu_button_content(message.text)
         await bot.send_message(chat_id=message.chat.id, text=button_content)
-    elif message.text == '⚡ Электронные ресурсы':
+    elif message.text == lib_resources_button:
         await bot.send_message(chat_id=message.chat.id,
                                text='Электронные ресурсы\n',
                                reply_markup=inline_keyboard_library_el_res())

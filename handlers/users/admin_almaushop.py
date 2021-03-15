@@ -14,6 +14,9 @@ from keyboards.inline import almau_shop_faq_delete_callback, almau_shop_faq_edit
     inline_keyboard_cancel_almaushop_faq_create, inline_keyboard_cancel_almaushop_faq_update, \
     inline_keyboard_cancel_almaushop_website_contacts
 
+
+from data.button_names.almaushop_buttons import almaushop_website_button, almaushop_contacts_button
+
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -85,14 +88,16 @@ async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     if call.data == 'edit_website_b_almaushop':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки "🌐  Вебсайт"',
+                                    text=f'Напишите новый текст для кнопки {almaushop_website_button}',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
-        await state.update_data(button_name='🌐  Вебсайт')
+        await state.update_data(button_name=almaushop_website_button)
     elif call.data == 'edit_contacts_b_almaushop':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text='Напишите новый текст для кнопки "☎  Контакты":',
+                                    text=f'Напишите новый текст для кнопки {almaushop_contacts_button}:',
+                                    parse_mode='HTML',
                                     reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
-        await state.update_data(button_name='☎  Контакты')
+        await state.update_data(button_name=almaushop_contacts_button)
     await EditButtonContentAlmauShop.button_content.set()
     await call.answer()
 

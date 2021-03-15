@@ -108,11 +108,11 @@ async def SendRequest(message: types.Message, state: FSMContext):
             phone = f"+{phone}"
         async with state.proxy() as data:
             data['phone'] = phone
-        message_txt = f"Ваши данные:\n" \
-                      f"ФИО: {data['names']}\n" \
-                      f"Ваш email: {data['email']}\n" \
-                      f"Ваш телефон: {data['phone']}\n" \
-                      f"Вид справки: {data['type']}"
+        message_txt = f"<b>Ваши данные:</b>\n" \
+                      f"• <b>ФИО:</b> {data['names']}\n" \
+                      f"• <b>Ваш email:</b> {data['email']}\n" \
+                      f"• <b>Ваш телефон:</b> {data['phone']}\n" \
+                      f"• <b>Вид справки:</b> {data['type']}"
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_req_data())
         await state.reset_state(with_data=False)
     else:

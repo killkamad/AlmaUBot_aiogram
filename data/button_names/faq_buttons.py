@@ -1,0 +1,5 @@
+add_faq_button = "➕ Добавить FAQ"
+edit_faq_button = "♻ Изменить FAQ"
+delete_faq_button = "❌ Удалить FAQ"
+question_button = "❓ Вопрос"
+answer_button = "❗ Ответ"

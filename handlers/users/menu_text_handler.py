@@ -7,17 +7,17 @@ import logging
 from utils.json_loader import json_data
 from utils.misc import rate_limit
 from .menu import _main_menu_text
-
+from data.button_names.main_menu_buttons import start_menu_buttons, menu_button, about_button
 
 @rate_limit(1)
-@dp.message_handler(lambda message: message.text in ['🏠 Меню', '❓ Помощь', '💻 О боте', '⬅ В главное меню'])
+@dp.message_handler(lambda message: message.text in start_menu_buttons)
 async def bot_echo(message: types.Message):
     logging.info(f'User({message.chat.id}) нажал на кнопку {message.text}')
     # Кнопки главного меню
-    if message.text == '🏠 Меню':
+    if message.text == menu_button:
         await message.answer(_main_menu_text,
                              reply_markup=inline_keyboard_menu())
-    elif message.text == '💻 О боте':
+    elif message.text == about_button:
         await message.answer('<b>О боте:</b>\n\n'
                              '- Для загрузки расписания, войти в меню админа - /admin '
                              'и нажать на кнопку <b>"📤 Загрузить расписание"</b>.\n\n'

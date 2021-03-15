@@ -11,8 +11,8 @@ from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_key
     inline_keyboard_nav_unifi
 
 # Импорт текстовых кнопок
-from data.config import main_menu_def_buttons, schedule_button_text, faq_button_text, library_button_text, \
-    shop_button_text, calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text
+from data.button_names.main_menu_buttons import main_menu_def_buttons, schedule_button_text, faq_button_text, library_button_text, \
+    shop_button_text, calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text, to_main_menu_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
@@ -137,10 +137,10 @@ async def main_menu_handler(message: Message, state: FSMContext):
         await message.answer(text='Навигация по университету', reply_markup=inline_keyboard_nav_unifi())
 
 
-@dp.message_handler(lambda message: message.text in ["⬅ В главное меню"])
+@dp.message_handler(lambda message: message.text in to_main_menu_button)
 async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
-    if message.text == "⬅ В главное меню":
+    if message.text == to_main_menu_button:
         await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
 
 

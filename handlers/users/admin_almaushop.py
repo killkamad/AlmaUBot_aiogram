@@ -14,7 +14,6 @@ from keyboards.inline import almau_shop_faq_delete_callback, almau_shop_faq_edit
     inline_keyboard_cancel_almaushop_faq_create, inline_keyboard_cancel_almaushop_faq_update, \
     inline_keyboard_cancel_almaushop_website_contacts
 
-
 from data.button_names.almaushop_buttons import almaushop_website_button, almaushop_contacts_button
 
 # Импортирование функций из БД контроллера
@@ -198,9 +197,12 @@ async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, 
             await state.update_data(answer=fmt.quote_html(message.text))
             await message.reply('✅ Ответ получен.\n')
             data = await state.get_data()
-            await message.answer(f'Ваш вопрос - {data["question"]}\n'
-                                 f'Ваш ответ - {data["answer"]}\n\n'
-                                 f'Сохранить их в F.A.Q?', reply_markup=inline_keyboard_add_almaushop_faq_or_cancel())
+            await message.answer(f'• <b>Ваш вопрос</b>\n'
+                                 f'{data["question"]}\n\n'
+                                 f'• <b>Ваш ответ</b>\n'
+                                 f'{data["answer"]}\n\n'
+                                 f'<i><u>Добавть их в F.A.Q?</u></i>',
+                                 reply_markup=inline_keyboard_add_almaushop_faq_or_cancel())
             await state.reset_state(with_data=False)
         else:
             await message.reply(
@@ -259,8 +261,10 @@ async def callback_inline_cancel_faq_almaushop_update(call: CallbackQuery, state
     data = await state.get_data()
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Выберите, что нужно изменить:\n'
-                                     f'<u>Вопрос</u> - {data["question_text"]}\n'
-                                     f'<u>Ответ</u> - {data["answer_text"]}',
+                                     f'• <b>Вопрос</b>\n'
+                                     f'{data["question_text"]}\n\n'
+                                     f'• <b>Ответ</b>\n'
+                                     f'{data["answer_text"]}',
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
     await state.reset_state(with_data=False)
     await call.answer()
@@ -300,9 +304,11 @@ async def callback_inline_delete_faq_almaushop_final(call: CallbackQuery, state:
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     id = callback_data.get('callback_id')
     question = await db.almaushop_faq_find_question(id)
+    text_delete = f"Вы хотите удалить кнопку F.A.Q\n" \
+                  f"<b>{question}</b>\n\n" \
+                  f"<i><u>Вы уверены?</u></i>"
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Вы точно уверены, что хотите удалить кнопку:\n'
-                                     f'<b>{question}</b>',
+                                text=text_delete,
                                 reply_markup=cancel_or_delete_faq_almau_shop())
     await state.update_data(question_text=fmt.quote_html(question), user_id=call.message.chat.id)
     await DeleteFaqAlmauShop.confirm_delete.set()
@@ -347,8 +353,10 @@ async def callback_inline_edit_faq_almaushop_choice_step(call: CallbackQuery, st
     answer = db_request['answer']
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Выберите, что нужно изменить:\n'
-                                     f'<u>Вопрос</u> - {question}\n'
-                                     f'<u>Ответ</u> - {answer}',
+                                     f'• <b>Вопрос</b>\n'
+                                     f'{question}\n\n'
+                                     f'• <b>Ответ</b>\n'
+                                     f'{answer}',
                                 reply_markup=inline_keyboard_edit_faq_almaushop_choice(), parse_mode='HTML')
     await state.update_data(question_text=fmt.quote_html(question), answer_text=fmt.quote_html(answer),
                             user_id=call.message.chat.id, faq_id=id)
@@ -385,9 +393,11 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
             await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='question_to_change')
             data = await state.get_data()
-            await message.answer(f'Ваш новый вопрос - {data["selected_item"]}\n'
-                                 f'для ответа - {data["answer_text"]}\n'
-                                 f'<u>(Подтвердите изменение)</u>',
+            await message.answer(f'• <b>Ваш новый вопрос</b>\n'
+                                 f'{data["selected_item"]}\n\n'
+                                 f'• <b>Для ответа</b>\n'
+                                 f'{data["answer_text"]}\n\n'
+                                 f'<i><u>Подтвердите изменение</u></i>',
                                  reply_markup=inline_keyboard_edit_almaushop_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:
@@ -409,9 +419,11 @@ async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, st
             await state.update_data(selected_item=fmt.quote_html(message.text),
                                     thing_to_change='answer_to_change')
             data = await state.get_data()
-            await message.answer(f'Ваш новый ответ - {data["selected_item"]}\n'
-                                 f'для вопроса - {data["question_text"]}\n'
-                                 f'<u>(Подтвердите изменение)</u>',
+            await message.answer(f'• <b>Ваш новый ответ</b>\n'
+                                 f'{data["selected_item"]}\n\n'
+                                 f'• <b>Для вопроса</b>\n'
+                                 f'{data["question_text"]}\n\n'
+                                 f'<i><u>Подтвердите изменение</u></i>',
                                  reply_markup=inline_keyboard_edit_almaushop_faq_or_cancel(), parse_mode='HTML')
             await state.reset_state(with_data=False)
         else:

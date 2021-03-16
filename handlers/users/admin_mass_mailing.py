@@ -1,7 +1,7 @@
 import logging
 import asyncio
 from aiogram import types
-from aiogram.types import CallbackQuery, ContentType
+from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram.dispatcher import FSMContext
 
 from .admin_menu import admin_menu
@@ -37,7 +37,7 @@ async def message_send_text(message: types.Message, state: FSMContext):
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(message_text_all=fmt.quote_html(message.text))
-            message_txt = f'Ваше сообщение:\n' \
+            message_txt = f'• <b>Ваше сообщение:</b>\n' \
                           f'{fmt.quote_html(message.text)}\n\n' \
                           f'<i><u>Вы уверены?</u></i>'
             await bot.send_message(message.chat.id, message_txt,
@@ -58,7 +58,7 @@ async def message_send_text(message: types.Message, state: FSMContext):
 async def callback_inline_attach_pic_or_doc(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку ➕ Добавить фото или документ - {call.data}')
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
-    await bot.send_message(call.message.chat.id, 'Прикрепите фото или файл к рассылке:',
+    await bot.send_message(call.message.chat.id, 'Прикрепите к рассылке фото/документ/голосовое сообщение',
                            reply_markup=inline_keyboard_cancel_mass_mailing())
     await MassMailSending.message_attached.set()
     await call.answer()
@@ -72,7 +72,7 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         await state.update_data(content_type="photo", file_id=message.photo[-1].file_id)
         # logging.info(message.photo[-1].file_id)
         data = await state.get_data()
-        message_txt = f'Ваше сообщение:\n' \
+        message_txt = f'• <b>Ваше сообщение:</b>\n' \
                       f'{data["message_text_all"]}\n\n' \
                       f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
@@ -81,7 +81,7 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         await state.update_data(content_type="document", file_id=message.document.file_id)
         # logging.info(message.document.file_id)
         data = await state.get_data()
-        message_txt = f'Ваше сообщение:\n' \
+        message_txt = f'• <b>Ваше сообщение:</b>\n' \
                       f'{data["message_text_all"]}\n\n' \
                       f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
@@ -90,7 +90,7 @@ async def message_send_photo(message: types.Message, state: FSMContext):
         await state.update_data(content_type="voice", file_id=message.voice.file_id)
         # logging.info(message.voice.file_id)
         data = await state.get_data()
-        message_txt = f'Ваше сообщение:\n' \
+        message_txt = f'• <b>Ваше сообщение:</b>\n' \
                       f'{data["message_text_all"]}\n\n' \
                       f'<i><u>Вы уверены?</u></i>'
         await message.reply(message_txt, parse_mode='HTML', reply_markup=inline_keyboard_cancel_or_send())
@@ -115,6 +115,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
                                parse_mode='HTML')
         await admin_menu(call.message)
         all_users = await db.select_users()
+        await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
         for user in all_users:
             try:
                 if data['content_type'] == "photo":
@@ -155,6 +156,7 @@ async def callback_inline_send_send_all(call: CallbackQuery, state: FSMContext):
                                parse_mode='HTML')
         await admin_menu(call.message)
         all_users = await db.select_users()
+        await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
         for user in all_users:
             try:
                 await bot.send_message(user, data['message_text_all'], parse_mode='HTML')

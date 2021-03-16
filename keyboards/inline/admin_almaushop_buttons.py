@@ -5,10 +5,13 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.inline.callback_datas import almau_shop_faq_delete_callback, almau_shop_faq_edit_callback
 from utils import db_api as db
 
-from data.button_names.almaushop_buttons import update_merch_button, update_books_button, add_shop_faq_button, edit_shop_faq_button, \
-                                                delete_shop_faq_button, edit_shop_website_button, edit_shop_contacts_button, \
-                                                shop_question_button, shop_answer_button
-from data.button_names.admin_menu_buttons import back_to_admin_menu_button, edit_admin_button, save_admin_button, delete_admin_button, cancel_admin_button
+from data.button_names.almaushop_buttons import update_merch_button, update_books_button, add_shop_faq_button, \
+    edit_shop_faq_button, \
+    delete_shop_faq_button, edit_shop_website_button, edit_shop_contacts_button, \
+    shop_question_button, shop_answer_button
+from data.button_names.admin_menu_buttons import back_to_admin_menu_button, edit_admin_button, save_admin_button, \
+    delete_admin_button, cancel_admin_button
+
 
 # Админ меню AlmaU Shop
 def inline_keyboard_almau_shop_admin():
@@ -119,5 +122,5 @@ def inline_keyboard_cancel_almaushop_faq_update():
 def inline_keyboard_cancel_almaushop_website_contacts():
     markup = InlineKeyboardMarkup()
     cancel_button = InlineKeyboardButton(text=cancel_admin_button, callback_data="cancel_ed_but_con_shop")
-    markup.add(cancel_admin_button)
+    markup.add(cancel_button)
     return markup

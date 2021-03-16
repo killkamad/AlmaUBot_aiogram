@@ -294,9 +294,10 @@ async def edit_button_content_library_text(message: types.Message, state: FSMCon
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(button_content=message.text)
-            await message.reply('✅ Новый текст получен.\n'
-                                'Подтвердите изменение',
-                                reply_markup=inline_keyboard_edit_button_content_library_or_cancel())
+            await message.reply('✅ Новый текст получен.\n\n'
+                                '<i><u>Подтвердите изменение</u></i>',
+                                reply_markup=inline_keyboard_edit_button_content_library_or_cancel(),
+                                parse_mode="HTML")
             await EditButtonContentLibrary.confirm.set()
         else:
             await message.reply(

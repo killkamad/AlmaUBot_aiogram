@@ -26,8 +26,8 @@ from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 async def callback_inline_edit_users_role(call: CallbackQuery):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='- Для успешного изменения роли, пользователь должен зарегистрировать свой номер командой /phone_reg .\n'
-                                     '- Если пользователь зарегистрировал свой номер отправте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
+                                text='• Для успешного изменения-добавление роли, пользователь должен зарегистрировать свой номер командой /phone_reg .\n\n'
+                                     '• Если пользователь зарегистрировал свой номер отправьте его номер телефона с плюсом например(+77073040120), Или отправте как контакт (нажав на скрепку слева снизу вашего смартфона):\n',
                                 reply_markup=inline_keyboard_cancel_users_role_change())
     await UpdateUserRole.phone.set()
     await call.answer()

@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from data.button_names.mass_mailing_buttons import file_or_photo_button, send_mailing_button
 from data.button_names.admin_menu_buttons import send_admin_button, cancel_admin_button
 
+
 # Рассылка
 def inline_keyboard_mass_mailing_send_or_attach():
     markup = InlineKeyboardMarkup(row_width=1)

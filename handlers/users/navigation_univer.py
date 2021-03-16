@@ -196,32 +196,32 @@ async def callback_handler_dekan_pps(call: CallbackQuery):
 async def callback_handler_tutors_pps(call: CallbackQuery):
     calldatalast = call.data[-1]
     if calldatalast == '1':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[0])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[0])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '2':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[1])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[1])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '3':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[2])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[2])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '4':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[3])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[3])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '5':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[4])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[4])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))
     if calldatalast == '6':
-        keyboard = keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[5])
+        keyboard = inline_keyboard_pps_shcool_back(school_callback_tuple[5])
         description = await db.pps_center_description(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         photo_id = await db.find_photoid_pps(scholl_tuple[int(calldatalast) - 1], position_tuple[1])
         await create_task(check_photo_is_none_map_nav_function(keyboard, description, photo_id, call))

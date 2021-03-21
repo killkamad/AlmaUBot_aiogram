@@ -39,18 +39,21 @@ WantedBy=multi-user.target
 Войти в root - sudo -i
 Как поменять название файла - mv название_файла тут_новое_название
 Чтобы поменять линки:
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
 единица в конце обозначает приоритет
 ```
 **Настройка сервера**
 ```
+sudo apt -y upgrade
 1) sudo -i
 2) adduser botadmin
 3) войти в etc/sudoers и выдать нужному пользователю root права
-4) sudo nano /etc/ssh/sshd_config и PasswordAuthentication сделать yes
-чтобы можно было подключаться через ip
-5) git clone проекта
-6) sudo -H pip3 install --upgrade pip
+4) sudo nano /etc/ssh/sshd_config . PasswordAuthentication сделать yes
+чтобы можно было подключаться через ip,
+   Потом - sudo systemctl reload sshd
+5) git clone проекта,
+6) sudo apt-get install python3-pip
+   sudo -H pip3 install --upgrade pip
    sudo -H pip3 install virtualenv
 7) virtualenv myprojectenv - создаем виртуальное окружение
 8) source myprojectenv/bin/activate - входим в него

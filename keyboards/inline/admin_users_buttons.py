@@ -8,7 +8,6 @@ from data.button_names.users_buttons import *
 from utils import db_api as db
 
 
-
 # Админ меню Пользователей
 def inline_keyboard_users_admin():
     markup = InlineKeyboardMarkup(row_width=1)

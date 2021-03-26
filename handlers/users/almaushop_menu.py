@@ -11,7 +11,8 @@ from loader import dp, bot
 from utils import db_api as db
 from utils.misc import rate_limit
 
-from data.button_names.almaushop_buttons import almaushop_products_button, almaushop_books_button, almaushop_website_button, \
+from data.button_names.almaushop_buttons import almaushop_products_button, almaushop_books_button, \
+    almaushop_website_button, \
     almaushop_contacts_button, almaushop_faq_button, almaushop_def_buttons
 
 

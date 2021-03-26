@@ -9,6 +9,7 @@ from utils.misc import rate_limit
 from .menu import _main_menu_text
 from data.button_names.main_menu_buttons import start_menu_buttons, menu_button, about_button
 
+
 @rate_limit(1)
 @dp.message_handler(lambda message: message.text in start_menu_buttons)
 async def bot_echo(message: types.Message):

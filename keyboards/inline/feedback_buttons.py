@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from data.button_names.feedback_buttons import feedback_advisor_button, send_feedback_button
 from data.button_names.main_menu_buttons import to_back_button, cancel_menu_button
 
+
 def inline_keyboard_feedback():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text=feedback_advisor_button, callback_data='message_to_rector')

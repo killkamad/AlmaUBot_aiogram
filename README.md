@@ -9,10 +9,11 @@ https://www.youtube.com/watch?v=wj1Vwq3IrL4&list=PLwVBSkoL97Q3phZRyInbM4lShvS1cB
 **Для сервера:**
 ```
 Обновить даемон - sudo systemctl daemon-reload
-Незнаю чото - sudo systemctl enable bot
-Стартануть бота - sudo systemctl start bot
-Проверить статус - sudo systemctl status bot
-Шобы остановить бота - sudo systemctl stop bot
+Первоначальная команда включения сервиса - sudo systemctl enable bot
+Запустить бота - sudo systemctl start bot
+Проверить статус и логи - sudo systemctl status bot
+Для останвоки - sudo systemctl stop bot
+Для перезапуска - sudo systemctl restart bot
 Для просмотра логов - journalctl --no-pager
 ```
 
@@ -38,9 +39,8 @@ WantedBy=multi-user.target
 ```
 Войти в root - sudo -i
 Как поменять название файла - mv название_файла тут_новое_название
-Чтобы поменять линки:
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-единица в конце обозначает приоритет
+Чтобы поменять линки питона:
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 (единица в конце обозначает приоритет)
 ```
 **Настройка сервера**
 ```
@@ -58,7 +58,7 @@ sudo apt -y upgrade
 7) virtualenv myprojectenv - создаем виртуальное окружение
 8) source myprojectenv/bin/activate - входим в него
 9) pip install -r requirements.txt - устанавливаем зависимости
-10) создаем bot.service - sudo nano /etc/systemd/system/bot.service
+10) sudo nano /etc/systemd/system/bot.service - создаем bot.service
 ```
 **Настройка PostgreSQL сервера**
 ```

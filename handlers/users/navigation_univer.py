@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 from loader import dp, bot
 from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \
     inline_keyboard_contacts_center_back, inline_keyboard_pps, inline_keyboard_pps_rectorat, \
-    inline_keyboard_pps_rectorat_back,inline_keyboard_pps_shcool_back, inline_keyboard_map_nav, \
+    inline_keyboard_pps_rectorat_back, inline_keyboard_pps_shcool_back, inline_keyboard_map_nav, \
     inline_keyboard_old_building, inline_keyboard_new_building, inline_keyboard_new_building_back, \
     inline_keyboard_old_building_back, inline_keyboard_cabinets_dinamyc, inline_keyboard_pps_shcool_choise
 from utils import db_api as db
@@ -17,7 +17,7 @@ scholl_tuple = ('Школа менеджмента', 'Школа политик�
                 'Школа Инженерного Менеджмента',
                 'Высшая Школа Бизнеса', 'Ректорат')
 position_tuple = ('Декан', 'Преподаватели', 'Ректор', 'Проректоры')
-school_callback_tuple = ('management', 'law', 'inovation','economic',  'engineer', 'bussines')
+school_callback_tuple = ('management', 'law', 'inovation', 'economic', 'engineer', 'bussines')
 floors_tuple = ('1 этаж', '2 этаж', '3 этаж', '4 этаж', '5 этаж', '6 этаж')
 building_tuple = ('Новое здание', 'Старое здание')
 

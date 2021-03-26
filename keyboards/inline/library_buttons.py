@@ -1,9 +1,11 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 from .callback_datas import lib_res_callback
-from data.button_names.lib_buttons import lib_send_reg_data_button, lib_cancel_reg_button, lib_reg_db_button, lib_free_kz_button, \
-                                          lib_free_foreign_button, lib_free_online_button, lib_reg_button
+from data.button_names.lib_buttons import lib_send_reg_data_button, lib_cancel_reg_button, lib_reg_db_button, \
+    lib_free_kz_button, \
+    lib_free_foreign_button, lib_free_online_button, lib_reg_button
 from data.button_names.main_menu_buttons import to_back_button, cancel_menu_button
+
 
 # def inline_keyboard_library():
 #     markup = InlineKeyboardMarkup(row_width=1)
@@ -24,12 +26,12 @@ from data.button_names.main_menu_buttons import to_back_button, cancel_menu_butt
 #     return markup
 
 async def inline_keyboard_library_choice_db():
-        markup = InlineKeyboardMarkup(row_width=3)
-        resource = await db.select_data_lib_resource_reg()
-        markup.add(*[InlineKeyboardButton(text=f"{item['button_name']}",
-                                          callback_data=lib_res_callback.new(id=item['id'])) for item in resource])
-        markup.add(InlineKeyboardButton(text=to_back_button, callback_data="back_to_library_el_res"))
-        return markup
+    markup = InlineKeyboardMarkup(row_width=3)
+    resource = await db.select_data_lib_resource_reg()
+    markup.add(*[InlineKeyboardButton(text=f"{item['button_name']}",
+                                      callback_data=lib_res_callback.new(id=item['id'])) for item in resource])
+    markup.add(InlineKeyboardButton(text=to_back_button, callback_data="back_to_library_el_res"))
+    return markup
 
 
 def inline_keyboard_cancel_lic_db_reg():
@@ -69,7 +71,7 @@ def inline_keyboard_library_el_res():
                                             callback_data='library_free_kaz')
     callback_button3 = InlineKeyboardButton(text=lib_free_foreign_button,
                                             callback_data='library_free_zarub')
-    callback_button4 = InlineKeyboardButton(text= lib_free_online_button, callback_data='library_online_librares')
+    callback_button4 = InlineKeyboardButton(text=lib_free_online_button, callback_data='library_online_librares')
     # callback_back = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back_library")
     markup.add(callback_button1, callback_button2, callback_button3, callback_button4)
     return markup

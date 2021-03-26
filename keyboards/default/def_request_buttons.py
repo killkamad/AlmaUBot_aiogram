@@ -3,6 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from data.button_names.certificate_buttons import *
 from data.button_names.main_menu_buttons import to_main_menu_button, send_phone_button
 
+
 def keyboard_certificate_type():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
     callback_button1 = KeyboardButton(text=military_button)

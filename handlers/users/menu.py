@@ -11,10 +11,13 @@ from keyboards.inline import main_faq_callback, inline_keyboard_menu, inline_key
     inline_keyboard_nav_unifi
 
 # Импорт текстовых кнопок
-from data.button_names.main_menu_buttons import main_menu_def_buttons, schedule_button_text, faq_button_text, library_button_text, \
-    shop_button_text, calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text, to_main_menu_button
+from data.button_names.main_menu_buttons import main_menu_def_buttons, schedule_button_text, faq_button_text, \
+    library_button_text, \
+    shop_button_text, calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text, \
+    to_main_menu_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
+from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 
 from utils.misc import rate_limit
 from states.register_user_phone import RegisterUserPhone
@@ -39,7 +42,8 @@ async def cmd_set_commands(message: types.Message):
         commands = [types.BotCommand(command="/menu", description="главное меню"),
                     types.BotCommand(command="/help", description="помощь"),
                     types.BotCommand(command="/admin", description="админ меню"),
-                    types.BotCommand(command="/set_commands", description="установка команд бота")
+                    types.BotCommand(command="/set_commands", description="установка команд бота"),
+                    types.BotCommand(command="/cancel", description="выход из диалога с ботом")
                     ]
         await bot.set_my_commands(commands)
         await message.answer("Команды настроены.")
@@ -278,4 +282,13 @@ async def callback_inline_faq_menu_back(call: CallbackQuery, state: FSMContext):
                                 reply_markup=await inline_keyboard_main_faq(data['page']))
     await call.answer()
 
+
 ############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################
+
+# Выход из любого admin state командой /cancel
+@dp.message_handler(commands=['cancel'], state=['*'])
+async def cancel_from_anywhere(message: types.Message, state: FSMContext):
+    await delete_inline_buttons_in_dialogue(message)
+    await bot.send_message(message.chat.id, 'Успешно отменено,\n'
+                                            'Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
+    await state.reset_state()

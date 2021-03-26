@@ -13,11 +13,11 @@ from keyboards.inline import inline_keyboard_library_first_page_admin, inline_ke
     inline_keyboard_del_lib_res, lib_res_delete_callback, cancel_or_delete_lib_resource, cancel_edit_lib_res
 
 from data.button_names.lib_buttons import lib_website_button, lib_resources_button, lib_contacts_button, \
-                                          lib_work_hours_button, lib_courses_button, lib_idcard_button, \
-                                          lib_rules_button, lib_rights_button, lib_unallowed_button, \
-                                          lib_responsibility_button, lib_booking_button, lib_reg_db_button, \
-                                          lib_free_kz_button, lib_free_foreign_button, lib_free_online_button, \
-                                          add_lib_resource_button, del_lib_resource_button
+    lib_work_hours_button, lib_courses_button, lib_idcard_button, \
+    lib_rules_button, lib_rights_button, lib_unallowed_button, \
+    lib_responsibility_button, lib_booking_button, lib_reg_db_button, \
+    lib_free_kz_button, lib_free_foreign_button, lib_free_online_button, \
+    add_lib_resource_button, del_lib_resource_button
 
 from states.admin import EditButtonContentLibrary, AddLibraryResource, DeleteLibraryResource
 
@@ -64,22 +64,22 @@ async def edit_library_free_libs(call: CallbackQuery, state: FSMContext):
     if call.data == 'edit_library_registration':
         await state.update_data(lib_type='reg')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=lib_reg_db_button+':',
+                                    text=lib_reg_db_button + ':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_free_kz':
         await state.update_data(lib_type='kz')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=lib_free_kz_button+':',
+                                    text=lib_free_kz_button + ':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_free_foreign':
         await state.update_data(lib_type='foreign')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=lib_free_foreign_button+':',
+                                    text=lib_free_foreign_button + ':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     elif call.data == 'edit_library_online_libs':
         await state.update_data(lib_type='online')
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=lib_free_online_button+':',
+                                    text=lib_free_online_button + ':',
                                     reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
@@ -150,6 +150,8 @@ async def add_lib_resource_to_db(call: CallbackQuery, state: FSMContext):
                               reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
+
+
 # -------------------- Конец добавление электронного ресурса --------------------
 
 
@@ -215,6 +217,8 @@ async def callback_inlint_del_resource_cancel(call: CallbackQuery, state: FSMCon
                               reply_markup=inline_keyboard_library_res_edit_admin())
     await AddLibraryResource.lib_type.set()
     await call.answer()
+
+
 # --------------------- Конец удаление электронного ресурса ---------------------
 
 

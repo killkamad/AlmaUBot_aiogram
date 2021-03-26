@@ -1,7 +1,9 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from data.button_names.admin_menu_buttons import mailing_button_text, schedule_button_text, certificate_button_text, faq_button_text, \
-                                                 library_button_text, almaushop_button_text, calendar_button_text, navigation_button_text, \
-                                                 users_button_text
+from data.button_names.admin_menu_buttons import mailing_button_text, schedule_button_text, certificate_button_text, \
+    faq_button_text, \
+    library_button_text, almaushop_button_text, calendar_button_text, navigation_button_text, \
+    users_button_text
+
 
 # Главное Админ меню
 def inline_keyboard_admin():

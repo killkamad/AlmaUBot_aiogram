@@ -13,11 +13,21 @@ from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_cale
 # Импортирование функций из БД контроллера
 from utils import db_api as db
 
-# Импорт стейтов
-from states.admin import SendAcademCalendar
-
 from utils.misc import rate_limit
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
+# Импорт стейтов
+from states.admin import SendAcademCalendar
+from states.admin import SendAcademCalendar, PpsAdmin, EditMainFaq, MapNavigation, EditFaqAlmauShop, AddLibraryResource, \
+    CreateFaqAlmauShop, CreateMainFaq, DeleteCertificate, DeleteFaqAlmauShop, DeleteMainFaq, DeleteSchedule, \
+    MassMailSending, SendCertificate, SendContactCenter, SendScheduleToBot, UpdateCertificate, UpdateSchedule, \
+    UpdateUserRole, DeleteContactCenter, DeleteLibraryResource, EditButtonContentAlmauShop, EditButtonContentLibrary, \
+    MapNavigationDelete, MapNavigationUpdate, UpdateContactCenter
+
+admin_states = [PpsAdmin, EditMainFaq, MapNavigation, EditFaqAlmauShop, AddLibraryResource,
+                CreateFaqAlmauShop, CreateMainFaq, DeleteCertificate, DeleteFaqAlmauShop, DeleteMainFaq, DeleteSchedule,
+                MassMailSending, SendCertificate, SendContactCenter, SendScheduleToBot, UpdateCertificate,
+                UpdateSchedule, UpdateUserRole, DeleteContactCenter, DeleteLibraryResource, EditButtonContentAlmauShop,
+                EditButtonContentLibrary, MapNavigationDelete, MapNavigationUpdate, UpdateContactCenter]
 
 
 # Вход в главное админ меню
@@ -81,9 +91,10 @@ async def callback_inline_back_to_admin_menu(call: CallbackQuery):
         logging.info(f'Ошибка - {e}')
 
 
-# Выход из любого state командой /cancel
-@dp.message_handler(commands=['cancel'], state=['*'])
+# Выход из любого admin state командой /cancel
+@dp.message_handler(commands=['cancel'], state=admin_states)
 async def cancel_from_anywhere(message: types.Message, state: FSMContext):
+    await delete_inline_buttons_in_dialogue(message)
     await bot.send_message(message.chat.id, 'Успешно отменено')
     await admin_menu(message)
     await state.reset_state()

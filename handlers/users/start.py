@@ -25,4 +25,3 @@ async def bot_start(message: types.Message):
     elif message.from_user.username:
         await bot.send_message(message.chat.id, f'Привет, {message.from_user.username} 😃',
                                reply_markup=always_stay_menu_keyboard())
-    # await bot.send_message(message.chat.id, _main_menu_text, reply_markup=inline_keyboard_menu())

@@ -4,19 +4,22 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 from .callback_datas import lib_res_delete_callback
 
-from data.button_names.lib_buttons import lib_admin_website_button, lib_admin_contacts_button, lib_admin_work_hours_button, \
-                                          lib_admin_courses_button, lib_admin_idcard_button, lib_admin_rules_button, \
-                                          lib_admin_rights_button, lib_admin_unallowed_button, lib_admin_responsibility_button, \
-                                          lib_admin_booking_button, lib_admin_resources_button, lib_cancel_edit_button, lib_next, \
-                                          lib_prev, lib_reg_db_button, lib_free_kz_button, lib_free_foreign_button, lib_free_online_button, \
-                                          add_lib_resource_button, del_lib_resource_button
-from data.button_names.admin_menu_buttons import back_to_admin_menu_button, add_admin_button, edit_admin_button, delete_admin_button, cancel_admin_button
+from data.button_names.lib_buttons import lib_admin_website_button, lib_admin_contacts_button, \
+    lib_admin_work_hours_button, \
+    lib_admin_courses_button, lib_admin_idcard_button, lib_admin_rules_button, \
+    lib_admin_rights_button, lib_admin_unallowed_button, lib_admin_responsibility_button, \
+    lib_admin_booking_button, lib_admin_resources_button, lib_cancel_edit_button, lib_next, \
+    lib_prev, lib_reg_db_button, lib_free_kz_button, lib_free_foreign_button, lib_free_online_button, \
+    add_lib_resource_button, del_lib_resource_button
+from data.button_names.admin_menu_buttons import back_to_admin_menu_button, add_admin_button, edit_admin_button, \
+    delete_admin_button, cancel_admin_button
 
 
 def inline_keyboard_library_first_page_admin():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_edit_website_button = InlineKeyboardButton(text=lib_admin_website_button, callback_data='edit_lib_website')
-    callback_edit_contacts_button = InlineKeyboardButton(text=lib_admin_contacts_button, callback_data='edit_lib_contacts')
+    callback_edit_contacts_button = InlineKeyboardButton(text=lib_admin_contacts_button,
+                                                         callback_data='edit_lib_contacts')
     callback_edit_work_hours_button = InlineKeyboardButton(text=lib_admin_work_hours_button,
                                                            callback_data='edit_lib_work_hours')
     callback_edit_courses_button = InlineKeyboardButton(text=lib_admin_courses_button,
@@ -43,7 +46,7 @@ def inline_keyboard_library_second_page_admin():
     callback_edit_unallowed_button = InlineKeyboardButton(text=lib_admin_unallowed_button,
                                                           callback_data='edit_lib_unallow')
     callback_edit_booking_button = InlineKeyboardButton(text=lib_admin_booking_button,
-                                                          callback_data='edit_lib_booking')
+                                                        callback_data='edit_lib_booking')
     callback_edit_responsibility_button = InlineKeyboardButton(text=lib_admin_responsibility_button,
                                                                callback_data='edit_lib_respons')
     callback_next_page = InlineKeyboardButton(text=lib_next, callback_data='lib_next_page')

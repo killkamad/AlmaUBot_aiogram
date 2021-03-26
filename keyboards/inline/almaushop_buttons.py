@@ -3,6 +3,7 @@ from keyboards.inline.callback_datas import almau_shop_faq_callback
 from utils import db_api as db
 from data.button_names.main_menu_buttons import to_back_button
 
+
 async def inline_keyboard_faq_almaushop():
     markup = InlineKeyboardMarkup(row_width=1)
     faq_questions = await db.almaushop_faq_select_data()

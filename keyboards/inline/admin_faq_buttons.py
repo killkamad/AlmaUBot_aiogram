@@ -4,8 +4,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.inline.callback_datas import main_faq_edit_callback, main_faq_delete_callback
 from utils import db_api as db
 from data.button_names.faq_buttons import *
-from data.button_names.admin_menu_buttons import back_to_admin_menu_button, edit_admin_button, save_admin_button, delete_admin_button, cancel_admin_button
-
+from data.button_names.admin_menu_buttons import back_to_admin_menu_button, edit_admin_button, save_admin_button, \
+    delete_admin_button, cancel_admin_button
 
 
 # Админ меню FAQ

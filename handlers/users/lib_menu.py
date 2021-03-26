@@ -38,7 +38,7 @@ def is_valid_email(s):
 
 @rate_limit(1)
 @dp.message_handler(
-    lambda message: message.text in lib_def_buttons or message.text==lib_resources_button)
+    lambda message: message.text in lib_def_buttons or message.text == lib_resources_button)
 async def library_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     # Кнопки БИБЛИОТЕКИ

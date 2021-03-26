@@ -1,9 +1,10 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 from .callback_datas import schedule_update_callback, schedule_delete_callback
-from data.button_names.schedule_buttons import add_schedule_button, update_schedule_button, delete_schedule_button, cancel_send_schedule_button
+from data.button_names.schedule_buttons import add_schedule_button, update_schedule_button, delete_schedule_button, \
+    cancel_send_schedule_button
 from data.button_names.admin_menu_buttons import back_to_admin_menu_button, send_admin_button, edit_admin_button, \
-                                                 delete_admin_button, cancel_admin_button
+    delete_admin_button, cancel_admin_button
 
 
 # Админ меню Расписания

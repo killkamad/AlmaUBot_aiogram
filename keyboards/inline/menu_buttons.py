@@ -1,6 +1,8 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from data.button_names.main_menu_buttons import schedule_button_text, faq_button_text, library_button_text, shop_button_text, \
-                                                calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text
+from data.button_names.main_menu_buttons import schedule_button_text, faq_button_text, library_button_text, \
+    shop_button_text, \
+    calendar_button_text, certificate_button_text, feedback_button_text, navigation_button_text
+
 
 def inline_keyboard_menu():
     markup = InlineKeyboardMarkup(row_width=2)

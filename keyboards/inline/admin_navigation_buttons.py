@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from data.button_names.navigation_buttons import *
 from data.button_names.admin_menu_buttons import back_to_admin_menu_button, send_admin_button, edit_admin_button, \
-                                                 delete_admin_button, cancel_admin_button
+    delete_admin_button, cancel_admin_button
 from utils import db_api as db
 import logging
 from .callback_datas import cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete
@@ -72,7 +72,8 @@ async def inline_keyboard_contacts_center_delete():
 def cancel_or_delete_contact_center_admin():
     markup = InlineKeyboardMarkup()
     callback_button = InlineKeyboardButton(text=delete_admin_button, callback_data="delete_info_contact_center_admin")
-    callback_button2 = InlineKeyboardButton(text=back_to_admin_menu_button, callback_data="cancel_step_contact_center_admin")
+    callback_button2 = InlineKeyboardButton(text=back_to_admin_menu_button,
+                                            callback_data="cancel_step_contact_center_admin")
     markup.add(callback_button, callback_button2)
     return markup
 
@@ -350,7 +351,8 @@ def cancel_or_update_or_image_tutors_admin():
     markup = InlineKeyboardMarkup(row_width=1)
     callback_button = InlineKeyboardButton(text=pin_edit_photo_button,
                                            callback_data="update_image_pps_admin")
-    callback_button1 = InlineKeyboardButton(text=send_edit_desc_button, callback_data="send_tutors_management_description")
+    callback_button1 = InlineKeyboardButton(text=send_edit_desc_button,
+                                            callback_data="send_tutors_management_description")
     callback_button2 = InlineKeyboardButton(text=cancel_admin_button, callback_data="cancel_step_tutors_admin")
     markup.add(callback_button, callback_button1, callback_button2)
     return markup

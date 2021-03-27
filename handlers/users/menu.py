@@ -134,7 +134,7 @@ async def main_menu_handler(message: Message, state: FSMContext):
                              reply_markup=await inline_keyboard_certificate())
     elif message.text == feedback_button_text:
         await message.answer(
-            text='Вы можете написать письмо с жалобами и предложениями адресованное ректору нашего университета. \n'
+            text='Вы можете написать письмо с вопросами, жалобами или предложениями адресованное в "Эдвайзинг центр" нашего университета. \n'
                  'Для этого вам нужно указать свои контактные данные и непосредственно текст самого письма.',
             reply_markup=keyboard_feedback())
     elif message.text == navigation_button_text:

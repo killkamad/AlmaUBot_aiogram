@@ -48,8 +48,7 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
     cancel_or_update_certificate, cancel_or_delete_certificate, inline_keyboard_upd_req_certificate, \
     inline_keyboard_update_certificate, inline_keyboard_del_req_certificate, inline_keyboard_delete_certificate, \
-    inline_keyboard_get_request_certificate, inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
-    inline_keyboard_on_send_request_certificate
+    inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, inline_keyboard_on_send_request_certificate
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
     inline_keyboard_edit_button_content_library_or_cancel, inline_keyboard_cancel_edit_library_button, \

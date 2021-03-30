@@ -26,10 +26,8 @@ from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 @dp.callback_query_handler(request_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    request_name = callback_data.get('request_name')
-    request_id = await db.find_request_id(request_name)
-    id_telegram = await db.find_request_id_telegram(request_name)
-    await state.update_data(request=request_id)
+    request_id = callback_data.get('id')
+    id_telegram = await db.find_request_id_telegram(request_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите заявку:',
                                 reply_markup=await inline_keyboard_get_certificate_type(id_telegram))
@@ -67,10 +65,8 @@ async def callback_inline_update_certificate_bot(call: CallbackQuery):
 @dp.callback_query_handler(request_update_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    request_name = callback_data.get('request_name')
-    request_id = await db.find_request_id(request_name)
-    id_telegram = await db.find_request_id_telegram(request_name)
-    await state.update_data(request=request_id, id_student=id_telegram)
+    request_id = callback_data.get('id')
+    id_telegram = await db.find_request_id_telegram(request_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите справку для изменения:',
                                 reply_markup=await inline_keyboard_update_certificate(id_telegram))
@@ -89,9 +85,9 @@ async def callback_inline_cancel_update_certificate_bot(call: CallbackQuery, sta
 @dp.callback_query_handler(certificate_update_callback.filter(), state=['*'])
 async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    req_id = callback_data.get('id')
-    certificate_button_name = await db.find_certificate_name(req_id)
-    await state.update_data(button_name=certificate_button_name, user_id=call.message.chat.id, id_req=req_id)
+    request_id = callback_data.get('id')
+    certificate_button_name = await db.find_certificate_name(request_id)
+    await state.update_data(button_name=certificate_button_name, user_id=call.message.chat.id, request_id=request_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Отправьте файл со справкой для кнопки <b>{certificate_button_name}</b>:',
                                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_certificate())
@@ -106,8 +102,9 @@ async def change_certificate_id(message: types.Message, state: FSMContext):
     if message.content_type == 'document':
         await state.update_data(file_id=message.document.file_id)
         data = await state.get_data()
-        txt = f'Наименование справки: <b>{data["button_name"]}</b>'
-        await bot.send_document(message.chat.id, data["file_id"], caption=txt,
+        await bot.send_document(message.chat.id, data["file_id"],
+                                caption=f'Наименование справки: <b>{data["button_name"]}</b>\n'
+                                        f'Номер заявки: <b>{data["request_id"]}</b>',
                                 reply_markup=cancel_or_update_certificate())
         await state.reset_state(with_data=False)
     else:
@@ -129,10 +126,9 @@ async def callback_inline_send_certificate_bot(call: CallbackQuery):
 @dp.callback_query_handler(request_delete_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    request_name = callback_data.get('request_name')
-    request_id = await db.find_request_id(request_name)
-    id_telegram = await db.find_request_id_telegram(request_name)
-    await state.update_data(request=request_id, id_student=id_telegram)
+    request_id = callback_data.get('id')
+    id_telegram = await db.find_request_id_telegram(request_id)
+    await state.update_data(id_student=id_telegram)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Выберите справку для удаления:',
                                 reply_markup=await inline_keyboard_delete_certificate(id_telegram))
@@ -151,9 +147,9 @@ async def callback_inline_cancel_delete_certificate_bot(call: CallbackQuery, sta
 @dp.callback_query_handler(certificate_delete_callback.filter(), state=['*'])
 async def callback_inline(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    id_request = callback_data.get('id')
-    certificate_button_name = await db.find_certificate_name(id_request)
-    await state.update_data(button_name=certificate_button_name, user_id=call.message.chat.id, id_req=id_request)
+    request_id = callback_data.get('id')
+    certificate_button_name = await db.find_certificate_name(request_id)
+    await state.update_data(button_name=certificate_button_name, user_id=call.message.chat.id, request_id=request_id)
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'Вы точно уверены, что хотите удалить кнопку справки для <b>{certificate_button_name}</b>:',
                                 parse_mode='HTML', reply_markup=cancel_or_delete_certificate())
@@ -176,7 +172,11 @@ async def callback_inline_cancel_step(call: CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(request_type_callback.filter(), state=['*'])
 async def message_send_button_name(call: CallbackQuery, callback_data: dict, state: FSMContext):
     logging.info(f'call = {call.data}')
-    await state.update_data(button_name=call.data[5:], user_id=call.message.chat.id)
+    request_id = callback_data.get('id')
+    await state.update_data(request_id=request_id)
+    data = await state.get_data()
+    request_name = await db.find_certificate_name(data['request_id'])
+    await state.update_data(button_name=request_name, user_id=call.message.chat.id)
     await bot.send_message(chat_id=call.message.chat.id, text='Отправьте файл со справкой',
                            reply_markup=inline_keyboard_cancel_certificate())
     await SendCertificate.send_file.set()
@@ -188,10 +188,10 @@ async def message_send_button_name(call: CallbackQuery, callback_data: dict, sta
 async def message_certificate_send_file(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     if message.content_type == 'document':
-        await state.update_data(file_id=message.document.file_id, upload=True, request_state=True)
+        await state.update_data(file_id=message.document.file_id, upload=True)
         data = await state.get_data()
         txt = f'Наименование справки будет: {data["button_name"]}\n' \
-              f'Номер заявки: {data["request"]}'
+              f'Номер заявки: {data["request_id"]}'
         await bot.send_document(message.chat.id, data["file_id"], caption=txt,
                                 reply_markup=cancel_or_send_certificate())
         await state.reset_state(with_data=False)
@@ -206,9 +206,7 @@ async def message_certificate_send_file(message: types.Message, state: FSMContex
 async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await db.add_certificate_data(data['user_id'], data['request'], data['file_id'], data['button_name'],
-                                      data['upload'])
-        await db.mark_as_loaded_request(data['request'], data['request_state'])
+        await db.add_certificate_data(data['request_id'], data['file_id'], data['upload'])
         logging.info(f'User({call.message.chat.id}) отправил справку для {data["button_name"]}')
         try:
             await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
@@ -232,7 +230,7 @@ async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContex
 async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContext):
     try:
         data = await state.get_data()
-        await db.update_certificate_data(data['user_id'], data['request'], data['file_id'], data["id_req"])
+        await db.update_certificate_data(data["request_id"], data['file_id'])
         logging.info(f'User({call.message.chat.id}) обновил справку для {data["button_name"]}')
         try:
             await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
@@ -259,7 +257,7 @@ async def callback_inline_send_certificate(call: CallbackQuery, state: FSMContex
     try:
         data = await state.get_data()
         print(data['id_student'])
-        await db.delete_certificate_button(data["id_req"])
+        await db.delete_certificate_button(data["request_id"])
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=f'Справка для <b>{data["button_name"]}</b> успешно удалена из базы данных\n'
                                          'Выберите справку для удаления',

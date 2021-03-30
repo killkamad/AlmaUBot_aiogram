@@ -311,36 +311,17 @@ async def create_table_certificate():
                 CREATE TABLE if not exists certificate(
                 id  serial unique primary key,
                 id_Telegram INT NOT NULL,
-                id_request INT NOT NULL,
-                id_certif VARCHAR (500),
-                name_certif VARCHAR (200),
-                FOREIGN KEY (id_request) REFERENCES request_certificate (id))
-                """
-            # record: Record = await pool.fetchval(sql_ex)
-            record: Record = await connection.fetchval(sql_ex)
-            print('Table certificate successfully created')
-            return record
-    except(Exception, ErrorInAssignmentError) as error:
-        print(error)
-
-
-async def create_table_request_certificate():
-    pool: Connection = db
-    try:
-        async with pool.acquire() as connection:
-            # async with pool.transaction():
-            sql_ex = """
-                CREATE TABLE if not exists request_certificate(
-                id  serial unique primary key,
-                id_Telegram INT NOT NULL,
                 full_name VARCHAR (200),
                 phone VARCHAR (200),
                 email VARCHAR (200),
                 certif_type VARCHAR (200),
+                id_certif VARCHAR (500),
+                is_loaded BOOL DEFAULT false,
                 date_time TIMESTAMP)
                 """
-            record: Record = await pool.fetchval(sql_ex)
-            print('Table request_certificate successfully created')
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table certificate successfully created')
             return record
     except(Exception, ErrorInAssignmentError) as error:
         print(error)

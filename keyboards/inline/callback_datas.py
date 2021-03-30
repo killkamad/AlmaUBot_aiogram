@@ -28,10 +28,10 @@ certificate_update_callback = CallbackData('crtu', 'id')
 certificate_delete_callback = CallbackData('crtd', 'id')
 
 # Request
-request_callback = CallbackData('req', 'request_name')
-request_type_callback = CallbackData('reqt', 'request_name')
-request_update_callback = CallbackData('requ', 'request_name')
-request_delete_callback = CallbackData('reqd', 'request_name')
+request_callback = CallbackData('req', 'id')
+request_type_callback = CallbackData('reqt', 'id')
+request_update_callback = CallbackData('requ', 'id')
+request_delete_callback = CallbackData('reqd', 'id')
 
 # map-navigation
 cabinet_callback = CallbackData('cab', 'cabinet')

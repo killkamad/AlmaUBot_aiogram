@@ -22,30 +22,30 @@ async def map_nav_description(building, floor):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT cabinet, cabinet_description FROM map_navigation WHERE building = $1 and floor=$2 ORDER BY cabinet;"
+            sql_select = "SELECT cabinet, id FROM map_navigation WHERE building = $1 and floor=$2 ORDER BY cabinet;"
             record: Record = await connection.fetch(sql_select, str(building), str(floor))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def find_cabinet_description(cabinet):
+async def find_cabinet_description(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT cabinet_description FROM map_navigation WHERE cabinet = $1;"
-            record: Record = await connection.fetchval(sql_select, str(cabinet))
+            sql_select = "SELECT cabinet_description FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
 
-async def find_photoid_description(cabinet):
+async def find_photoid_description(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT photo_id FROM map_navigation WHERE cabinet = $1;"
-            record: Record = await connection.fetchval(sql_select, str(cabinet))
+            sql_select = "SELECT photo_id FROM map_navigation WHERE id = $1;"
+            record: Record = await connection.fetchval(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -89,7 +89,7 @@ async def select_cabinet_admin(id):
     try:
         async with pool.acquire() as connection:
             sql_select = "SELECT cabinet FROM map_navigation WHERE id = $1;"
-            record: Record = await connection.fetchrow(sql_select, int(id))
+            record: Record = await connection.fetchval(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)

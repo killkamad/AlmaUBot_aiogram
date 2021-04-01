@@ -593,7 +593,7 @@ async def map_nav_admin_state_cabinet(message: types.Message, state: FSMContext)
             else:
                 continue
         if (message.content_type == 'text') and (check_cabinet is True):
-            if len(message.text) <= 28:
+            if len(message.text) <= 200:
                 async with state.proxy() as data:
                     data['cabinet'] = message.text
                 await message.reply(f"<b>Напишите описание для:</b>\n"
@@ -771,9 +771,10 @@ async def map_nav_admin_state_floor_update(call: CallbackQuery, state: FSMContex
 @dp.callback_query_handler(cabinet_callback_update.filter(), state=MapNavigationUpdate.cabinet)
 async def map_nav_admin_state_cabinet_update(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    cabinet_name = callback_data.get('cabinet')
+    callback_id = callback_data.get('id')
+    name = await db.select_cabinet_admin(callback_id)
     async with state.proxy() as data:
-        data['cabinet'] = cabinet_name
+        data['cabinet'] = name
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text=f'<b>Выберите что хотите изменить для:</b>\n'
                                      f"<b>• Кабинет:</b> {data['cabinet']}\n"
@@ -1004,10 +1005,12 @@ async def map_nav_admin_state_floor_delete(call: CallbackQuery, state: FSMContex
 @dp.callback_query_handler(cabinet_callback_update.filter(), state=MapNavigationDelete.cabinet)
 async def map_nav_admin_state_cabinet_delete(call: CallbackQuery, state: FSMContext, callback_data: dict):
     logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    cabinet_name = callback_data.get('cabinet')
-    await state.update_data(cabinet=cabinet_name)
+    callback_id = callback_data.get('id')
+    name = await db.select_cabinet_admin(callback_id)
+    async with state.proxy() as data:
+        data['cabinet'] = name
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=f'Удалить <b>{cabinet_name}? </b>',
+                                text=f'Удалить <b>{data["cabinet"]}? </b>',
                                 parse_mode='HTML', reply_markup=cancel_or_delete_map_nav_admin())
     await state.reset_state(with_data=False)
     await call.answer()

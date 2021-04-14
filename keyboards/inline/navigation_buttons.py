@@ -164,7 +164,7 @@ async def inline_keyboard_cabinets_dinamyc(building, floor):
         build_call = 'old'
     map_navigation = await db.map_nav_description(building, floor)
     markup.add(
-        *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(cabinet=item["cabinet"])) for
+        *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback.new(id=item["id"])) for
           item in map_navigation])
     markup.add(InlineKeyboardButton(text=to_back_button, callback_data=build_call + "_building"))
     return markup

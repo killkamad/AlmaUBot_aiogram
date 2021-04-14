@@ -339,12 +339,11 @@ async def callback_inline_nav_unifi_new_building_sixth(call: CallbackQuery):
 @dp.callback_query_handler(cabinet_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    cabinet = callback_data.get('cabinet')
-    description = await db.find_cabinet_description(cabinet)
-    photo_id = await db.find_photoid_description(cabinet)
-    id_cab = await db.find_id_cabinet(cabinet)
-    floor = await db.find_floor_cabinet(id_cab)
-    building = await db.find_building_cabinet(id_cab)
+    callback_id = callback_data.get('id')
+    description = await db.find_cabinet_description(callback_id)
+    photo_id = await db.find_photoid_description(callback_id)
+    floor = await db.find_floor_cabinet(callback_id)
+    building = await db.find_building_cabinet(callback_id)
     if floor == floors_tuple[0] and building == building_tuple[1]:
         building_callback = "old_"
         floor_callback = "_first"

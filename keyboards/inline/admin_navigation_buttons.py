@@ -127,7 +127,7 @@ async def inline_keyboard_cabinets_admin(building, floor):
     markup = InlineKeyboardMarkup(row_width=2)
     map_navigation = await db.map_nav_description(building, floor)
     markup.add(
-        *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback_update.new(cabinet=item["cabinet"]))
+        *[InlineKeyboardButton(text=item['cabinet'], callback_data=cabinet_callback_update.new(id=item["id"]))
           for item in map_navigation])
     markup.add(InlineKeyboardButton(text=back_to_admin_menu_button, callback_data="cancel_step_map_nav_admin"))
     return markup

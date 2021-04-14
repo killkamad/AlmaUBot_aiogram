@@ -97,9 +97,9 @@ class AlmauShop:
         text = self.load_page()
         self.parse_page(text=text)
         # logger.info(f'Получено {len(self.result)} товаров')
-        # for i in self.result:
-        #     logger.info(i)
-        #     logger.info(i.product_name)
+        for i in self.result:
+            logger.info(i)
+            # logger.info(i.product_name)
 
 
 class AlmauShopBooks:
@@ -174,8 +174,8 @@ class AlmauShopBooks:
         text = self.load_page()
         self.parse_page(text=text)
         logger.info(f'Получено {len(self.result)} товаров')
-        for i in self.result:
-            logger.info(i)
+        # for i in self.result:
+        #     logger.info(i)
 
 
 def main():

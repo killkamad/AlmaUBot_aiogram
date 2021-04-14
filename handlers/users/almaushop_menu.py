@@ -24,7 +24,6 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
     # Кнопки AlmaU Shop
     albums_list = []
     albums = 0
-    await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
     if message.text == almaushop_products_button:
         data = await db.almaushop_select_data()
         for item in data:
@@ -33,6 +32,7 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
             albums_list.append(InputMediaPhoto(item["img"], caption=text))
             albums += 1
             if albums % 10 == 0:
+                await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
                 await bot.send_media_group(message.chat.id, albums_list)
                 await asyncio.sleep(1)
                 albums_list.clear()
@@ -45,6 +45,7 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
             albums_list.append(InputMediaPhoto(item["img"], caption=text))
             albums += 1
             if albums % 10 == 0:
+                await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
                 await bot.send_media_group(message.chat.id, albums_list)
                 await asyncio.sleep(1)
                 albums_list.clear()

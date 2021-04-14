@@ -3,8 +3,10 @@ from aiogram import executor
 from loader import dp
 from utils.notify_admins import on_startup_notify
 import filters, middlewares
+
 filters.setup(dp)
 import handlers
+
 middlewares.setup(dp)
 
 

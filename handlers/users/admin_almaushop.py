@@ -48,7 +48,6 @@ async def callback_inline_update_almaushop_merch(call: CallbackQuery):
     except Exception as err:
         logging.exception(err)
         await bot.send_message(call.message.chat.id, '❗ Произошла ошибка')
-    await call.answer(text='✅ Данные в таблице almau shop успешно обновлены', show_alert=False)
 
 
 # Парсинг сайта almaushop.kz/books книг и загрузка данных в таблицу в БД

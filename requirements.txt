@@ -1,4 +1,4 @@
-asyncpg==0.20.1
+asyncpg==0.21.0
 aiogram==2.9.2
 aiohttp==3.6.2
 aiofiles==0.6.0

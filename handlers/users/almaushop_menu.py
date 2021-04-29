@@ -3,7 +3,7 @@ import logging
 
 from aiogram import types
 from aiogram.types import CallbackQuery, InputMediaPhoto, ChatActions
-
+from math import ceil
 from keyboards.inline import almau_shop_faq_callback
 from keyboards.inline.almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back
 from loader import dp, bot
@@ -21,21 +21,15 @@ from data.button_names.almaushop_buttons import almaushop_products_button, almau
 @dp.message_handler(lambda message: message.text in [almaushop_products_button, almaushop_books_button])
 async def almaushop_text_buttons_parser_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
-    # Кнопки AlmaU Shop
     albums_list = []
-    albums = 0
+    start = 0
+    messages_sent = 0
     if message.text == almaushop_products_button:
         data = await db.almaushop_select_data()
         for item in data:
             text = f'<u><a href="{item["url"]}">{item["product_name"]}</a></u> \n' \
                    f'{item["price"]} {item["currency"]}\n'
             albums_list.append(InputMediaPhoto(item["img"], caption=text))
-            albums += 1
-            if albums % 10 == 0:
-                await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
-                await bot.send_media_group(message.chat.id, albums_list)
-                await asyncio.sleep(1)
-                albums_list.clear()
     elif message.text == almaushop_books_button:
         data = await db.almaushop_select_books()
         for item in data:
@@ -43,17 +37,13 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
                    f'{item["book_author"]} \n' \
                    f'{item["price"]} {item["currency"]}\n'
             albums_list.append(InputMediaPhoto(item["img"], caption=text))
-            albums += 1
-            if albums % 10 == 0:
-                await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
-                await bot.send_media_group(message.chat.id, albums_list)
-                await asyncio.sleep(1)
-                albums_list.clear()
-            # await bot.send_photo(chat_id=message.chat.id, photo=item["img"], caption=text)
-            # request += 1
-            # if request % 30 == 0:
-            #     await asyncio.sleep(2)
-            #     request = 0
+    for i in range(1, ceil(len(albums_list) / 10) + 1):
+        await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
+        await bot.send_media_group(message.chat.id, albums_list[start:10 * i])
+        start += 10
+        if messages_sent % 30 == 0:
+            await asyncio.sleep(1)
+            messages_sent = 0
 
 
 @rate_limit(1)

@@ -247,7 +247,7 @@ async def callback_inline(call: CallbackQuery):
 @dp.callback_query_handler(schedule_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
-    schedule_id = callback_data.get('schedule_id')  # Получение названия кнопки из callback_data
+    schedule_id = callback_data.get('schedule_id')  # Получение id расписания из callback_data
     file_id = await db.find_schedule_id(schedule_id)  # Получение file_id кнопки из БД
     await bot.send_document(call.message.chat.id, file_id)  # Отправка расписания пользователю
     await call.answer()

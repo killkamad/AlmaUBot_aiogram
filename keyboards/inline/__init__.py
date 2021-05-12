@@ -40,7 +40,8 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
     map_nav_admin_choice_floor_new_update, map_nav_admin_choice_floor_old_update, map_nav_admin_choice_floor_new, \
     map_nav_admin_choice_floor_old, keyboard_map_nav_choice_building, keyboard_pps_choice_position, \
     keyboard_pps_choice_position_rector, keyboard_pps_choice_shcool, inline_keyboard_cancel_tutors_admin, \
-    cancel_or_send_or_image_map_nav_admin, cancel_or_update_or_image_map_nav_admin, cancel_or_description_or_image_map_nav_admin, \
+    cancel_or_send_or_image_map_nav_admin, cancel_or_update_or_image_map_nav_admin, \
+    cancel_or_description_or_image_map_nav_admin, \
     cancel_or_description_or_send_map_nav_admin, inline_keyboard_description_image_tutors_admin, \
     cancel_or_description_or_send_tutors_admin, cancel_or_update_or_image_tutors_admin, cancel_or_delete_photo_pps_admin
 
@@ -48,7 +49,8 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
     cancel_or_update_certificate, cancel_or_delete_certificate, inline_keyboard_upd_req_certificate, \
     inline_keyboard_update_certificate, inline_keyboard_del_req_certificate, inline_keyboard_delete_certificate, \
-    inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, inline_keyboard_on_send_request_certificate
+    inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
+    inline_keyboard_on_send_request_certificate
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
     inline_keyboard_edit_button_content_library_or_cancel, inline_keyboard_cancel_edit_library_button, \
@@ -56,7 +58,8 @@ from .admin_library_buttons import inline_keyboard_library_first_page_admin, inl
     inline_keyboard_del_lib_res, cancel_or_delete_lib_resource, cancel_edit_lib_res
 
 # Кнопки для главного админ меню и админ меню для ролей
-from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin
+from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_admin, inline_keyboard_marketing_admin, \
+    inline_keyboard_advisor_admin
 
 # CALLBACK DATAS фильтр
 from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callback, almau_shop_faq_delete_callback, \

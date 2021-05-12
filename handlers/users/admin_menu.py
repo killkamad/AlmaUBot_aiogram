@@ -8,7 +8,8 @@ from loader import dp, bot
 from keyboards.inline import inline_keyboard_admin, cancel_or_send_academic_calendar, \
     cancel_academic_calendar, inline_keyboard_almau_shop_admin, inline_keyboard_schedule_admin, \
     inline_keyboard_faq_admin, inline_keyboard_users_admin, inline_keyboard_certificate_admin, \
-    inline_keyboard_library_admin, inline_keyboard_marketing_admin, inline_keyboard_library_first_page_admin
+    inline_keyboard_library_admin, inline_keyboard_marketing_admin, inline_keyboard_library_first_page_admin, \
+    inline_keyboard_advisor_admin
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
@@ -51,6 +52,11 @@ async def admin_menu(message):
             await bot.send_message(message.chat.id, f'Меню Админа Маркетинга:\n'
                                                     f'Количество пользователей = {await db.count_users()}\n',
                                    reply_markup=inline_keyboard_marketing_admin())
+        elif role == 'advisor_admin':
+            logging.info(f'User({message.chat.id}) вошел в админ меню эдвайзинга')
+            await bot.send_message(message.chat.id, f'Меню Админа Эдвайзера:\n'
+                                                    f'Количество пользователей = {await db.count_users()}\n',
+                                   reply_markup=inline_keyboard_advisor_admin())
         else:
             await bot.send_message(message.chat.id, 'Недостаточный уровень доступа')
             logging.info(f'User({message.chat.id}) попытался войти в админ меню')
@@ -77,12 +83,19 @@ async def callback_inline_back_to_admin_menu(call: CallbackQuery):
                                              f'Количество пользователей = {await db.count_users()}\n',
                                         reply_markup=inline_keyboard_library_admin())
         elif role == 'marketing_admin':
-            logging.info(f'User({call.message.chat.id}) вошел в админ меню библиотеки')
+            logging.info(f'User({call.message.chat.id}) вошел в админ меню маркетинга')
             await bot.edit_message_text(chat_id=call.message.chat.id,
                                         message_id=call.message.message_id,
                                         text=f'Меню Админа Маркетинга:\n'
                                              f'Количество пользователей = {await db.count_users()}\n',
                                         reply_markup=inline_keyboard_marketing_admin())
+        elif role == 'advisor_admin':
+            logging.info(f'User({call.message.chat.id}) вошел в админ меню эдвайзинга')
+            await bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=call.message.message_id,
+                                        text=f'Меню Админа Эдвайзера:\n'
+                                             f'Количество пользователей = {await db.count_users()}\n',
+                                        reply_markup=inline_keyboard_advisor_admin())
         else:
             await bot.send_message(call.message.chat.id, 'Недостаточный уровень доступа')
             logging.info(f'User({call.message.chat.id}) попытался войти в админ меню')

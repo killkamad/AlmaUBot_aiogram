@@ -42,6 +42,16 @@ async def callback_inline_update_schedule_bot(call: CallbackQuery):
     await call.answer()
 
 
+#### Удаление расписания ####
+@dp.callback_query_handler(text='delete_schedule_bot', state=None)
+async def callback_inline_delete_schedule_bot(call: CallbackQuery):
+    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Выберите кнопку для удаления:',
+                                reply_markup=await inline_keyboard_delete_schedule())
+    await call.answer()
+
+
 #### ОТМЕНА Обновление расписания
 @dp.callback_query_handler(text='cancel_update_step')
 async def callback_inline_cancel_update_schedule_bot(call: CallbackQuery, state: FSMContext):
@@ -83,16 +93,6 @@ async def change_schedule_id(message: types.Message, state: FSMContext):
                                'Ошибка - вы отправили не документ\n'
                                'Повторите Отправление файла с расписанием',
                                reply_markup=inline_keyboard_cancel_schedule())
-
-
-#### Удаление расписания ####
-@dp.callback_query_handler(text='delete_schedule_bot', state=None)
-async def callback_inline_send_schedule_bot(call: CallbackQuery):
-    logging.info(f'User({call.message.chat.id}) нажал на кнопку {call.data}')
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Выберите кнопку для удаления:',
-                                reply_markup=await inline_keyboard_delete_schedule())
-    await call.answer()
 
 
 #### ОТМЕНА Удаления расписания
@@ -216,7 +216,6 @@ async def callback_inline_send_schedule(call: CallbackQuery, state: FSMContext):
             except Exception as e:
                 pass
                 # logging.info(f'Ошибка Бот заблокирован {e}')
-
     except Exception as e:
         await call.message.answer(f'Ошибка расписание не обновлено, (Ошибка - {e})')
         logging.info(f'Ошибка - {e}')

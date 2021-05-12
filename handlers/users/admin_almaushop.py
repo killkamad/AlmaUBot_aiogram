@@ -116,8 +116,6 @@ async def edit_button_content_almaushop(call: CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=ContentType.ANY, state=EditButtonContentAlmauShop.button_content)
 async def edit_button_content_almaushop_first_step(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
-    # a = await state.get_state()
-    # print(a)
     if message.content_type == 'text':
         if len(message.text) <= 4000:
             await state.update_data(button_content=message.text)
@@ -127,7 +125,8 @@ async def edit_button_content_almaushop_first_step(message: types.Message, state
             await EditButtonContentAlmauShop.confirm.set()
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML',
                 reply_markup=inline_keyboard_cancel_almaushop_website_contacts())
     else:
@@ -178,7 +177,8 @@ async def callback_inline_add_faq_almaushop_question_step(message: types.Message
             await CreateFaqAlmauShop.answer.set()
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_almaushop_faq_create())
     else:
         # print(message.content_type)
@@ -205,7 +205,8 @@ async def callback_inline_add_faq_almaushop_answer_step(message: types.Message, 
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML')
     else:
         # print(message.content_type)
@@ -401,7 +402,8 @@ async def edit_faq_almaushop_choice_step_question_final(message: types.Message, 
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML',
                 reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     else:
@@ -427,7 +429,8 @@ async def edit_faq_almaushop_choice_step_answer_final(message: types.Message, st
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML',
                 reply_markup=inline_keyboard_cancel_almaushop_faq_update())
     else:

@@ -44,7 +44,8 @@ async def callback_inline_add_main_faq_question_step(message: types.Message, sta
             await CreateMainFaq.answer.set()
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
@@ -67,7 +68,8 @@ async def callback_inline_add_main_faq_answer_step(message: types.Message, state
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 4000 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq())
     else:
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
@@ -164,7 +166,8 @@ async def edit_main_faq_choice_step_question_final(message: types.Message, state
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq_edit())
     else:
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
@@ -199,7 +202,8 @@ async def edit_main_faq_choice_step_answer_final(message: types.Message, state: 
             await state.reset_state(with_data=False)
         else:
             await message.reply(
-                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
+                f'Ваше сообщение содержит больше количество символов = <b>{len(message.text)}</b>. '
+                f'Ограничение в 300 символов. Сократите количество символов и попробуйте снова',
                 parse_mode='HTML', reply_markup=inline_keyboard_cancel_faq_edit())
     else:
         await message.reply('Ошибка - ваше сообщение должно содержать только текст\n'
@@ -293,7 +297,7 @@ async def callback_inline_delete_main_faq_final(call: CallbackQuery, state: FSMC
     await call.answer()
 
 
-# Удаление FAQ AlmaU Shop из базы данных
+# Удаление FAQ из базы данных
 @dp.callback_query_handler(text='delete_main_faq', state=DeleteMainFaq.confirm_delete)
 async def callback_inline_delete_main_faq_delete_step(call: CallbackQuery, state: FSMContext):
     try:

@@ -17,7 +17,8 @@ async def create_table_users():
                 firstname VARCHAR (256),
                 lastname VARCHAR (256),
                 phone VARCHAR (200),
-                role VARCHAR (20))
+                role VARCHAR (20),
+                date_time TIMESTAMP)
                 """
             record: Record = await connection.execute(sql_ex)
             print('Table users successfully created')
@@ -269,6 +270,7 @@ async def create_table_main_faq():
                     id_Telegram INT NOT NULL,
                     question VARCHAR (300),
                     answer VARCHAR (4000),
+                    type_answer VARCHAR (64),
                     date_time TIMESTAMP)
                     """
             record: Record = await connection.fetchval(sql_ex)
@@ -381,10 +383,10 @@ async def set_up_tables():
         await create_table_main_faq()
         await create_table_pps()
         await create_table_certificate()
-        await create_table_request_certificate()
         await create_table_map_navigation()
         await create_table_library_menu_buttons()
         await create_table_library_resources()
+        await create_table_contact_centers()
     except Exception as error:
         print(f'Error - {error}')
 

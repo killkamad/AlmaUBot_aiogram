@@ -4,11 +4,11 @@ from loader import db
 import logging
 
 
-async def main_faq_select_question_and_answer(id):
+async def main_faq_select_question_and_answer_and_type(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT question, answer FROM main_faq WHERE id = $1;"
+            sql_select = "SELECT question, answer, type_answer FROM main_faq WHERE id = $1;"
             record: Record = await connection.fetchrow(sql_select, int(id))
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -65,12 +65,13 @@ async def delete_main_faq_button(question):
         logging.info(error)
 
 
-async def add_data_main_faq(id_telegram, question, answer):
+async def add_data_main_faq(id_telegram, question, answer, type_answer):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Insert into main_faq(id_Telegram, question, answer, date_time) values ($1,$2,$3,now())"
-            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(question), str(answer))
+            sql_ex = "Insert into main_faq(id_Telegram, question, answer, type_answer, date_time) values ($1,$2,$3,$4,now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(question), str(answer),
+                                                       str(type_answer))
             logging.info(f"ADD main_faq({question}) to DB")
             return record
     except(Exception, ErrorInAssignmentError) as error:
@@ -89,12 +90,12 @@ async def edit_main_faq_question(id_telegram, question, id):
         logging.info(error)
 
 
-async def edit_main_faq_answer(id_telegram, answer, id):
+async def edit_main_faq_answer(id_telegram, answer, id, type_answer):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_ex = "Update main_faq set id_Telegram = $1, answer = $2, date_time = now() Where id = $3"
-            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(answer), int(id))
+            sql_ex = "Update main_faq set id_Telegram = $1, answer = $2, type_answer = $3, date_time = now() Where id = $4"
+            record: Record = await connection.fetchrow(sql_ex, int(id_telegram), str(answer), str(type_answer), int(id))
             logging.info(f"EDIT  main_faq answer id = ({id}) to DB")
             return record
     except(Exception, ErrorInAssignmentError) as error:

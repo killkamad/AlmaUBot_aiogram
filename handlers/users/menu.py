@@ -117,9 +117,11 @@ async def main_menu_handler(message: Message, state: FSMContext):
     if message.text == schedule_button_text:
         await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
     elif message.text == faq_button_text:
-        await state.update_data(page=0)
+        max_pages = (ceil(await db.main_faq_count() / 10))
+        await state.update_data(page=0, max_pages=max_pages)
         data = await state.get_data()
-        await message.answer(text=f'F.A.Q Страница {data["page"] + 1}',
+        text = f'F.A.Q Страница {data["page"] + 1} из {data["max_pages"]}'
+        await message.answer(text=text,
                              reply_markup=await inline_keyboard_main_faq(data["page"]))
     elif message.text == library_button_text:
         await message.answer(text='Библиотека ↘', reply_markup=keyboard_library())
@@ -146,29 +148,6 @@ async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
     if message.text == to_main_menu_button:
         await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
-
-
-# FAQ кнопки вперед и назад
-@dp.callback_query_handler(text=["main_faq_previous", "main_faq_next"])
-async def main_menu_faq_next_prev(call: CallbackQuery, state: FSMContext):
-    logging.info(f"User({call.message.chat.id}) enter {call.data}")
-    data = await state.get_data()
-    max_pages = (ceil(await db.main_faq_count() / 10))
-    if call.data == "main_faq_next" and (data['page'] + 1 < max_pages):
-        await state.update_data(page=(data['page'] + 1))
-        data = await state.get_data()
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text=f'F.A.Q Страница {data["page"] + 1}',
-                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
-    elif call.data == "main_faq_previous" and (data['page'] != 0):
-        await state.update_data(page=(data['page'] - 1))
-        data = await state.get_data()
-        await bot.edit_message_text(chat_id=call.message.chat.id,
-                                    message_id=call.message.message_id,
-                                    text=f'F.A.Q Страница {data["page"] + 1}',
-                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
-    # await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
 
 
 @dp.callback_query_handler(text='/schedule')
@@ -258,17 +237,34 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(main_faq_callback.filter())
 async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
     id = callback_data.get('callback_id')
-    db_request = await db.main_faq_select_question_and_answer(id)
-    question = db_request['question']
-    answer = db_request['answer']
-    text_faq = f'• <b>Вопрос:</b>\n' \
-               f'{question} \n\n' \
-               f'• <b>Ответ:</b>\n' \
-               f'{answer}'
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text=text_faq,
-                                reply_markup=inline_keyboard_main_faq_back(),
-                                parse_mode="HTML")
+    db_request = await db.main_faq_select_question_and_answer_and_type(id)
+    if db_request['type_answer'] == 'text':
+        question = db_request['question']
+        answer = db_request['answer']
+        text_faq = f'• <b>Вопрос:</b>\n' \
+                   f'{question} \n\n' \
+                   f'• <b>Ответ:</b>\n' \
+                   f'{answer}'
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=text_faq,
+                                    reply_markup=inline_keyboard_main_faq_back(),
+                                    parse_mode="HTML")
+    elif db_request['type_answer'] == 'document':
+        question = db_request['question']
+        answer = db_request['answer']
+        text_faq = f'• <b>Вопрос:</b>\n' \
+                   f'{question} \n\n'
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_document(call.message.chat.id, answer, caption=text_faq, parse_mode='HTML',
+                                reply_markup=inline_keyboard_main_faq_back())
+    elif db_request['type_answer'] == 'photo':
+        question = db_request['question']
+        answer = db_request['answer']
+        text_faq = f'• <b>Вопрос:</b>\n' \
+                   f'{question} \n\n'
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_photo(call.message.chat.id, answer, caption=text_faq, parse_mode='HTML',
+                             reply_markup=inline_keyboard_main_faq_back())
     await call.answer()
 
 
@@ -276,11 +272,41 @@ async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
 async def callback_inline_faq_menu_back(call: CallbackQuery, state: FSMContext):
     logging.info(f'User({call.message.chat.id}) вернулся в админ меню')
     data = await state.get_data()
-    await bot.edit_message_text(chat_id=call.message.chat.id,
-                                message_id=call.message.message_id,
-                                text=f'F.A.Q Страница {data["page"] + 1}',
-                                reply_markup=await inline_keyboard_main_faq(data['page']))
+    text = f'F.A.Q Страница {data["page"] + 1} из {data["max_pages"]}'
+    if call.message.content_type == 'text':
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=text,
+                                    reply_markup=await inline_keyboard_main_faq(data['page']))
+    if call.message.content_type in ('document', 'photo'):
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.send_message(chat_id=call.message.chat.id,
+                               text=text,
+                               reply_markup=await inline_keyboard_main_faq(data['page']))
     await call.answer()
+
+
+# FAQ кнопки вперед и назад
+@dp.callback_query_handler(text=["main_faq_previous", "main_faq_next"])
+async def main_menu_faq_next_prev(call: CallbackQuery, state: FSMContext):
+    logging.info(f"User({call.message.chat.id}) enter {call.data}")
+    data = await state.get_data()
+    if call.data == "main_faq_next" and (data['page'] + 1 < data["max_pages"]):
+        await state.update_data(page=(data['page'] + 1))
+        data = await state.get_data()
+        text = f'F.A.Q Страница {data["page"] + 1} из {data["max_pages"]}'
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=text,
+                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
+    elif call.data == "main_faq_previous" and (data['page'] != 0):
+        await state.update_data(page=(data['page'] - 1))
+        data = await state.get_data()
+        text = f'F.A.Q Страница {data["page"] + 1} из {data["max_pages"]}'
+        await bot.edit_message_text(chat_id=call.message.chat.id,
+                                    message_id=call.message.message_id,
+                                    text=text,
+                                    reply_markup=await inline_keyboard_main_faq(data["page"]))
 
 
 ############################ КОНЕЦ Меню F.A.Q КОНЕЦ #########################################################

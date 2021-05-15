@@ -5,7 +5,7 @@ from data.button_names.navigation_buttons import floor_1, floor_2, floor_3, floo
     tutors_university, old_building, new_building, dean_button, teachers_button, rector_button, prorectors_button, \
     management_button, law_button, \
     sem_button, startup_button, business_button, econ_button, rector_place_button, map_menu_button, back_to_old_button, \
-    back_to_new_button
+    back_to_new_button, booking
 from data.button_names.main_menu_buttons import to_back_button
 from .callback_datas import cabinet_callback, nav_center_callback
 
@@ -147,11 +147,12 @@ def inline_keyboard_new_building_back():
 
 def inline_keyboard_old_building_back(building_callback, floor_callback):
     markup = InlineKeyboardMarkup(row_width=1)
+    callback_button3 = InlineKeyboardButton(text=booking, url = 'http://booking.almau.edu.kz')
     callback_button = InlineKeyboardButton(text=to_back_button,
                                            callback_data=building_callback + "building" + floor_callback)
     callback_button1 = InlineKeyboardButton(text=back_to_old_button, callback_data="old_building")
     callback_button2 = InlineKeyboardButton(text=back_to_new_button, callback_data="new_building")
-    markup.add(callback_button, callback_button1, callback_button2)
+    markup.add(callback_button3, callback_button, callback_button1, callback_button2, )
     return markup
 
 

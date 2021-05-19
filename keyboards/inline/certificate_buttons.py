@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 from .callback_datas import instruction_callback
-from data.button_names.certificate_buttons import completes_button_text, request_button_text, send_request_button_text, \
+from data.button_names.certificate_buttons import request_button_text, send_request_button_text, \
     cancel_request_button_text, almaunion_link_button_text
 from data.button_names.main_menu_buttons import cancel_menu_button
 
@@ -18,16 +18,6 @@ async def inline_keyboard_certificate():
     # callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
     markup.add(callback_button_link, callback_button_req)
     return markup
-
-
-# async def inline_keyboard_get_certificate(user_id):
-#     markup = InlineKeyboardMarkup(row_width=1)
-#     certificate = await db.select_data_certificate(user_id)
-#     markup.add(*[InlineKeyboardButton(text=f"{item['certif_type']} {item['date_time'].strftime('%d.%m.%y')}",
-#                                       callback_data=certificate_callback.new(id=item['id'])) for item in
-#                  certificate])
-#     markup.add(InlineKeyboardButton(text="⬅ Назад", callback_data="/certificate"))
-#     return markup
 
 
 def inline_keyboard_certificate_back():

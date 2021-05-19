@@ -31,16 +31,6 @@ def is_valid_email(s):
     return valid_email_pattern.match(s) is not None
 
 
-# # Список залитых индивидуальных справок студента
-# @dp.callback_query_handler(text='complete_certificates')
-# async def callback_inline_completes(call: CallbackQuery):
-#     logging.info(f"User({call.message.chat.id}) вошел в Готовые справки")
-#     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-#                                 text='Готовые справки:',
-#                                 reply_markup=await inline_keyboard_get_certificate(call.message.chat.id))
-#     await call.answer()
-
-
 @dp.callback_query_handler(instruction_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
@@ -77,9 +67,18 @@ async def process_name(message: types.Message, state: FSMContext):
     else:
         async with state.proxy() as data:
             data['type'] = fmt.quote_html(message.text)
-        await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_request())
+        await message.reply("Напишите комментарий к заявке (название военкомата, место требования и т.д.)", reply_markup=inline_keyboard_cancel_request())
         # await bot.send_message(message.chat.id, 'Напишите ваше ФИО:', reply_markup=inline_keyboard_cancel_request())
-        await CertificateRequest.names.set()
+        await CertificateRequest.comment.set()
+
+
+@dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.comment)
+async def process_name(message: types.Message, state: FSMContext):
+    await delete_inline_buttons_in_dialogue(message)
+    async with state.proxy() as data:
+        data['comment'] = message.text
+    await message.reply("Напишите ваше ФИО", reply_markup=inline_keyboard_cancel_request())
+    await CertificateRequest.names.set()
 
 
 @dp.message_handler(content_types=ContentType.TEXT, state=CertificateRequest.names)
@@ -125,7 +124,8 @@ async def SendRequest(message: types.Message, state: FSMContext):
                       f"• <b>ФИО:</b> {data['names']}\n" \
                       f"• <b>Ваш email:</b> {data['email']}\n" \
                       f"• <b>Ваш телефон:</b> {data['phone']}\n" \
-                      f"• <b>Вид справки:</b> {data['type']}"
+                      f"• <b>Вид справки:</b> {data['type']}\n" \
+                      f"• <b>Комментарий:</b> {data['comment']}\n"
         await bot.send_message(message.chat.id, message_txt, reply_markup=inline_keyboard_send_req_data())
         await state.reset_state(with_data=False)
     else:
@@ -152,7 +152,7 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     logging.info(f"User({call.message.chat.id}) отправил заявку")
     data = await state.get_data()
     await db.add_certificate_request_data(call.message.chat.id, data['names'], data['phone'], data['email'],
-                                          data['type'])
+                                          data['type'], data['comment'])
 
     email_message = MIMEMultipart("alternative")
     email_message["From"] = email_bot
@@ -167,7 +167,8 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
         f"ФИО - {data['names']} <br/> "
         f"Email - {data['email']} <br/> "
         f"Телефон - {data['phone']}  <br/> "
-        f"Вид справки - {data['type']}"
+        f"Вид справки - {data['type']} <br/> "
+        f"Комментарий - {data['comment']}"
         f"</h1>"
         f"</body>"
         f"</html>",
@@ -192,7 +193,8 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
             await bot.send_message(admin['idt'], f"Пришла заявка на получение справки:\n"
                                                  f"• ФИО - {data['names']}\n"
                                                  f"• Email - {data['email']}\n"
-                                                 f"• Телефон - {data['phone']} \n"
-                                                 f"• Вид справки - {data['type']}")
+                                                 f"• Телефон - {data['phone']}\n"
+                                                 f"• Вид справки - {data['type']}\n"
+                                                 f"• Комментарий - {data['comment']}")
     except Exception as err:
         logging.exception(err)

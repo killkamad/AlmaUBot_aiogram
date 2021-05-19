@@ -36,7 +36,7 @@ async def add_library_resource(message: types.Message, state: FSMContext):
     await delete_inline_buttons_in_dialogue(message)
     async with state.proxy() as data:
         data['button_name'] = message.text
-    await message.reply('Напишите тест инструкции:', reply_markup=cancel_edit_instruction())
+    await message.reply('Напишите текст инструкции:', reply_markup=cancel_edit_instruction())
     await AddCertificateInstruction.button_content.set()
 
 

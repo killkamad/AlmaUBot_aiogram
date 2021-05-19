@@ -24,12 +24,6 @@ schedule_delete_callback = CallbackData('schdel', 'schedule_id')
 
 # Certificate
 instruction_callback = CallbackData('inst', 'id')
-certificate_update_callback = CallbackData('crtu', 'id')
-certificate_delete_callback = CallbackData('crtd', 'id')
-
-# Request
-request_callback = CallbackData('req', 'id')
-request_type_callback = CallbackData('reqt', 'id')
 instruction_update_callback = CallbackData('instu', 'id')
 instruction_add_doc_callback = CallbackData('insta', 'id')
 instruction_delete_callback = CallbackData('instd', 'id')

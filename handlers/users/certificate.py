@@ -6,6 +6,7 @@ from aiogram import types
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove, ChatActions
 from aiogram.dispatcher import FSMContext
 
+from data.config import email_certificate, email_bot, email_bot_password, hostname_bot, port_bot
 from loader import dp, bot
 
 from email.mime.multipart import MIMEMultipart
@@ -20,7 +21,6 @@ from utils import db_api as db
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 # Импорт стейтов
 from states.request_state import CertificateRequest
-
 
 # Патерн регулярного выражения для проверки почты
 valid_email_pattern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
@@ -45,47 +45,47 @@ def is_valid_email(s):
 async def callback_inline_certificate_instructions(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Готовые справки")
     await bot.send_message(chat_id=call.message.chat.id,
-                                text=f'Инструкция по заполнению заявок на справку ГЦВП (пособие), вонкомат (по призыву) и по месту требования.\n\n' \
-                                    f'Для прохождения данной процедуры вам необходимо:\n' \
-                                    f'1) Войти в портал AlmaUnion https://almaunion.almau.edu.kz/login и авторизоваться (ввести свои логин и пароль*)\n' \
-                                    f'2) В меню слева выбрать модуль «Обращения»\n\n' \
-                                    f'<b>Примечания*</b> Если у вас нет/вы его забыли/потеряли/вообще не было <b>логина и пароля</b>, то вы можете обратиться в Офис регистратора и получить их в индивидуальном порядке.\n\n' \
-                                    f'3) Для создания нового обращения нажимаете «OK, я прошел анкетирование»\n' \
-                                    f'4) Нажимаете на кнопку «Создать обращение»\n' \
-                                    f'5) Выбираете категорию «Заявка на справку»\n' \
-                                    f'6) Вид справки «ГЦВП», «Справка для военкомата», «По месту требования»\n' \
-                                    f'7) Вводите номер сотового телефона\n' \
-                                    f'8) В комментариях заполняете номер справки/место призыва\n' \
-                                    f'9) Нажимаете на кнопку «Отправить»\n\n' \
-                                    f'<b>В личном кабинете студент так же может получить справку по месту требования с подтверждающим QR кодом в формате PDF.</b>\n' \
-                                    f'<b>Такая справка действительна в течении 10 рабочих дней.</b>\n\n' \
-                                    f'Студент должен зайти в свой личный кабинет almaunion.almau.edu.kz:\n' \
-                                    f'1) В меню слева выбрать модуль «Справка»\n' \
-                                    f'2) В появившемся окне «Справка» нажимаете на кнопку «Скачать»\n\n' \
-                                    f'Данную справку  можно скачать только при наличии на смартфоне шрифта «Times New Roman», если вы заходите со смартфона. Если данного шрифта нет в телефоне, она выйдет с ошибкой.\n',
-                                parse_mode='HTML')
+                           text=f'Инструкция по заполнению заявок на справку ГЦВП (пособие), вонкомат (по призыву) и по месту требования.\n\n' \
+                                f'Для прохождения данной процедуры вам необходимо:\n' \
+                                f'1) Войти в портал AlmaUnion https://almaunion.almau.edu.kz/login и авторизоваться (ввести свои логин и пароль*)\n' \
+                                f'2) В меню слева выбрать модуль «Обращения»\n\n' \
+                                f'<b>Примечания*</b> Если у вас нет/вы его забыли/потеряли/вообще не было <b>логина и пароля</b>, то вы можете обратиться в Офис регистратора и получить их в индивидуальном порядке.\n\n' \
+                                f'3) Для создания нового обращения нажимаете «OK, я прошел анкетирование»\n' \
+                                f'4) Нажимаете на кнопку «Создать обращение»\n' \
+                                f'5) Выбираете категорию «Заявка на справку»\n' \
+                                f'6) Вид справки «ГЦВП», «Справка для военкомата», «По месту требования»\n' \
+                                f'7) Вводите номер сотового телефона\n' \
+                                f'8) В комментариях заполняете номер справки/место призыва\n' \
+                                f'9) Нажимаете на кнопку «Отправить»\n\n' \
+                                f'<b>В личном кабинете студент так же может получить справку по месту требования с подтверждающим QR кодом в формате PDF.</b>\n' \
+                                f'<b>Такая справка действительна в течении 10 рабочих дней.</b>\n\n' \
+                                f'Студент должен зайти в свой личный кабинет almaunion.almau.edu.kz:\n' \
+                                f'1) В меню слева выбрать модуль «Справка»\n' \
+                                f'2) В появившемся окне «Справка» нажимаете на кнопку «Скачать»\n\n' \
+                                f'Данную справку  можно скачать только при наличии на смартфоне шрифта «Times New Roman», если вы заходите со смартфона. Если данного шрифта нет в телефоне, она выйдет с ошибкой.\n',
+                           parse_mode='HTML')
 
 
 @dp.callback_query_handler(text='application_inst')
 async def callback_inline_application_instructions(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Готовые справки")
     await bot.send_message(chat_id=call.message.chat.id,
-                                text=f'Инструкция по заполнению заявлений.\n\n'
-                                    f'Для прохождения данной процедуры вам необходимо:\n'
-                                    f'1) Войти в портал AlmaUnion https://almaunion.almau.edu.kz/login и авторизоваться (ввести свои логин и пароль*)\n'
-                                    f'2) В меню слева выбрать модуль «Обращения»\n\n'
-                                    f'<b>Примечания*</b> Если у вас нет/ вы его забыли/ потеряли/ вообще не было <b>Логина и пароля</b>, то вы можете обратиться в Офис регистратора и получить их в индивидуальном порядке.\n\n'
-                                    f'3) Для создания нового обращения нажимаете «OK, я прошел анкетирование»\n'
-                                    f'4) Нажимаете на кнопку «Создать обращение»\n'
-                                    f'5) Выбираете категорию «Заявка на заявление»\n'
-                                    f'6) Выбираете вид заявки, т.е. какое заявление вам надо заполнить\n'
-                                    f'7) С левой стороны будет прикреплен образец, как заполнить заявление\n'
-                                    f'8) В инструкции, как заполнять заявление, вы можете скачать бланк для заполнения заявления\n'
-                                    f'9) Вводите номер сотового телефона\n'
-                                    f'10) В комментариях заполняете или уточняете интересующие вас вопросы\n'
-                                    f'11) Прикрепляете заявление\n'
-                                    f'12) Нажимаете на кнопку «Отправить»\n',
-                                parse_mode='HTML')
+                           text=f'Инструкция по заполнению заявлений.\n\n'
+                                f'Для прохождения данной процедуры вам необходимо:\n'
+                                f'1) Войти в портал AlmaUnion https://almaunion.almau.edu.kz/login и авторизоваться (ввести свои логин и пароль*)\n'
+                                f'2) В меню слева выбрать модуль «Обращения»\n\n'
+                                f'<b>Примечания*</b> Если у вас нет/ вы его забыли/ потеряли/ вообще не было <b>Логина и пароля</b>, то вы можете обратиться в Офис регистратора и получить их в индивидуальном порядке.\n\n'
+                                f'3) Для создания нового обращения нажимаете «OK, я прошел анкетирование»\n'
+                                f'4) Нажимаете на кнопку «Создать обращение»\n'
+                                f'5) Выбираете категорию «Заявка на заявление»\n'
+                                f'6) Выбираете вид заявки, т.е. какое заявление вам надо заполнить\n'
+                                f'7) С левой стороны будет прикреплен образец, как заполнить заявление\n'
+                                f'8) В инструкции, как заполнять заявление, вы можете скачать бланк для заполнения заявления\n'
+                                f'9) Вводите номер сотового телефона\n'
+                                f'10) В комментариях заполняете или уточняете интересующие вас вопросы\n'
+                                f'11) Прикрепляете заявление\n'
+                                f'12) Нажимаете на кнопку «Отправить»\n',
+                           parse_mode='HTML')
 
 
 @dp.callback_query_handler(certificate_callback.filter())
@@ -194,14 +194,14 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
                                           data['type'])
 
     email_message = MIMEMultipart("alternative")
-    email_message["From"] = "almaubot@gmail.com"
-    email_message["To"] = "killka_m@mail.ru"
-    email_message["Subject"] = "Заявка на получение справки с места учебы"
+    email_message["From"] = email_bot
+    email_message["To"] = email_certificate
+    email_message["Subject"] = "Заявка на получение справки"
     sending_message = MIMEText(
         f"<html>"
         f"<body>"
         f"<h1>"
-        f"Заявка на получение справки с места учебы <br/> <br/>"
+        f"Заявка на получение справки<br/> <br/>"
         f"Данные студента: <br/>"
         f"ФИО - {data['names']} <br/> "
         f"Email - {data['email']} <br/> "
@@ -216,14 +216,22 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     email_message.attach(sending_message)
     await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
     await aiosmtplib.send(email_message,
-                          hostname="smtp.gmail.com",
-                          port=587,
+                          hostname=hostname_bot,
+                          port=port_bot,
                           start_tls=True,
-                          # recipients=["killka_m@mail.ru"],
-                          username="almaubot@gmail.com",
-                          password="mjykwcchpvduwcjy")
+                          username=email_bot,
+                          password=email_bot_password)
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка успешно отправлена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Заявка успешно отправлена',
                            reply_markup=always_stay_menu_keyboard())
+    try:
+        for admin in (await db.find_id_by_role('certificate_admin')):
+            await bot.send_message(admin['idt'], f"Пришла заявка на получение справки:\n"
+                                                 f"• ФИО - {data['names']}\n"
+                                                 f"• Email - {data['email']}\n"
+                                                 f"• Телефон - {data['phone']} \n"
+                                                 f"• Вид справки - {data['type']}")
+    except Exception as err:
+        logging.exception(err)

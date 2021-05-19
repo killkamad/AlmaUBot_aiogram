@@ -35,9 +35,9 @@ from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 async def callback_inline_update_almaushop_merch(call: CallbackQuery):
     logging.info(
         f'User({call.message.chat.id}) запустил обновление данных таблицы "almau_shop_products" call.data - {call.data}')
-    shop = AlmauShop()
-    shop.parse_page(text=shop.load_page())
     try:
+        shop = AlmauShop()
+        shop.parse_page(text=shop.load_page())
         await bot.send_message(call.message.chat.id,
                                '🔄 Началось обновление данных в таблице, пожалуйста ожидайте!')
         await db.clear_almaushop_table()

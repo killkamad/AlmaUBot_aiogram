@@ -24,6 +24,8 @@ from states.register_user_phone import RegisterUserPhone
 
 from aiogram.dispatcher import FSMContext
 
+from utils.get_linenumber import get_linenumber
+
 _main_menu_text = 'Главное меню:\n' \
                   '- Расписание - просмотр актуального расписания\n' \
                   '- FAQ - часто задаваемые вопросы студентов и ответы на них\n' \
@@ -63,6 +65,7 @@ async def menu_handler(message):
 @rate_limit(5, 'menu')
 @dp.message_handler(commands=['menu'])
 async def menu_handler(message):
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({message.chat.id}) вошел в меню")
     await bot.send_message(message.chat.id, 'Главное меню ↘',
                            reply_markup=always_stay_menu_keyboard())
@@ -79,6 +82,7 @@ async def register_user_phone(message):
 
 @dp.message_handler(content_types=ContentType.ANY, state=RegisterUserPhone.phone)
 async def register_user_phone_next(message: types.Message, state: FSMContext):
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     if message.content_type == 'contact':
         if message.chat.id == message.contact.user_id:
             logging.info(f"User({message.chat.id}) ввел правильный номер {message.contact.phone_number}")
@@ -114,6 +118,7 @@ async def register_user_phone_next(message: types.Message, state: FSMContext):
 @dp.message_handler(lambda message: message.text in main_menu_def_buttons)
 async def main_menu_handler(message: Message, state: FSMContext):
     logging.info(f"User({message.chat.id}) enter {message.text}")
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     if message.text == schedule_button_text:
         await message.answer(text='Выберите ваш курс ↘', reply_markup=await inline_keyboard_schedule())
     elif message.text == faq_button_text:
@@ -146,6 +151,7 @@ async def main_menu_handler(message: Message, state: FSMContext):
 @dp.message_handler(lambda message: message.text in to_main_menu_button)
 async def main_menu_handler(message: Message):
     logging.info(f"User({message.chat.id}) enter {message.text}")
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     if message.text == to_main_menu_button:
         await message.answer('Возвращение в главное меню', reply_markup=always_stay_menu_keyboard())
 
@@ -225,6 +231,7 @@ async def callback_inline(call: CallbackQuery):
 
 @dp.callback_query_handler(schedule_callback.filter())
 async def callback_inline(call: CallbackQuery, callback_data: dict):
+    await db.add_bot_log(call.message.chat.id, call.data, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f'call = {call.data}')
     schedule_id = callback_data.get('schedule_id')  # Получение id расписания из callback_data
     file_id = await db.find_schedule_id(schedule_id)  # Получение file_id кнопки из БД
@@ -238,6 +245,7 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
 async def callback_inline_faq_menu(call: CallbackQuery, callback_data: dict):
     id = callback_data.get('callback_id')
     db_request = await db.main_faq_select_question_and_answer_and_type(id)
+    await db.add_bot_log(call.message.chat.id, db_request['question'], f"{__name__}.py [LINE:{get_linenumber()}]")
     if db_request['type_answer'] == 'text':
         question = db_request['question']
         answer = db_request['answer']

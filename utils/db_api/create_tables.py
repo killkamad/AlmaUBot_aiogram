@@ -353,6 +353,28 @@ async def create_table_map_navigation():
         print(error)
 
 
+# Создание таблицы для карты навигации
+async def create_table_bot_log():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = """
+                CREATE TABLE if not exists bot_log(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                action VARCHAR (200),
+                date_time TIMESTAMP,
+                log_record VARCHAR(1000))
+                """
+            # record: Record = await pool.fetchval(sql_ex)
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table bot_log successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # async def create_table_test():
 #     pool: Connection = db
 #     try:
@@ -387,6 +409,7 @@ async def set_up_tables():
         await create_table_library_menu_buttons()
         await create_table_library_resources()
         await create_table_contact_centers()
+        await create_table_bot_log()
     except Exception as error:
         print(f'Error - {error}')
 

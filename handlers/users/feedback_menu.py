@@ -13,6 +13,7 @@ from loader import dp, bot
 from data.button_names.feedback_buttons import feedback_advisor_button
 # Импортирование функций из БД контроллера
 from utils import db_api as db
+from utils.get_linenumber import get_linenumber
 from utils.misc import rate_limit
 from aiogram.types import ReplyKeyboardRemove
 
@@ -36,6 +37,7 @@ def is_valid_email(s):
 @rate_limit(1)
 @dp.message_handler(text=[feedback_advisor_button], state=None)
 async def feedback_text_buttons_handler(message: types.Message, state: FSMContext):
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     if message.text == feedback_advisor_button:
         # await message.answer('...', reply_markup=ReplyKeyboardRemove())

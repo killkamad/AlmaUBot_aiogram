@@ -152,9 +152,23 @@ async def edit_user_role(role, phone):
         logging.info(error)
 
 
+# Получение id пользователей с ролью
+async def find_id_by_role(role):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            # async with pool.transaction():
+            sql_ex = "SELECT idT FROM users WHERE role = $1"
+            record: Record = await connection.fetch(sql_ex, str(role))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def main():
-    print(await select_users())
-    print(await check_role_by_id(468899120))
+    # print(await select_users())
+    # print(await check_role_by_id(468899120))
+    print(await find_id_by_role('library_admin'))
 
 
 if __name__ == '__main__':

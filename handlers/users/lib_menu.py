@@ -3,6 +3,7 @@ import aiogram.utils.markdown as fmt
 from aiogram.types import CallbackQuery, ContentType, ChatActions
 from aiogram import types
 
+from data.config import email_library, email_bot, email_bot_password, hostname_bot, port_bot
 from keyboards.default import keyboard_library, keyboard_library_send_phone
 from keyboards.inline import lib_res_callback
 from states.library_state import EmailReg
@@ -16,6 +17,7 @@ from data.button_names.lib_buttons import lib_def_buttons, lib_resources_button
 
 # Импортирование функций из БД контроллера
 from utils import db_api as db
+from utils.get_linenumber import get_linenumber
 from utils.misc import rate_limit
 from aiogram.types import ReplyKeyboardRemove
 
@@ -41,6 +43,7 @@ def is_valid_email(s):
     lambda message: message.text in lib_def_buttons or message.text == lib_resources_button)
 async def library_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     # Кнопки БИБЛИОТЕКИ
     if message.text in lib_def_buttons:
         button_content = await db.select_library_menu_button_content(message.text)
@@ -53,6 +56,7 @@ async def library_text_buttons_handler(message: types.Message):
 
 @dp.callback_query_handler(text=['library_registration'])
 async def callback_library_registration(call: CallbackQuery):
+    await db.add_bot_log(call.message.chat.id, call.data, f"{__name__}.py [LINE:{get_linenumber()}]")
     resource = await db.select_data_lib_resource_reg()
     libs = []
     for res in resource:
@@ -224,9 +228,8 @@ async def send_email_to_library_and_notification(call: CallbackQuery, state: FSM
     await db.add_lib_reg_request_data(call.message.chat.id, data['names'], data['phone'], data['email'],
                                       data['book_database'])
     email_message = MIMEMultipart("alternative")
-    email_message["From"] = "almaubot@gmail.com"
-    email_message["To"] = "killka_m@mail.ru"
-    # email_message["To"] = "lib@almau.edu.kz"
+    email_message["From"] = email_bot
+    email_message["To"] = email_library
     email_message["Subject"] = "Регистрация на лицензионные базы с телеграм бота"
     sending_message = MIMEText(
         f"<html>"
@@ -247,23 +250,23 @@ async def send_email_to_library_and_notification(call: CallbackQuery, state: FSM
     email_message.attach(sending_message)
     await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
     await aiosmtplib.send(email_message,
-                          hostname="smtp.gmail.com",
-                          port=587,
+                          hostname=hostname_bot,
+                          port=port_bot,
                           start_tls=True,
                           # recipients=["killka_m@mail.ru"],
-                          username="almaubot@gmail.com",
-                          password="mjykwcchpvduwcjy")
+                          username=email_bot,
+                          password=email_bot_password)
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)  # Убирает инлайн клавиатуру
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Запрос успешно отправлен")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Запрос на регистрацию успешно отправлен, ожидайте ответа на указанную почту',
                            reply_markup=keyboard_library())
-    # for admin in library_admins:
-    #     try:
-    #         await bot.send_message(admin, f"Пришла заявка на регистрацию:\n"
-    #                                       f"ФИО - {data['names']}\n"
-    #                                       f"Email - {data['email']}\n"
-    #                                       f"Телефон - {data['phone']}\n"
-    #                                       f"База Данных - {data['book_database']}")
-    #     except Exception as err:
-    #         logging.exception(err)
+    try:
+        for admin in (await db.find_id_by_role('library_admin')):
+            await bot.send_message(admin['idt'], f"Пришла заявка на регистрацию:\n"
+                                                 f"ФИО - {data['names']}\n"
+                                                 f"Email - {data['email']}\n"
+                                                 f"Телефон - {data['phone']}\n"
+                                                 f"База Данных - {data['book_database']}")
+    except Exception as err:
+        logging.exception(err)

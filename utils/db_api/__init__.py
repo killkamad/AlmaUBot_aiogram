@@ -16,3 +16,4 @@ from .users_table import *
 from .map_navigation_table import *
 from .library_menu_buttons_table import *
 from .library_resources_table import *
+from .bot_log_table import *

@@ -2,6 +2,7 @@ import logging
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandHelp
 from loader import dp
+from utils.get_linenumber import get_linenumber
 from utils.misc import rate_limit
 from utils import db_api as db
 
@@ -44,6 +45,7 @@ message_for_user = '<b>О боте:</b>\n\n' \
 @rate_limit(5, 'help')
 @dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({message.chat.id}) enter {message.text}")
     role = await db.check_role_by_id(message.chat.id)
     try:

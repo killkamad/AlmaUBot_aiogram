@@ -9,6 +9,7 @@ from keyboards.inline.almaushop_buttons import inline_keyboard_faq_almaushop, in
 from loader import dp, bot
 # Импортирование функций из БД контроллера
 from utils import db_api as db
+from utils.get_linenumber import get_linenumber
 from utils.misc import rate_limit
 
 from data.button_names.almaushop_buttons import almaushop_products_button, almaushop_books_button, \
@@ -21,6 +22,7 @@ from data.button_names.almaushop_buttons import almaushop_products_button, almau
 @dp.message_handler(lambda message: message.text in [almaushop_products_button, almaushop_books_button])
 async def almaushop_text_buttons_parser_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     albums_list = []
     start = 0
     messages_sent = 0
@@ -41,6 +43,7 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
         await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
         await bot.send_media_group(message.chat.id, albums_list[start:10 * i])
         start += 10
+        messages_sent += 1
         if messages_sent % 30 == 0:
             await asyncio.sleep(1)
             messages_sent = 0
@@ -50,6 +53,7 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
 @dp.message_handler(lambda message: message.text in almaushop_def_buttons)
 async def almaushop_text_buttons_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
+    await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     if message.text == almaushop_website_button:
         button_content = await db.select_almau_shop_menu_button_content(message.text)
         await bot.send_message(chat_id=message.chat.id,

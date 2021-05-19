@@ -6,6 +6,7 @@ from aiogram import types
 from aiogram.types import CallbackQuery, ContentType, ReplyKeyboardRemove, ChatActions
 from aiogram.dispatcher import FSMContext
 
+from data.config import email_certificate, email_bot, email_bot_password, hostname_bot, port_bot
 from loader import dp, bot
 
 from email.mime.multipart import MIMEMultipart
@@ -20,7 +21,6 @@ from utils import db_api as db
 from utils.delete_inline_buttons import delete_inline_buttons_in_dialogue
 # Импорт стейтов
 from states.request_state import CertificateRequest
-
 
 # Патерн регулярного выражения для проверки почты
 valid_email_pattern = re.compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
@@ -147,14 +147,20 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
                                           data['type'])
 
     email_message = MIMEMultipart("alternative")
+<<<<<<< HEAD
     email_message["From"] = "almaubot@gmail.com"
     email_message["To"] = "ketchupass10@gmail.com"
     email_message["Subject"] = "Заявка на получение справки с места учебы"
+=======
+    email_message["From"] = email_bot
+    email_message["To"] = email_certificate
+    email_message["Subject"] = "Заявка на получение справки"
+>>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9
     sending_message = MIMEText(
         f"<html>"
         f"<body>"
         f"<h1>"
-        f"Заявка на получение справки с места учебы <br/> <br/>"
+        f"Заявка на получение справки<br/> <br/>"
         f"Данные студента: <br/>"
         f"ФИО - {data['names']} <br/> "
         f"Email - {data['email']} <br/> "
@@ -169,16 +175,22 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     email_message.attach(sending_message)
     await bot.send_chat_action(call.message.chat.id, ChatActions.TYPING)
     await aiosmtplib.send(email_message,
-                          hostname="smtp.gmail.com",
-                          port=587,
+                          hostname=hostname_bot,
+                          port=port_bot,
                           start_tls=True,
+<<<<<<< HEAD
                           username="almaubot@gmail.com",
                           password="mjykwcchpvduwcjy")
+=======
+                          username=email_bot,
+                          password=email_bot_password)
+>>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка успешно отправлена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Заявка успешно отправлена',
                            reply_markup=always_stay_menu_keyboard())
+<<<<<<< HEAD
     # try:
     #     await bot.send_message(476219167, f"Пришла заявка на получение справки:\n"
     #                                   f"ФИО - {data['names']}\n"
@@ -187,3 +199,14 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
     #                                   f"Вид справки - {data['type']}")
     # except Exception as err:
     #     logging.exception(err)
+=======
+    try:
+        for admin in (await db.find_id_by_role('certificate_admin')):
+            await bot.send_message(admin['idt'], f"Пришла заявка на получение справки:\n"
+                                                 f"• ФИО - {data['names']}\n"
+                                                 f"• Email - {data['email']}\n"
+                                                 f"• Телефон - {data['phone']} \n"
+                                                 f"• Вид справки - {data['type']}")
+    except Exception as err:
+        logging.exception(err)
+>>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9

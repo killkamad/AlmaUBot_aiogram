@@ -78,6 +78,7 @@ class AlmauShop:
             print('error')
         img = img_block.select_one('img').get('data-original')
 
+        # field="li_title__1497456130776"
         url2 = name_block.get('field')
         url2 = url2.split('__')[1]
 

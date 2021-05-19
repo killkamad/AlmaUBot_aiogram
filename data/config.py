@@ -11,13 +11,17 @@ DB_PASS = str(os.getenv("DB_PASS"))
 DB_HOST = str(os.getenv("DB_HOST"))
 DB_PORT = str(os.getenv("DB_PORT"))
 
+# Нужно для оповещения о запуске бота
 admins = [
     468899120,
     302422833,
     472211929
 ]
 
-library_admins = [
-    668049153,
-    846857659
-]
+hostname_bot = "smtp.gmail.com"  # smtp сервер
+port_bot = 587  # порт
+email_bot = "almaubot@gmail.com"  # почта откуда будут отправляться письма
+email_bot_password = "mjykwcchpvduwcjy"  # пароль от почты бота
+
+email_library = "lib@almau.edu.kz"  # почта библиотеки
+email_certificate = "g.kyzdarbekova@almau.edu.kz"  # почта куда будут отправлять заявки на справку

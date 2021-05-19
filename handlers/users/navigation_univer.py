@@ -10,7 +10,7 @@ from keyboards.inline.navigation_buttons import inline_keyboard_nav_unifi, inlin
 from utils import db_api as db
 from asyncio import create_task
 from keyboards.inline import cabinet_callback, nav_center_callback
-
+from utils.get_linenumber import get_linenumber
 
 scholl_tuple = ('Школа менеджмента', 'Школа политики и права',
                 'Школа предпринимательства и инноваций',
@@ -28,7 +28,6 @@ floor_call_tuple = ("_first", "_second", "_third",
 
 async def check_photo_map_nav_function(keyboard, text_buttons, call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в навигацию ({call.data})")
-
     if call.message.content_type == 'photo':
         await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id,
@@ -57,6 +56,7 @@ async def check_photo_is_none_map_nav_function(keyboard, description, photo_id, 
 
 @dp.callback_query_handler(text='/nav_unifi')
 async def callback_inline_nav_unifi(call: CallbackQuery):
+    await db.add_bot_log(call.message.chat.id, call.message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({call.message.chat.id}) вошел в Навигацию")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Навигация по университету', reply_markup=inline_keyboard_nav_unifi())
@@ -66,6 +66,7 @@ async def callback_inline_nav_unifi(call: CallbackQuery):
 # ---------------------   Контакты ключевых центров ---------------------
 @dp.callback_query_handler(text='contacts_center')
 async def callback_inline_contacts_center(call: CallbackQuery):
+    await db.add_bot_log(call.message.chat.id, call.message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({call.message.chat.id}) вошел в Контакты ключевых центров")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Контакты ключевых центров', reply_markup=await inline_keyboard_contacts_center())
@@ -87,6 +88,7 @@ async def callback_inline_contacts_center_call(call: CallbackQuery, callback_dat
 # --------------------- Профессорско-преподовательский состав---------------------
 @dp.callback_query_handler(text='tutors_university')
 async def callback_inline_tutors_university(call: CallbackQuery):
+    await db.add_bot_log(call.message.chat.id, call.message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     logging.info(f"User({call.message.chat.id}) вошел в Профессорско-преподавательский состав")
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Профессорско-преподавательский состав, выберите школу',

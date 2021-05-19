@@ -139,13 +139,13 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
         f"<h1>"
         f"Письмо от {data['names']}"
         f"</h1>"
-        f"<h3>"
+        f"<h2>"
         f"Email: {data['email']} <br/> "
         f"Телефон: {data['phone']}  <br/> "
-        f"</h3>"
-        f"<h4>"
+        f"</h2>"
+        f"<h2>"
         f"Содержание письма: <br/>"
-        f"</h4>"
+        f"</h2>"
         f"<p>"
         f"{data['content']}"
         f"</p>"
@@ -167,13 +167,14 @@ async def callback_inline_SendMsgToRector(call: CallbackQuery, state: FSMContext
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Письмо успешно отправлено',
                            reply_markup=always_stay_menu_keyboard())
-    for admin in admins:
-        try:
-            await bot.send_message(admin, f"<b>Вам пришло письмо от студента:</b>\n"
+
+    try:
+        for admin in (await db.find_id_by_role('advisor_admin')):
+            await bot.send_message(admin['idt'], f"<b>Вам пришло письмо от студента:</b>\n"
                                           f"• <b>ФИО</b> - {data['names']}\n"
                                           f"• <b>Email</b> - {data['email']}\n"
                                           f"• <b>Телефон</b> - {data['phone']}\n"
                                           f"• <b>Содержание письма:</b>\n"
                                           f"{data['content']}")
-        except Exception as err:
-            logging.exception(err)
+    except Exception as err:
+        logging.exception(err)

@@ -2,16 +2,19 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import db_api as db
 from .callback_datas import certificate_callback
 from data.button_names.certificate_buttons import completes_button_text, request_button_text, send_request_button_text, \
-    cancel_request_button_text
+    cancel_request_button_text, instruction1_button_text, instruction2_button_text, almaunion_link_button_text
 from data.button_names.main_menu_buttons import cancel_menu_button
 
 
 async def inline_keyboard_certificate():
     markup = InlineKeyboardMarkup(row_width=1)
-    callback_button = InlineKeyboardButton(text=completes_button_text, callback_data='complete_certificates')
-    callback_button1 = InlineKeyboardButton(text=request_button_text, callback_data='request_certificate')
+    # callback_button = InlineKeyboardButton(text=completes_button_text, callback_data='complete_certificates')
+    callback_button1 = InlineKeyboardButton(text=instruction1_button_text, callback_data='certificate_inst')
+    callback_button2 = InlineKeyboardButton(text=instruction2_button_text, callback_data='application_inst')
+    callback_button3 = InlineKeyboardButton(text=almaunion_link_button_text, url='https://almaunion.almau.edu.kz/report')
+    callback_button4 = InlineKeyboardButton(text=request_button_text, callback_data='request_certificate')
     # callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
-    markup.add(callback_button, callback_button1)
+    markup.add(callback_button1, callback_button2, callback_button3, callback_button4)
     return markup
 
 

@@ -340,6 +340,7 @@ async def create_table_certificate_menu_buttons():
                 id_Telegram INT NOT NULL,
                 button_name VARCHAR (300),
                 button_content VARCHAR (4000),
+                button_file VARCHAR(400),
                 date_time TIMESTAMP)
                 """
             record: Record = await connection.fetchval(sql_ex)

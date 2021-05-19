@@ -31,6 +31,7 @@ certificate_delete_callback = CallbackData('crtd', 'id')
 request_callback = CallbackData('req', 'id')
 request_type_callback = CallbackData('reqt', 'id')
 instruction_update_callback = CallbackData('instu', 'id')
+instruction_add_doc_callback = CallbackData('insta', 'id')
 instruction_delete_callback = CallbackData('instd', 'id')
 
 # map-navigation

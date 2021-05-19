@@ -179,6 +179,30 @@ async def add_instruction(id_Telegram, button_name, button_content):
         logging.info(error)
 
 
+async def add_instruction_document(button_id, button_file):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Update certificate_menu_buttons set button_file = $2, date_time = now() Where id = $1"
+            record: Record = await connection.fetchrow(sql_ex, int(button_id), str(button_file))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def add_instruction_with_document(id_Telegram, button_name, button_content, button_file):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = "Insert into certificate_menu_buttons(id_Telegram, button_name, button_content, button_file, date_time) values ($1,$2,$3,$4, now())"
+            record: Record = await connection.fetchrow(sql_ex, int(id_Telegram), str(button_name), str(button_content),
+                                                       str(button_file))
+            logging.info(f"ADD instuction of ({button_name})")
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
 async def select_data_instruction():
     pool: Connection = db
     try:
@@ -194,9 +218,30 @@ async def select_instruction(id):
     pool: Connection = db
     try:
         async with pool.acquire() as connection:
-            sql_select = "SELECT button_content FROM certificate_menu_buttons WHERE id = $1"
+            sql_select = "SELECT button_content, button_file FROM certificate_menu_buttons WHERE id = $1"
             record: Record = await connection.fetchrow(sql_select, int(id))
-            record = list(record)[0]
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def select_instruction_all(id):
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT * FROM certificate_menu_buttons WHERE id = $1"
+            record: Record = await connection.fetchrow(sql_select, int(id))
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        logging.info(error)
+
+
+async def select_instruction_without_file():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_select = "SELECT id, button_name, button_content FROM certificate_menu_buttons WHERE button_file is null"
+            record: Record = await connection.fetch(sql_select)
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -219,7 +264,7 @@ async def update_instruction_data(button_name, button_content):
         async with pool.acquire() as connection:
             sql_ex = "Update certificate_menu_buttons set button_content = $2, date_time = now() Where id = $1"
             record: Record = await connection.fetchrow(sql_ex, int(button_name), str(button_content))
-            logging.info(f"UPDATED button ({id_request})")
+            # logging.info(f"UPDATED button ({id_request})")
             return record
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
@@ -236,8 +281,9 @@ async def delete_instruction_button(button_name):
     except(Exception, ErrorInAssignmentError) as error:
         logging.info(error)
 
+
 async def main():
-    await alter_table_certificate()
+    print(await select_instruction_without_file())
 
 
 if __name__ == '__main__':

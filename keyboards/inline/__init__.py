@@ -50,7 +50,8 @@ from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel
     cancel_or_update_instruction, cancel_or_delete_instruction, inline_keyboard_upd_instruction, \
     inline_keyboard_update_certificate, inline_keyboard_del_instruction, inline_keyboard_delete_certificate, \
     inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
-    inline_keyboard_on_send_request_certificate, cancel_edit_instruction, cancel_or_add_instruction
+    inline_keyboard_on_send_request_certificate, cancel_edit_instruction, cancel_add_instruction_or_add_file, \
+    cancel_or_add_instruction, inline_keyboard_add_doc_instruction, cancel_add_doc_instruction, cancel_or_add_doc_instruction
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
     inline_keyboard_edit_button_content_library_or_cancel, inline_keyboard_cancel_edit_library_button, \
@@ -77,7 +78,7 @@ from .feedback_buttons import inline_keyboard_feedback, inline_keyboard_send_msg
 from .almaushop_buttons import inline_keyboard_faq_almaushop, inline_keyboard_faq_almaushop_back
 from .navigation_buttons import inline_keyboard_nav_unifi, inline_keyboard_contacts_center, \
     inline_keyboard_contacts_center_back
-from .certificate_buttons import inline_keyboard_certificate, inline_keyboard_get_certificate, \
+from .certificate_buttons import inline_keyboard_certificate, inline_keyboard_certificate_back, \
     inline_keyboard_send_req_data, inline_keyboard_cancel_request
 from .schedule_buttons import inline_keyboard_schedule
 from .menu_buttons import inline_keyboard_menu

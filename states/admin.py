@@ -133,9 +133,15 @@ class EditButtonContentCertificate(StatesGroup):
     confirm = State()
 
 
+class AddDocumentCertificate(StatesGroup):
+    button_file = State()
+    confirm = State()
+
+
 class AddCertificateInstruction(StatesGroup):
     button_name = State()
     button_content = State()
+    button_file = State()
     confirm_add = State()
 
 

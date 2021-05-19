@@ -203,10 +203,19 @@ async def callback_inline_almaushop(call: CallbackQuery):
 @dp.callback_query_handler(text='/certificate')
 async def callback_inline_certificate(call: CallbackQuery):
     logging.info(f"User({call.message.chat.id}) вошел в Получение справки")
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Получение справки с места учебы ↘ \n' \
-                                     'Вы можете получить инструкции для получения справок онлайн или оставить заявку на получение справки физически с места учебы по месту требования (военкомат и тд.)',
-                                reply_markup=await inline_keyboard_certificate())
+    if call.message.content_type == 'text':
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Получение справки с места учебы ↘ \n' \
+                                         'Вы можете получить инструкции для получения справок онлайн или оставить заявку на получение справки физически с места учебы по месту требования (военкомат и тд.)',
+                                    reply_markup=await inline_keyboard_certificate())
+    else:
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
+        await bot.send_message(chat_id=call.message.chat.id, text='Получение справки с места учебы ↘ \n' \
+                                                                  'Вы можете получить инструкции для получения справок онлайн '
+                                                                  'или оставить заявку на получение справки физически с '
+                                                                  'места учебы по месту требования (военкомат и тд.)',
+                               reply_markup=await inline_keyboard_certificate())
     await call.answer()
 
 

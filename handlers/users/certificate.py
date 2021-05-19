@@ -13,8 +13,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # Импорт клавиатур
-from keyboards.inline import inline_keyboard_get_certificate, inline_keyboard_send_req_data, instruction_callback, \
-    inline_keyboard_cancel_request
+from keyboards.inline import inline_keyboard_send_req_data, instruction_callback, \
+    inline_keyboard_cancel_request, inline_keyboard_certificate_back
 from keyboards.default import keyboard_request_send_phone, keyboard_certificate_type, \
     keyboard_feedback_send_phone, always_stay_menu_keyboard
 from utils import db_api as db
@@ -46,7 +46,15 @@ async def callback_inline(call: CallbackQuery, callback_data: dict):
     logging.info(f'call = {call.data}')
     id = callback_data.get('id')
     button_content = await db.select_instruction(id)
-    await bot.send_message(call.message.chat.id, button_content)
+    if button_content['button_file']:
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=button_content['button_content'])
+        await bot.send_document(call.message.chat.id, button_content['button_file'],
+                                reply_markup=inline_keyboard_certificate_back())
+    else:
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text=button_content['button_content'],
+                                    reply_markup=inline_keyboard_certificate_back())
     await call.answer()
 
 
@@ -147,15 +155,9 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
                                           data['type'])
 
     email_message = MIMEMultipart("alternative")
-<<<<<<< HEAD
-    email_message["From"] = "almaubot@gmail.com"
-    email_message["To"] = "ketchupass10@gmail.com"
-    email_message["Subject"] = "Заявка на получение справки с места учебы"
-=======
     email_message["From"] = email_bot
     email_message["To"] = email_certificate
     email_message["Subject"] = "Заявка на получение справки"
->>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9
     sending_message = MIMEText(
         f"<html>"
         f"<body>"
@@ -178,28 +180,13 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
                           hostname=hostname_bot,
                           port=port_bot,
                           start_tls=True,
-<<<<<<< HEAD
-                          username="almaubot@gmail.com",
-                          password="mjykwcchpvduwcjy")
-=======
                           username=email_bot,
                           password=email_bot_password)
->>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     await bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Заявка успешно отправлена")
     await bot.send_message(chat_id=call.message.chat.id,
                            text='Заявка успешно отправлена',
                            reply_markup=always_stay_menu_keyboard())
-<<<<<<< HEAD
-    # try:
-    #     await bot.send_message(476219167, f"Пришла заявка на получение справки:\n"
-    #                                   f"ФИО - {data['names']}\n"
-    #                                   f"Email - {data['email']}\n"
-    #                                   f"Телефон - {data['phone']}\n"
-    #                                   f"Вид справки - {data['type']}")
-    # except Exception as err:
-    #     logging.exception(err)
-=======
     try:
         for admin in (await db.find_id_by_role('certificate_admin')):
             await bot.send_message(admin['idt'], f"Пришла заявка на получение справки:\n"
@@ -209,4 +196,3 @@ async def callback_inline_send_request(call: CallbackQuery, state: FSMContext):
                                                  f"• Вид справки - {data['type']}")
     except Exception as err:
         logging.exception(err)
->>>>>>> 178d10730a1f803b98bb0b87045039eec1d669b9

@@ -47,10 +47,10 @@ from .admin_navigation_buttons import inline_keyboard_nav_university_admin_menu,
 
 # Админ кнопки для Справок
 from .admin_certificate_buttons import inline_keyboard_certificate_admin, cancel_or_send_certificate, \
-    cancel_or_update_certificate, cancel_or_delete_certificate, inline_keyboard_upd_req_certificate, \
-    inline_keyboard_update_certificate, inline_keyboard_del_req_certificate, inline_keyboard_delete_certificate, \
+    cancel_or_update_instruction, cancel_or_delete_instruction, inline_keyboard_upd_instruction, \
+    inline_keyboard_update_certificate, inline_keyboard_del_instruction, inline_keyboard_delete_certificate, \
     inline_keyboard_cancel_certificate, inline_keyboard_get_certificate_type, \
-    inline_keyboard_on_send_request_certificate
+    inline_keyboard_on_send_request_certificate, cancel_edit_instruction, cancel_or_add_instruction
 
 from .admin_library_buttons import inline_keyboard_library_first_page_admin, inline_keyboard_library_second_page_admin, \
     inline_keyboard_edit_button_content_library_or_cancel, inline_keyboard_cancel_edit_library_button, \
@@ -64,8 +64,8 @@ from .admin_main_buttons import inline_keyboard_admin, inline_keyboard_library_a
 # CALLBACK DATAS фильтр
 from .callback_datas import almau_shop_faq_callback, almau_shop_faq_edit_callback, almau_shop_faq_delete_callback, \
     main_faq_edit_callback, main_faq_delete_callback, main_faq_callback, schedule_callback, schedule_update_callback, \
-    schedule_delete_callback, certificate_callback, certificate_update_callback, certificate_delete_callback, \
-    request_callback, request_type_callback, request_update_callback, request_delete_callback, \
+    schedule_delete_callback, instruction_callback, certificate_update_callback, certificate_delete_callback, \
+    request_callback, request_type_callback, instruction_update_callback, instruction_delete_callback, \
     cabinet_callback, cabinet_callback_update, nav_center_callback_update, nav_center_callback_delete, \
     nav_center_callback, lib_res_callback, lib_res_delete_callback
 

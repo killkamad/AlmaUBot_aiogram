@@ -23,15 +23,15 @@ schedule_update_callback = CallbackData('schupd', 'schedule_id')
 schedule_delete_callback = CallbackData('schdel', 'schedule_id')
 
 # Certificate
-certificate_callback = CallbackData('crt', 'id')
+instruction_callback = CallbackData('inst', 'id')
 certificate_update_callback = CallbackData('crtu', 'id')
 certificate_delete_callback = CallbackData('crtd', 'id')
 
 # Request
 request_callback = CallbackData('req', 'id')
 request_type_callback = CallbackData('reqt', 'id')
-request_update_callback = CallbackData('requ', 'id')
-request_delete_callback = CallbackData('reqd', 'id')
+instruction_update_callback = CallbackData('instu', 'id')
+instruction_delete_callback = CallbackData('instd', 'id')
 
 # map-navigation
 cabinet_callback = CallbackData('cab', 'id')

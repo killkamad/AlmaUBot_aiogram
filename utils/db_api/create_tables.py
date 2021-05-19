@@ -329,6 +329,26 @@ async def create_table_certificate():
         print(error)
 
 
+# Создание таблицы для кнопок меню справок
+async def create_table_certificate_menu_buttons():
+    pool: Connection = db
+    try:
+        async with pool.acquire() as connection:
+            sql_ex = """
+                CREATE TABLE if not exists certificate_menu_buttons(
+                id  serial unique primary key,
+                id_Telegram INT NOT NULL,
+                button_name VARCHAR (300),
+                button_content VARCHAR (4000),
+                date_time TIMESTAMP)
+                """
+            record: Record = await connection.fetchval(sql_ex)
+            print('Table certificate_menu_buttons successfully created')
+            return record
+    except(Exception, ErrorInAssignmentError) as error:
+        print(error)
+
+
 # Создание таблицы для карты навигации
 async def create_table_map_navigation():
     pool: Connection = db
@@ -387,6 +407,7 @@ async def set_up_tables():
         await create_table_library_menu_buttons()
         await create_table_library_resources()
         await create_table_contact_centers()
+        await create_table_certificate_menu_buttons()
     except Exception as error:
         print(f'Error - {error}')
 

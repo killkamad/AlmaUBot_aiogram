@@ -128,6 +128,22 @@ class DeleteCertificate(StatesGroup):
     confirm_delete = State()
 
 
+class EditButtonContentCertificate(StatesGroup):
+    button_content = State()
+    confirm = State()
+
+
+class AddCertificateInstruction(StatesGroup):
+    button_name = State()
+    button_content = State()
+    confirm_add = State()
+
+
+class DeleteCertificateInstruction(StatesGroup):
+    button_name = State()
+    confirm_delete = State()
+
+
 class MapNavigation(StatesGroup):
     building = State()
     floor = State()

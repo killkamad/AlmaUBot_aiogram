@@ -14,9 +14,8 @@ async def inline_keyboard_certificate():
                                       callback_data=instruction_callback.new(id=item['id'])) for item in
                  instructions])
     callback_button_link = InlineKeyboardButton(text=almaunion_link_button_text, url='https://almaunion.almau.edu.kz/report')
-    callback_button_req = InlineKeyboardButton(text=request_button_text, callback_data='request_certificate')
-    # callback_button2 = InlineKeyboardButton(text="⬅ Назад", callback_data="go_back")
-    markup.add(callback_button_link, callback_button_req)
+    # callback_button_req = InlineKeyboardButton(text=request_button_text, callback_data='request_certificate')  # Кнопка оставить заявку на справку
+    markup.add(callback_button_link)
     return markup
 
 

@@ -4,7 +4,6 @@ from keyboards.inline.menu_buttons import inline_keyboard_menu
 from loader import dp, bot
 import logging
 
-from utils.json_loader import json_data
 from utils.misc import rate_limit
 from .menu import _main_menu_text
 from data.button_names.main_menu_buttons import start_menu_buttons, menu_button, about_button

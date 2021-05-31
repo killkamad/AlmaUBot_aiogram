@@ -17,14 +17,13 @@ from data.button_names.almaushop_buttons import almaushop_products_button, almau
     almaushop_contacts_button, almaushop_faq_button, almaushop_def_buttons
 
 
-# Библиотека регулярных выражений
 @rate_limit(3)
 @dp.message_handler(lambda message: message.text in [almaushop_products_button, almaushop_books_button])
 async def almaushop_text_buttons_parser_handler(message: types.Message):
     logging.info(f"User({message.chat.id}) нажал на {message.text}")
     await db.add_bot_log(message.chat.id, message.text, f"{__name__}.py [LINE:{get_linenumber()}]")
     albums_list = []
-    start = 0
+    start_point = 0
     messages_sent = 0
     if message.text == almaushop_products_button:
         data = await db.almaushop_select_data()
@@ -41,8 +40,8 @@ async def almaushop_text_buttons_parser_handler(message: types.Message):
             albums_list.append(InputMediaPhoto(item["img"], caption=text))
     for i in range(1, ceil(len(albums_list) / 10) + 1):
         await bot.send_chat_action(message.chat.id, ChatActions.UPLOAD_PHOTO)
-        await bot.send_media_group(message.chat.id, albums_list[start:10 * i])
-        start += 10
+        await bot.send_media_group(message.chat.id, albums_list[start_point:10 * i])
+        start_point += 10
         messages_sent += 1
         if messages_sent % 30 == 0:
             await asyncio.sleep(1)

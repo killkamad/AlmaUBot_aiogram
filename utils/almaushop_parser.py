@@ -5,7 +5,6 @@ import collections
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('wb')
 
 ParseResult_merch = collections.namedtuple(
     'ParseResult_merch',
@@ -99,7 +98,7 @@ class AlmauShop:
         self.parse_page(text=text)
         # logger.info(f'Получено {len(self.result)} товаров')
         for i in self.result:
-            logger.info(i)
+            logging.info(i)
             # logger.info(i.product_name)
 
 
@@ -174,9 +173,9 @@ class AlmauShopBooks:
     def run(self):
         text = self.load_page()
         self.parse_page(text=text)
-        logger.info(f'Получено {len(self.result)} товаров')
-        # for i in self.result:
-        #     logger.info(i)
+        logging.info(f'Получено {len(self.result)} товаров')
+        for i in self.result:
+            logging.info(i)
 
 
 def main():

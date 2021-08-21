@@ -431,6 +431,7 @@ async def set_up_tables():
         await create_table_library_resources()
         await create_table_contact_centers()
         await create_table_certificate_menu_buttons()
+        await create_table_bot_log()
     except Exception as error:
         print(f'Error - {error}')
 

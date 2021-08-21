@@ -1,6 +1,7 @@
 import asyncio
 from asyncpg import ErrorInAssignmentError, Connection, Record
 from loader import db
+
 import logging
 
 

@@ -44,7 +44,7 @@ async def cmd_set_commands(message: types.Message):
         commands = [types.BotCommand(command="/menu", description="главное меню"),
                     types.BotCommand(command="/help", description="помощь"),
                     types.BotCommand(command="/admin", description="админ меню"),
-                    types.BotCommand(command="/set_commands", description="установка команд бота"),
+                    # types.BotCommand(command="/set_commands", description="установка команд бота"),
                     types.BotCommand(command="/cancel", description="выход из диалога с ботом")
                     ]
         await bot.set_my_commands(commands)
